@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         // Renamed 'man_female' to 'gender_target' for clarity
         gender_target: {
-            type: DataTypes.ENUM('man', 'female'),
+            type: DataTypes.ENUM('male', 'female'),
             allowNull: false,
         },
         washing: {

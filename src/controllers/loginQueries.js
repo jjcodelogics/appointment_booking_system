@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('../middleware/passport');
-const db = require('../models'); // Changed from '{ users }' to 'db' for consistency
-// REMOVED: const { read } = require('fs');
-// REMOVED: const { body, validationResult } = require('express-validator'); 
+const db = require('../models');  
 const asyncHandler = require('express-async-handler');
 
 // NEW ZOD IMPORTS

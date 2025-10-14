@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const db = require('./models');
-const emailService = require('./services/emailService');
+const db = require('./src/models');
+const emailService = require('./src/services/emailService');
 
 const { Appointment, User } = db;
 

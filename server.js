@@ -1,57 +1,55 @@
-// This file is a dedicated Passport.js configuration file.
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcryptjs');
-const db = require('../models');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const helmet = require('helmet');
+const session = require('express-session');
+const passport = require('./src/middleware/passport');
 
-// Configure the local strategy for authentication.
-passport.use(
-  new LocalStrategy(async (username, password, done) => {
-    try {
-      const user = await db.Users.findOne({ where: { username: username } });
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
+// Middleware
+app.use(helmet());
+dotenv.config();
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-      // Use bcrypt to securely compare the hashed password from the database
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const db = require('./src/models');
+const store = new SequelizeStore({ db: db.sequelize });
+store.sync();
 
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
+// session and passport setup
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 172800000, sameSite: "none", httpOnly: true  },
+    store: store 
   })
 );
 
-// Serialize user: This determines which user data to store in the session.
-// We store the user's ID because it's a small, unique identifier.
-passport.serializeUser((user, done) => {
-  done(null, user.user_id); // Use user.user_id from your model
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Import and start the scheduler
+const { startReminderScheduler } = require('./scheduler');
+startReminderScheduler();
+
+
+// Import and use your routers
+const loginRouter = require('./src/controllers/loginQueries');
+app.use('/auth', loginRouter);
+const pageRouter = require('./src/controllers/appointmentQueriesU');
+app.use('/myappointments', pageRouter);
+const contestRouter = require('./src/controllers/appointmentsQueriesA');
+app.use('/appointments', contestRouter);
+
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
-
-// Deserialize user: This retrieves the full user object from the database
-// based on the ID stored in the session.
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await db.Users.findByPk(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
-
-// Middleware to check if a user is authenticated
-// We can now attach this directly to the passport object for easier access.
-passport.isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ msg: 'You are not logged in' });
-};
-
-// Export the passport object itself, which contains all the configured methods
-// and our custom isAuthenticated function.
-module.exports = passport;
