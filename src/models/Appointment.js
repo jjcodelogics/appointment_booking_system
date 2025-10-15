@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            foreignKey: true,
         },
         appointment_date: { 
             type: DataTypes.DATE,
