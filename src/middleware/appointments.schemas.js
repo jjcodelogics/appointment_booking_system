@@ -1,5 +1,5 @@
 // middleware/appointment.schemas.js (New file)
-const { z } = require('zod');
+import { z } from 'zod';
 
 // Zod schema for a valid future date
 const appointmentDateSchema = z.string().refine(
@@ -47,7 +47,7 @@ const IdParamSchema = z.object({
     }),
 });
 
-module.exports = {
+export default {
     CreateAppointmentSchema,
     UpdateAppointmentSchema,
     IdParamSchema,

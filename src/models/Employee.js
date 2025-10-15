@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   // Renamed to 'Employee' for PascalCase consistency with other models
   const Employee = sequelize.define('Employee', { 
     employee_id: {

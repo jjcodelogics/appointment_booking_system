@@ -8,6 +8,6 @@ const isAuthenticated = (req, res, next) => {
     res.status(401).json({ msg: 'Authentication required. You are not logged in.' });
 };
 
-module.exports = {
+export default {
     isAuthenticated
 };

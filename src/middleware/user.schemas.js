@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 const UserRegisterSchema = z.object({
   body: z.object({
@@ -15,4 +15,4 @@ const UserLoginSchema = z.object({
   }),
 });
 
-module.exports = { UserRegisterSchema, UserLoginSchema };
+export default { UserRegisterSchema, UserLoginSchema };

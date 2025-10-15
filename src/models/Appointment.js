@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
     const Appointment = sequelize.define('Appointment', {
         // --- All your fields go inside this object ---
         appointment_id: {

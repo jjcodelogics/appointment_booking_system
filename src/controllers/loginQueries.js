@@ -1,14 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('../middleware/passport');
-const db = require('../models');  
-const asyncHandler = require('express-async-handler');
-
-// NEW ZOD IMPORTS
-const validate = require('../middleware/validate');
-const { UserRegisterSchema, UserLoginSchema } = require('../middleware/user.schemas');
-// END NEW ZOD IMPORTS
-
+import { Router } from 'express';
+const router = Router();
+import passport from '../middleware/passport.js'; 
+import asyncHandler from 'express-async-handler';
+import validate from '../middleware/validate.js';
+import userSchemas from '../middleware/user.schemas.js';
+const { UserRegisterSchema, UserLoginSchema } = userSchemas;
+import dbModels from '../models/index.js'; 
+const { User } = dbModels; 
 
 // Route for user registration.
 router.post('/register', 
@@ -16,12 +14,11 @@ router.post('/register',
   validate(UserRegisterSchema),
   
   async (req, res) => {
-    // OLD EXPRESS-VALIDATOR ERROR HANDLING REMOVED. Zod's middleware handles it.
     
     const { username_email, name, password } = req.body; 
     try {
       // Data is now guaranteed to be valid and sanitized by Zod
-      const newUser = await db.User.create({
+      const newUser = await User.create({
         username_email,
         name,
         password, 
@@ -53,7 +50,7 @@ router.post(
   // NEW ZOD VALIDATION
   validate(UserLoginSchema),
   // PASSPORT AUTHENTICATION
-  passport.authenticate('local', { session: true }),
+  authenticate('local', { session: true }),
   (req, res) => {
     res.json({
         msg: 'Logged in successfully',
@@ -86,4 +83,4 @@ router.post('/logout', (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

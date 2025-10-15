@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
     // Renamed to 'Service' for PascalCase consistency with other models
     const Service = sequelize.define('Service', {
         service_id: {
