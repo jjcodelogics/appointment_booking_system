@@ -1,24 +1,23 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../models');
-const auth = require('../middleware/authMiddleware');
-const authZ = require('../middleware/authZMiddleware');
-const asyncHandler = require('express-async-handler');
-// REMOVED: const { body, param, validationResult } = require('express-validator');
+import { Router } from 'express';
+const router = Router();
+import { isAuthenticated } from '../middleware/authMiddleware.js';
+import { isAdmin } from '../middleware/authZMiddleware.js';
+import asyncHandler from 'express-async-handler';
+import validate from '../middleware/validate.js';
 
-// NEW ZOD IMPORTS
-const validate = require('../middleware/validate');
-const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = require('../middleware/appointments.schemas');
-// END NEW ZOD IMPORTS
+// FIX 1: Import the schemas object (default export)
+import appointmentsSchemas from '../middleware/appointments.schemas.js';
+// FIX 2: Destructure the needed schemas from the object
+const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas;
 
-// Get our Appointment model
-const { Appointment } = db;
+import dbModels from '../models/index.js'; 
+// FIX 3: Destructure all needed models from dbModels
+const { User, Appointment } = dbModels; 
 
-// REMOVED: Middleware to handle validation results (handleValidationErrors)
 
 //routes for admin to manage all appointments
 // GET /appointments - Fetches all appointments (Admin only)
-router.get('/', auth.isAuthenticated, authZ.isAdmin, asyncHandler(async (req, res) => {
+router.get('/', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
   const appointments = await Appointment.findAll();
   res.json(appointments);
 }));
@@ -26,8 +25,8 @@ router.get('/', auth.isAuthenticated, authZ.isAdmin, asyncHandler(async (req, re
 // POST /appointments - Creates a new appointment (Admin only)
 router.post(
   '/',
-  auth.isAuthenticated,
-  authZ.isAdmin,
+  isAuthenticated,
+  isAdmin,
   // NEW ZOD VALIDATION
   validate(CreateAppointmentSchema), 
   asyncHandler(async (req, res) => {
@@ -42,8 +41,8 @@ router.post(
 // PUT /appointments/:id - Updates an existing appointment (Admin only)
 router.put(
   '/:id',
-  auth.isAuthenticated,
-  authZ.isAdmin,
+  isAuthenticated,
+  isAdmin,
   // NEW ZOD VALIDATION
   validate(UpdateAppointmentSchema),
   asyncHandler(async (req, res) => {
@@ -62,8 +61,8 @@ router.put(
 // DELETE /appointments/:id - Deletes an appointment (Admin only)
 router.delete(
   '/:id',
-  auth.isAuthenticated,
-  authZ.isAdmin,
+  isAuthenticated,
+  isAdmin,
   // NEW ZOD VALIDATION
   validate(IdParamSchema),
   asyncHandler(async (req, res) => {
@@ -80,4 +79,4 @@ router.delete(
   })
 );
 
-module.exports = router;
+export default router;

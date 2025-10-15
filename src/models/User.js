@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt');
-const { z } = require('zod');
+import { genSalt, hash, compare } from 'bcrypt';
+import { z } from 'zod';
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     user_id: {
       type: DataTypes.INTEGER,
@@ -35,15 +35,15 @@ module.exports = (sequelize, DataTypes) => {
   // This removes the need to hash manually in the /register route.
   User.beforeCreate(async (user) => {
     if (user.password) {
-      const salt = await bcrypt.genSalt(10); 
-      user.password = await bcrypt.hash(user.password, salt);
+      const salt = await genSalt(10); 
+      user.password = await hash(user.password, salt);
     }
   });
 
 
   User.prototype.validPassword = async function (password) {
     // bcrypt.compare safely compares a plaintext string to a stored hash
-    return await bcrypt.compare(password, this.password);
+    return await compare(password, this.password);
   };
 
   // Define associations (Relationships)

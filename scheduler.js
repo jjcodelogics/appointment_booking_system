@@ -1,7 +1,9 @@
-const cron = require('node-cron');
-const { Op } = require('sequelize');
-const db = require('./src/models');
-const emailService = require('./src/services/emailService');
+import { schedule } from 'node-cron';
+import { Op } from 'sequelize';
+import db from './src/models/index.js';
+import { sendAppointmentReminder } from './src/services/emailService.js';
+
+
 
 const { Appointment, User } = db;
 
@@ -9,7 +11,7 @@ const { Appointment, User } = db;
 // Cron syntax: [minute] [hour] [day_of_month] [month] [day_of_week]
 // '0 * * * *' means "at minute 0 of every hour"
 const startReminderScheduler = () => {
-  cron.schedule('0 * * * *', async () => {
+  schedule('0 * * * *', async () => {
     console.log('Running hourly check for appointment reminders...');
 
     // Find appointments that are today and haven't had a reminder sent yet
@@ -52,4 +54,4 @@ const startReminderScheduler = () => {
   });
 };
 
-module.exports = { startReminderScheduler };
+export { startReminderScheduler };

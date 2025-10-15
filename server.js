@@ -1,25 +1,26 @@
-const express = require('express');
+import express from 'express'
 const app = express();
 const port = process.env.PORT || 3000;
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const helmet = require('helmet');
-const session = require('express-session');
-const passport = require('./src/middleware/passport');
+import pkg from 'body-parser';
+const { json, urlencoded } = pkg;
+import cors from 'cors';
+import 'dotenv/config'
+import helmet from 'helmet';
+import session, { Store } from 'express-session';
+import passport from './src/middleware/passport.js';
 
 // Middleware
 app.use(helmet());
-dotenv.config();
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
 }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const db = require('./src/models');
+import connectSessionSequelize from 'connect-session-sequelize';
+import db from './src/models/index.js';
+const SequelizeStore = connectSessionSequelize(Store);
 const store = new SequelizeStore({ db: db.sequelize });
 store.sync();
 
@@ -38,16 +39,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Import and start the scheduler
-const { startReminderScheduler } = require('./scheduler');
+import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();
 
 
 // Import and use your routers
-const loginRouter = require('./src/controllers/loginQueries');
+import loginRouter from './src/controllers/loginQueries.js';
 app.use('/auth', loginRouter);
-const pageRouter = require('./src/controllers/appointmentQueriesU');
+import pageRouter from './src/controllers/appointmentQueriesU.js';
 app.use('/myappointments', pageRouter);
-const contestRouter = require('./src/controllers/appointmentsQueriesA');
+import contestRouter from './src/controllers/appointmentsQueriesA.js';
 app.use('/appointments', contestRouter);
 
 app.listen(port, () => {

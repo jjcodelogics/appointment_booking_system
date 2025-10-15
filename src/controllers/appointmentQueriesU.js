@@ -1,31 +1,25 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../models');
-const auth = require('../middleware/authMiddleware');
-const authZ = require('../middleware/authZMiddleware');
-const asyncHandler = require('express-async-handler');
-// REMOVED: const { body, param, validationResult } = require('express-validator');
-const emailService = require('../services/emailService');
+import { Router } from 'express';
+const router = Router();
+import { isAuthenticated } from '../middleware/authMiddleware.js';
+import { canAccess } from '../middleware/authZMiddleware.js'; // This is a correct Named Export from its file
+import asyncHandler from 'express-async-handler';
+import { sendBookingConfirmation, sendAppointmentReminder } from '../services/emailService.js';
+import { z } from 'zod';
+import validate from '../middleware/validate.js';
 
-// NEW ZOD IMPORTS
-const { z } = require('zod');
-const validate = require('../middleware/validate');
-const { 
-  IdParamSchema, 
-  idSchema, 
-  appointmentDateSchema 
-} = require('../middleware/appointments.schemas');
-// END NEW ZOD IMPORTS
+// Correct Schema Destructuring from default export
+import appointmentsSchemas from '../middleware/appointments.schemas.js'; 
+const { IdParamSchema, idSchema, appointmentDateSchema } = appointmentsSchemas;
 
-// Get our Appointment model from the database connection
-const { Appointment } = db;
+// Correct Model Destructuring from default export
+import dbModels from '../models/index.js'; 
+const { User, Appointment } = dbModels; 
 
-// REMOVED: Middleware to handle validation results (handleValidationErrors)
 
 // routes for users to manage their own appointments
 
 // GET /myappointments - Fetches all appointments for the logged-in user
-router.get('/', auth.isAuthenticated, authZ.canAccess, asyncHandler(async (req, res) => {
+router.get('/', isAuthenticated, canAccess, asyncHandler(async (req, res) => {
   const appointments = await Appointment.findAll({
     where: { user_id: req.user.user_id },
   });
@@ -35,8 +29,8 @@ router.get('/', auth.isAuthenticated, authZ.canAccess, asyncHandler(async (req, 
 // POST /myappointments/book - Creates a new appointment
 router.post(
   '/book',
-  auth.isAuthenticated,
-  authZ.canAccess,
+  isAuthenticated,
+  canAccess,
   // NEW ZOD VALIDATION (Inline Schema Composition)
   validate(z.object({
     body: z.object({
@@ -60,7 +54,7 @@ router.post(
       notes
     });
     // Send confirmation email
-    emailService.sendBookingConfirmation(req.user.username_email, newAppointment);
+    sendBookingConfirmation(req.user.username_email, newAppointment);
     res.status(201).json({
       msg: 'Appointment booked successfully!',
       appointment: newAppointment,
@@ -71,8 +65,8 @@ router.post(
 // PUT /myappointments/reschedule/:id - Reschedules an existing appointment
 router.put(
   '/reschedule/:id',
-  auth.isAuthenticated,
-  authZ.canAccess,
+  isAuthenticated,
+  canAccess,
   // NEW ZOD VALIDATION (Combining param validation and body validation)
   validate(z.object({
     params: IdParamSchema.shape.params, // Re-use ID validation for the URL parameter
@@ -102,8 +96,8 @@ router.put(
 // DELETE /myappointments/cancel/:id - Cancels an appointment
 router.delete(
   '/cancel/:id',
-  auth.isAuthenticated,
-  authZ.canAccess,
+  isAuthenticated,
+  canAccess,
   // NEW ZOD VALIDATION
   validate(IdParamSchema),
   asyncHandler(async (req, res) => {
@@ -121,4 +115,4 @@ router.delete(
   })
 );
 
-module.exports = router;
+export default router;

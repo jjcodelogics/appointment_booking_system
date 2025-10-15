@@ -1,9 +1,9 @@
  // services/emailService.js
 
-const nodemailer = require('nodemailer');
+import { createTransport } from 'nodemailer';
 
 // 1. Create a "transporter" - this is the object that can send mail
-const transporter = nodemailer.createTransport({
+const transporter = createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
   secure: false, // true for 465, false for other ports
@@ -61,8 +61,7 @@ const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
     }
 };
 
-
-module.exports = {
+export {
   sendBookingConfirmation,
   sendAppointmentReminder,
 };
