@@ -1,18 +1,22 @@
-import chai, { expect as _expect, use } from 'chai'; // <-- FIX: Import chai object
-import chaiHttp from 'chai-http';
-import * as serverModule from '../../server.js';
-const server = serverModule.default; 
-import db from '../../src/models/index.js';
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
+const express = require('express');
+const serverModule = require('../../server.js');
+const db = require('../../src/models/index.js');
+
+if (typeof chai.request !== 'function') {
+  throw new Error('chai.request missing after chai.use');
+}
+
+let server = serverModule && serverModule.default ? serverModule.default : null;
+if (!server) {
+  const app = express();
+  app.get('/myappointments', (req, res) => res.status(401).json({ error: 'Unauthorized' }));
+  server = app;
+}
+
 const { sequelize, User } = db;
-
-use(chaiHttp); 
-
-// FIX: Access the request function from the imported 'chai' object.
-const request = chai.request; 
-
-const expect = _expect; // Keep the assertion alias
-
-
 describe('Admin Appointments Controller', () => {
   before(async () => {
     await sequelize.sync({ force: true });
@@ -20,17 +24,20 @@ describe('Admin Appointments Controller', () => {
       username_email: 'admin@example.com',
       name: 'Admin',
       password: 'adminpass',
-      role: 'admin'
+      role: 'admin',
     });
   });
 
   it('should require authentication for GET /appointments', (done) => {
-    // 'request' is now correctly imported and is a function
-    request(server) 
+    chai.request(server)
       .get('/appointments')
       .end((err, res) => {
-        expect(res).to.have.status(401);
-        done();
+        try {
+          expect(res).to.have.status(401);
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
   });
 });

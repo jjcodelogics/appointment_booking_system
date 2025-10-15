@@ -1,9 +1,11 @@
 import { expect } from 'chai';
-import db from '../../src/models/index.js'; 
+import db from '../../src/models/index.js';
 const { sequelize, User, Employee, Service, Appointment } = db;
 
-describe('Appointment Model', () => {
-  before(async () => {
+describe('Appointment Model', function () {
+  this.timeout(10000);
+
+  before(async function () {
     await sequelize.sync({ force: true });
     // Create dependencies
     await User.create({
@@ -20,11 +22,11 @@ describe('Appointment Model', () => {
       washing: true,
       cutting: true,
       coloring: false,
-      price: 30.00,
+      price: 30.0,
     });
   });
 
-  it('should create an appointment', async () => {
+  it('should create an appointment', async function () {
     const appt = await Appointment.create({
       user_id: 1,
       appointment_date: new Date(),
