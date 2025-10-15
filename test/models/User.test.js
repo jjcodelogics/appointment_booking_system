@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import db from '../../src/models';
+import db from '../../src/models/index.js'; 
+const { sequelize, User, Employee, Service, Appointment } = db;
 import { compare } from 'bcrypt';
 
 describe('User Model', () => {

@@ -1,7 +1,8 @@
 import express from 'express'
 const app = express();
 const port = process.env.PORT || 3000;
-import { json, urlencoded } from 'body-parser';
+import pkg from 'body-parser';
+const { json, urlencoded } = pkg;
 import cors from 'cors';
 import 'dotenv/config'
 import helmet from 'helmet';
@@ -38,8 +39,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Import and start the scheduler
-import schedulerExports from './scheduler.js'; 
-const { startReminderScheduler } = schedulerExports;
+import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();
 
 

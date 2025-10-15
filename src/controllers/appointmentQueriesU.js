@@ -1,13 +1,9 @@
 import { Router } from 'express';
 const router = Router();
-// FIX 1: Import the default object (which contains isAuthenticated)
-import authExports from '../middleware/authMiddleware.js'; 
-const { isAuthenticated } = authExports; // FIX 2: Destructure the function from the object
-
+import { isAuthenticated } from '../middleware/authMiddleware.js';
 import { canAccess } from '../middleware/authZMiddleware.js'; // This is a correct Named Export from its file
-
 import asyncHandler from 'express-async-handler';
-import { sendBookingConfirmation } from '../services/emailService.js';
+import { sendBookingConfirmation, sendAppointmentReminder } from '../services/emailService.js';
 import { z } from 'zod';
 import validate from '../middleware/validate.js';
 

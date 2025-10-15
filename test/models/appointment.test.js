@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { sequelize, User, Employee, Service, Appointment } from '../../src/models';
+import db from '../../src/models/index.js'; 
+const { sequelize, User, Employee, Service, Appointment } = db;
 
 describe('Appointment Model', () => {
   before(async () => {

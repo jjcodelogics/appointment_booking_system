@@ -1,7 +1,9 @@
 import { schedule } from 'node-cron';
 import { Op } from 'sequelize';
 import db from './src/models/index.js';
-import emailService from './src/services/emailService.js';
+import { sendAppointmentReminder } from './src/services/emailService.js';
+
+
 
 const { Appointment, User } = db;
 
@@ -52,4 +54,4 @@ const startReminderScheduler = () => {
   });
 };
 
-export default { startReminderScheduler };
+export { startReminderScheduler };

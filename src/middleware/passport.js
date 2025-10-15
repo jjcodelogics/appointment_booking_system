@@ -1,22 +1,15 @@
 // /src/middleware/passport.js
-
-import passportPkg from 'passport'; 
+import { Passport } from 'passport'; 
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcrypt';
-import dbModels from '../models/index.js'; 
+import dbModels from '../models/index.js';
 
-// Destructure utility functions from the imported passport package
-const { use, serializeUser, deserializeUser } = passportPkg;
+const passport = new Passport();
 
-// FIX: Destructure the model from dbModels and alias it to _User
 const { User: _User } = dbModels; 
-
-// Define aliases for use in the rest of the file
-const passport = passportPkg; 
 const User = _User; 
 
-// Configure the local strategy for authentication.
-use(
+passport.use(
   new LocalStrategy(
     { usernameField: 'username_email' }, 
     async (username_email, password, done) => {
@@ -40,12 +33,14 @@ use(
 );
 
 // Serialize user: We store the user's ID in the session.
-serializeUser((user, done) => {
+// FIX 4: Call the method on the 'passport' instance
+passport.serializeUser((user, done) => {
   done(null, user.user_id); 
 });
 
 // Deserialize user: This retrieves the full user object from the database
-deserializeUser(async (id, done) => {
+// FIX 4: Call the method on the 'passport' instance
+passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findByPk(id);
     done(null, user);

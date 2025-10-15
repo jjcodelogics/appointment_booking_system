@@ -45,19 +45,18 @@ router.post('/register',
 });
 
 // login route
+// login route
 router.post(
   '/login',
-  // NEW ZOD VALIDATION
   validate(UserLoginSchema),
-  // PASSPORT AUTHENTICATION
-  authenticate('local', { session: true }),
+  // --- FIX: Add "passport." before the authenticate call ---
+  passport.authenticate('local', { session: true }),
   (req, res) => {
     res.json({
         msg: 'Logged in successfully',
         user: {
             id: req.user.user_id,
-            // Use username_email for consistency
-            username: req.user.username_email, 
+            username: req.user.username_email,
         },
       redirection: '/dashboard', 
     });

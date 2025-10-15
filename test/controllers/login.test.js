@@ -1,10 +1,17 @@
-import { expect as _expect, use, request } from 'chai';
+import chai, { expect as _expect, use } from 'chai'; // <-- FIX: Import chai object
 import chaiHttp from 'chai-http';
-import server from '../../server.js';
-import { sequelize, User } from '../../src/models';
-const expect = _expect;
+import * as serverModule from '../../server.js';
+const server = serverModule.default; 
+import db from '../../src/models/index.js';
+const { sequelize, User } = db;
 
-use(chaiHttp);
+use(chaiHttp); 
+
+// FIX: Access the request function from the imported 'chai' object.
+const request = chai.request; 
+
+const expect = _expect; // Keep the assertion alias
+
 
 describe('Login Controller', () => {
   before(async () => {
@@ -17,7 +24,8 @@ describe('Login Controller', () => {
   });
 
   it('should register a new user', (done) => {
-    request(server)
+    // 2. 'request' is now correctly imported and is a function
+    request(server) 
       .post('/auth/register')
       .send({
         username_email: 'newuser@example.com',

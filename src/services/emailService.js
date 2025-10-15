@@ -61,8 +61,7 @@ const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
     }
 };
 
-
-export default {
+export {
   sendBookingConfirmation,
   sendAppointmentReminder,
 };
