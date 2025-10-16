@@ -1,6 +1,10 @@
  // services/emailService.js
 
 import { createTransport } from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config(); // Load environment variables from .env file
+
 
 // 1. Create a "transporter" - this is the object that can send mail
 const transporter = createTransport({
@@ -11,12 +15,15 @@ const transporter = createTransport({
     user: process.env.EMAIL_USER, // For SendGrid, this is the string "apikey"
     pass: process.env.EMAIL_PASS, // This is your SendGrid API key
   },
+  tls: {
+    rejectUnauthorized: false // Allow self-signed certificates (useful for testing)
+  }
 });
 
 // 2. Create a reusable function to send the confirmation email
 const sendBookingConfirmation = async (userEmail, appointmentDetails) => {
   const mailOptions = {
-    from: '"Your App Name" <no-reply@yourapp.com>',
+    from: 'jjcodelogics@gmail.com',
     to: userEmail,
     subject: 'Your Appointment is Confirmed!',
     html: `
@@ -40,7 +47,7 @@ const sendBookingConfirmation = async (userEmail, appointmentDetails) => {
 // 3. Create a function for the reminder email
 const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
     const mailOptions = {
-      from: '"Your App Name" <no-reply@yourapp.com>',
+      from: 'jjcodelogics@gmail.com',
         to: userEmail,
         subject: 'Appointment Reminder',
         html: `

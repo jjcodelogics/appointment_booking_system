@@ -9,11 +9,12 @@ import validate from '../middleware/validate.js';
 
 // Correct Schema Destructuring from default export
 import { appointmentDateSchema } from '../middleware/appointments.schemas.js';
-import { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } from '../middleware/appointments.schemas.js';
+import schemas from '../middleware/appointments.schemas.js'; 
+const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema, idSchema } = schemas;
 
 // Correct Model Destructuring from default export
 import dbModels from '../models/index.js'; 
-const { User, Appointment } = dbModels; 
+const { User, Appointment, Service } = dbModels; 
 
 
 // routes for users to manage their own appointments
@@ -56,33 +57,68 @@ router.post(
   // NEW ZOD VALIDATION (Inline Schema Composition)
   validate(z.object({
     body: z.object({
-        appointment_date: appointmentDateSchema,
-        service_id: idSchema,
-        employee_id: idSchema,
-        notes: z.string().trim().max(255).optional(), 
+      appointment_date: appointmentDateSchema,
+      // ✨ ADD THESE FIELDS TO MATCH THE FRONTEND STATE
+      gender: z.enum(['male', 'female']),
+      washing: z.boolean(),
+      coloring: z.boolean(),
+      cut: z.boolean(),
+      status: z.enum(['scheduled', 'completed', 'canceled']).optional(), 
+      employee_name: z.string().optional(),
+      notes: z.string().trim().max(255).optional(),
     }),
     // Always include these to ensure no extra data is passed
     params: z.object({}).optional(), 
     query: z.object({}).optional(),
   })),
-  asyncHandler(async (req, res) => {
-    const { appointment_date, service_id, employee_id, notes } = req.body;
+asyncHandler(async (req, res) => {
+    // 1. Extract validated fields from the body
+    const { appointment_date, gender, washing, coloring, cut, employee_name, notes } = req.body; 
 
+    console.log('Service Lookup Parameters:', {
+        gender_target: gender,
+        washing: washing,
+        coloring: coloring,
+        cutting: cut
+    });
+    // 2. Look up the Service ID based on the client's selected attributes
+    const selectedService = await Service.findOne({
+        where: {
+            gender_target: gender,
+            washing: washing,
+            coloring: coloring,
+            cutting: cut, // CRITICAL: Mapping client's 'cut' to model's 'cutting'
+        }
+    });
+
+    // 3. Handle case where no service matches the criteria
+    if (!selectedService) {
+        return res.status(404).json({ msg: 'No matching service found for your selected options.' });
+    }
+
+    // Define defaults/retrieved IDs
+    const serviceId = selectedService.service_id;
+    const DEFAULT_EMPLOYEE_ID = 1; // Keeping employee ID as a hardcoded default for now
+
+    // 4. Create the appointment using *only* the foreign keys (service_id, employee_id)
     const newAppointment = await Appointment.create({
       user_id: req.user.user_id,
       appointment_date,
-      service_id,
-      employee_id,
+      status: 'scheduled', 
+      service_id: serviceId,           // Dynamic ID retrieved from Service lookup
+      employee_id: DEFAULT_EMPLOYEE_ID, // Hardcoded default
       notes
     });
+    
     // Send confirmation email
     sendBookingConfirmation(req.user.username_email, newAppointment);
+
     res.status(201).json({
       msg: 'Appointment booked successfully!',
       appointment: newAppointment,
     });
-  })
-);
+})
+)
 
 // PUT /myappointments/reschedule/:id - Reschedules an existing appointment
 router.put(

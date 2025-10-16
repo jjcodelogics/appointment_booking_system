@@ -50,4 +50,5 @@ export default {
     CreateAppointmentSchema,
     UpdateAppointmentSchema,
     IdParamSchema,
+    idSchema
 };
