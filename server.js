@@ -8,15 +8,37 @@ import 'dotenv/config'
 import helmet from 'helmet';
 import session, { Store } from 'express-session';
 import passport from './src/middleware/passport.js';
+import { join } from 'path';
 
 // Middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "script-src": [
+          "'self'",
+          "https://unpkg.com",
+          "https://cdn.jsdelivr.net"
+        ],
+        // You can add other directives as needed
+      },
+    },
+  })
+);
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [
+      process.env.FRONTEND_URL,
+      'http://localhost:3000',
+      'http://127.0.0.1:5500'
+    ],
     credentials: true,
 }));
 app.use(json());
 app.use(urlencoded({ extended: true }));
+
+// Serve static files from the 'public' directory
+app.use(express.static(join(process.cwd(), 'public')));
 
 import connectSessionSequelize from 'connect-session-sequelize';
 import db from './src/models/index.js';
@@ -30,7 +52,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 172800000, sameSite: "none", httpOnly: true  },
+    cookie: { secure: false, maxAge: 172800000, sameSite: "lax", httpOnly: true  },
     store: store 
   })
 );
