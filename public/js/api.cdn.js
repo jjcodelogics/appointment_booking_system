@@ -7,14 +7,36 @@ async function request(endpoint, options = {}) {
     'Content-Type': 'application/json',
     ...options.headers,
   };
+
+  // Timeout logic for debugging
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  options.signal = controller.signal;
+
   try {
     const response = await fetch(url, options);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.msg || 'An error occurred');
-    return data;
+    clearTimeout(timeout);
+    const text = await response.text();
+    try {
+      const data = JSON.parse(text);
+      if (!response.ok) throw new Error(data.msg || 'An error occurred');
+      return data;
+    } catch (e) {
+      throw new Error('Invalid JSON response: ' + text);
+    }
   } catch (error) {
     throw error;
   }
+}
+
+// Get current user info
+async function getCurrentUser() {
+  return request('/me', { method: 'GET' });
+}
+
+// Get all booked appointment slots (no personal details)
+async function getAllBookedSlots() {
+  return request('/appointments/slots', { method: 'GET' });
 }
 
 window.api = {
@@ -41,4 +63,6 @@ window.api = {
   getAllAppointments: () => request('/appointments'),
   deleteAppointmentAsAdmin: (id) =>
     request(`/appointments/${id}`, { method: 'DELETE' }),
+  getCurrentUser: getCurrentUser,
+  getAllBookedSlots: getAllBookedSlots,
 };

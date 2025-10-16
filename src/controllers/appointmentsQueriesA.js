@@ -4,6 +4,8 @@ import { isAuthenticated } from '../middleware/authMiddleware.js';
 import { isAdmin } from '../middleware/authZMiddleware.js';
 import asyncHandler from 'express-async-handler';
 import validate from '../middleware/validate.js';
+import { z } from 'zod';
+import { canAccess } from '../middleware/authZMiddleware.js'; 
 
 // FIX 1: Import the schemas object (default export)
 import appointmentsSchemas from '../middleware/appointments.schemas.js';
@@ -17,7 +19,7 @@ const { User, Appointment } = dbModels;
 
 //routes for admin to manage all appointments
 // GET /appointments - Fetches all appointments (Admin only)
-router.get('/', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+router.get('/', isAuthenticated, canAccess(['admin']), asyncHandler(async (req, res) => {
   const appointments = await Appointment.findAll();
   res.json(appointments);
 }));

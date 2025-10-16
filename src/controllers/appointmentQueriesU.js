@@ -8,8 +8,8 @@ import { z } from 'zod';
 import validate from '../middleware/validate.js';
 
 // Correct Schema Destructuring from default export
-import appointmentsSchemas from '../middleware/appointments.schemas.js'; 
-const { IdParamSchema, idSchema, appointmentDateSchema } = appointmentsSchemas;
+import { appointmentDateSchema } from '../middleware/appointments.schemas.js';
+import { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } from '../middleware/appointments.schemas.js';
 
 // Correct Model Destructuring from default export
 import dbModels from '../models/index.js'; 
@@ -19,9 +19,31 @@ const { User, Appointment } = dbModels;
 // routes for users to manage their own appointments
 
 // GET /myappointments - Fetches all appointments for the logged-in user
-router.get('/', isAuthenticated, canAccess, asyncHandler(async (req, res) => {
+
+router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(async (req, res) => {
+  try {
+    console.log('User:', req.user);
+    const appointments = await Appointment.findAll({
+      where: { user_id: req.user.user_id },
+    });
+    console.log('Appointments:', appointments);
+    res.json(appointments);
+  } catch (err) {
+    console.error('Error fetching appointments:', err);
+    res.status(500).json({ msg: 'Server error fetching appointments.' });
+  }
+}));
+
+// GET /me - returns current user info
+router.get('/me', isAuthenticated, (req, res) => {
+  res.json({ name: req.user.name, email: req.user.username_email });
+});
+
+// GET /appointments/slots - returns all booked slots (date/time only)
+router.get('/appointments/slots', asyncHandler(async (req, res) => {
   const appointments = await Appointment.findAll({
-    where: { user_id: req.user.user_id },
+    attributes: ['appointment_date'],
+    where: { status: 'booked' }
   });
   res.json(appointments);
 }));
@@ -30,7 +52,7 @@ router.get('/', isAuthenticated, canAccess, asyncHandler(async (req, res) => {
 router.post(
   '/book',
   isAuthenticated,
-  canAccess,
+  canAccess(['user', 'admin']),
   // NEW ZOD VALIDATION (Inline Schema Composition)
   validate(z.object({
     body: z.object({
@@ -66,7 +88,7 @@ router.post(
 router.put(
   '/reschedule/:id',
   isAuthenticated,
-  canAccess,
+  canAccess(['user', 'admin']),
   // NEW ZOD VALIDATION (Combining param validation and body validation)
   validate(z.object({
     params: IdParamSchema.shape.params, // Re-use ID validation for the URL parameter
@@ -97,7 +119,7 @@ router.put(
 router.delete(
   '/cancel/:id',
   isAuthenticated,
-  canAccess,
+  canAccess(['user', 'admin']),
   // NEW ZOD VALIDATION
   validate(IdParamSchema),
   asyncHandler(async (req, res) => {

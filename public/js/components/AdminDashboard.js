@@ -21,6 +21,19 @@ const AdminDashboard = () => {
         fetchAppointments();
     }, []);
 
+    React.useEffect(() => {
+        window.api.getMyAppointments()
+            .then(data => {
+            console.log('Appointments:', data); // Add this line
+            setAppointments(data);
+            setLoading(false);
+        })
+            .catch(err => {
+            setError(err.message || 'Failed to load appointments');
+            setLoading(false);
+        });
+    }, []);
+
     const handleDelete = async (id) => {
         if(window.confirm('Are you sure you want to delete this appointment permanently?')) {
             try {
