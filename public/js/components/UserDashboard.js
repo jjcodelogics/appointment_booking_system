@@ -1,86 +1,109 @@
-// /public/js/components/UserDashboard.js
-import React, { useState, useEffect } from 'react';
-import * as api from '../api.js';
+// UserDashboardComponent.js
+const React = window.React;
+const { useState, useEffect, createElement } = window.React;
 
-const UserDashboard = () => {
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+export default function UserDashboardComponent() {
+  const [appointments, setAppointments] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState('');
+  const [user, setUser] = React.useState(null);
+  const [bookedSlots, setBookedSlots] = React.useState([]);
 
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const data = await api.getMyAppointments();
-                setAppointments(data);
-            } catch (err) {
-                setError('Could not fetch appointments. You may need to log in.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAppointments();
-    }, []);
+  React.useEffect(() => {
+    // Fetch user info
+    window.api.getCurrentUser()
+      .then(setUser)
+      .catch(() => setUser(null));
 
-    const handleCancel = async (id) => {
-        if(window.confirm('Are you sure you want to cancel this appointment?')) {
-            try {
-                await api.cancelAppointment(id);
-                setAppointments(appointments.filter(a => a.appointment_id !== id));
-            } catch (err) {
-                setError('Failed to cancel appointment.');
-            }
+    // Fetch user's appointments
+    window.api.getMyAppointments()
+      .then(setAppointments)
+      .catch(() => setAppointments([]))
+      .finally(() => setLoading(false));
+
+    // Fetch all booked slots
+    window.api.getAllBookedSlots()
+      .then(setBookedSlots)
+      .catch(() => setBookedSlots([]));
+  }, []);
+
+  const handleBook = () => {
+    window.location.href = '/book.html';
+  };
+  
+  // 🔥 FIX: ADDED handleCancel to resolve the original issue
+  async function handleCancel(id) {
+    if(window.confirm('Are you sure you want to cancel this appointment?')) {
+        try {
+            // Call the API function defined in api.cdn.js
+            await window.api.cancelAppointment(id);
+            // Optimistically update the UI by filtering out the cancelled appointment
+            setAppointments(appointments.filter(appt => appt.appointment_id !== id));
+        } catch (err) {
+            setError(err.message || 'Failed to cancel appointment.');
         }
-    };
-
-    const handleBook = () => {
-        // Replace this with your booking logic or navigation
-        window.location.href = '/book.html'; // Or open a booking modal
-    };
-
-    if (loading) {
-        return <div>Loading...</div>;
     }
-    if (error) {
-        return <div className="error-message">{error}</div>;
-    }
-    return (
-        <div className="container">
-            <h1>My Appointments</h1>
-            {appointments.length === 0 ? (
-                <div>
-                    <p>You have no bookings yet.</p>
-                    <button className="btn btn-primary" onClick={handleBook}>
-                        Click here to make your first appointment
-                    </button>
-                </div>
-            ) : (
-                <div className="card">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {appointments.map(app => (
-                                <tr key={app.appointment_id}>
-                                    <td>{new Date(app.appointment_date).toLocaleString()}</td>
-                                    <td>{app.status}</td>
-                                    <td>
-                                        <button className="btn" onClick={() => handleCancel(app.appointment_id)}>
-                                            Cancel
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
-    );
-};
+  }
 
-export default UserDashboard;
+  if (loading) return React.createElement("div", null, "Loading...");
+  if (error) return React.createElement("div", { className: "error-message" }, error);
+
+  return React.createElement(
+    "div",
+    { className: "container" },
+    user && React.createElement("h2", null, `Welcome, ${user.name}!`),
+    React.createElement("div", { className: "actions-right" },
+      React.createElement("button", { className: "btn btn-primary", onClick: handleBook }, "Book New Appointment")
+    ),
+    React.createElement("h3",  { style: { marginTop: '3.5rem' } }, null, "My Appointments"),
+    appointments.length === 0
+      ? React.createElement("p", null, "You have no bookings yet.")
+      : React.createElement(
+          "div",
+          { className: "card" },
+          React.createElement(
+            "table",
+            null,
+            React.createElement(
+              "thead",
+              null,
+              React.createElement(
+                "tr",
+                null,
+                React.createElement("th", null, "Date"),
+                React.createElement("th", null, "Status"),
+                React.createElement("th", null, "Actions")
+              )
+            ),
+  
+            React.createElement(
+              "tbody",
+              null,
+              appointments.map(app =>
+                React.createElement(
+                  "tr",
+                  { key: app.appointment_id },
+                  React.createElement("td", null, new Date(app.appointment_date).toLocaleString()),
+                  React.createElement("td", null, app.status),
+                  React.createElement("td", null,
+                    // Cancel button (existing)
+                    React.createElement("button", {
+                      className: "btn",
+                      onClick: () => handleCancel(app.appointment_id)
+                    }, "Cancel"),
+                    // Spacer
+                    React.createElement("span", { style: { display: "inline-block", width: "8px" } }),
+                    // Change (reschedule) button (new)
+                    React.createElement("button", {
+                      className: "btn",
+                      onClick: () => { window.location.href = `/reschedule.html?id=${app.appointment_id}`; }
+                    }, "Change")
+                  )
+                )
+              )
+            )
+
+          )
+        )
+  );
+}

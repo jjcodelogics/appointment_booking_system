@@ -1,7 +1,8 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = ''; // <-- This is the non-hardcoded solution for production
 
 async function request(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  let timeout; // Declare it up here to ensure function scope visibility
+  const url = `${API_BASE_URL}${endpoint}`; // <-- Uses the empty string
   options.credentials = 'include';
   options.headers = {
     'Content-Type': 'application/json',
@@ -10,18 +11,20 @@ async function request(endpoint, options = {}) {
 
   // Timeout logic for debugging
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  timeout = setTimeout(() => controller.abort(), 5000); // Assign value here
   options.signal = controller.signal;
 
   try {
     const response = await fetch(url, options);
-    clearTimeout(timeout);
+    clearTimeout(timeout)
     const text = await response.text();
     try {
       const data = JSON.parse(text);
       if (!response.ok) throw new Error(data.msg || 'An error occurred');
       return data;
     } catch (e) {
+      // If response text is empty or not JSON, but status is OK (e.g., 204 No Content, 200 OK with empty body), return null
+      if (response.ok && text.trim() === '') return null;
       throw new Error('Invalid JSON response: ' + text);
     }
   } catch (error) {
@@ -65,4 +68,15 @@ window.api = {
     request(`/appointments/${id}`, { method: 'DELETE' }),
   getCurrentUser: getCurrentUser,
   getAllBookedSlots: getAllBookedSlots,
+};
+
+// api.cdn.js
+window.api = window.api || {};
+
+window.api.rescheduleAppointment = async function (id, newDateISO) {
+  // Use 'request' function instead of raw fetch to handle base URL and error logic consistently
+  return request(`/myappointments/reschedule/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ appointment_date: newDateISO })
+  });
 };

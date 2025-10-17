@@ -23,6 +23,7 @@ body {
   background-color: var(--neutral-bg);
   color: var(--primary-color);
   line-height: 1.6;
+  z-index: 20;
 }
 
 /* 3. Typography */
@@ -42,6 +43,7 @@ a {
   max-width: 1100px;
   margin: 2rem auto;
   padding: 0 2rem;
+  z-index: 20;
 }
 
 .card {
@@ -51,6 +53,63 @@ a {
   margin-bottom: 1rem;
   border-radius: 8px;
 }
+
+.map-frame { width:100%; height:280px; border:0; display:block; }
+.map-card { position:relative; z-index:10; overflow:visible; }
+
+.main {
+  position: relative;
+  z-index: 50;
+}
+
+.main .container,
+section.container.split {
+  position: relative;
+  z-index: 60;
+}
+.scroll-indicator {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  opacity: 0.7;
+  animation: bounce 2s infinite;
+}
+
+.script-credit {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  opacity: 0.6;
+  text-align: center;
+  margin-top: 1rem;
+  z-index: 20;
+}
+
+
+/* center the reschedule app in the viewport */
+#root {
+  min-height: calc(100vh - 160px); /* leave room for header/footer */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 10;
+}
+
+/* optional: style the reschedule card */
+.reschedule-card {
+  width: 100%;
+  max-width: 720px;
+  background: var(--secondary-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+
 
 /* 5. Components (Forms, Buttons, Tables) */
 .btn {
@@ -112,34 +171,62 @@ thead {
     background-color: var(--secondary-bg);
 }
 
-/* 6. Header & Navigation */
+/* 6. Navigation & Header */
+/* Header & thin navigation bar */
+/* 6. Navigation & Header */
+/* Header & thin navigation bar */
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 48px;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
 }
 
+/* Large logo visually lifted above the header */
 .logo {
-    max-height: 400px; /* Controls the size of your logo */
+  height: 300px;
+  max-height: none;
+  width: auto;
+  margin-right: auto;
+  margin-top: -20px;
+  display: block;
+  z-index: 1; 
+  position: relative;
 }
 
+.actions-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+/* Navigation */
 nav ul {
-    list-style-type: none;
-    display: flex;
-    gap: 1.5rem; /* Space between nav items */
-    align-items: center;
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 nav a {
-    font-weight: 500;
-    transition: color 0.2s ease-in-out;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-block;
+  padding: 6px 8px;
+  transition: color 0.2s ease-in-out;
 }
 
 nav a:hover {
-    color: var(--primary-color);
+  color: var(--primary-color);
 }
+
+
 
 /* 7. Hero Section */
 .hero {
