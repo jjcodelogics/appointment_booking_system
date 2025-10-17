@@ -52,7 +52,12 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 172800000, sameSite: "lax", httpOnly: true  },
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 172800000,
+      sameSite: 'lax',
+      httpOnly: true
+    },
     store: store 
   })
 );

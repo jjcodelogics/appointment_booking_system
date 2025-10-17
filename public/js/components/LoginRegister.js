@@ -1,95 +1,124 @@
 // /public/js/components/LoginRegister.js
-import React, { useState } from 'react';
-import * as api from '../api.js';
+// LoginRegister.js
+const React = window.React;
+const { useState, useEffect, createElement } = window.React; 
 
-const LoginRegister = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
+
+export default function LoginRegister() {
+  // Assuming window.api is still available globally for simplicity in the CDN structure.
+  // In a proper module setup, you would import the api object.
+
+  const [isLogin, setIsLogin] = React.useState(true);
+  const [formData, setFormData] = React.useState({
     username_email: '',
     name: '',
     password: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = React.useState('');
 
-  const { username_email, name, password } = formData;
-
-  const onChange = (e) =>
+  function onChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-  const onSubmit = async (e) => {
+  async function onSubmit(e) {
     e.preventDefault();
     setError('');
     try {
       if (isLogin) {
-        await api.login(username_email, password);
-        window.location.href = '/dashboard.html'; // Redirect on success
+        await window.api.login(formData.username_email, formData.password);
+        window.location.href = '/dashboard.html';
       } else {
-        await api.register(username_email, name, password);
-        setIsLogin(true); // Switch to login form after registration
+        await window.api.register(formData.username_email, formData.name, formData.password);
+        setIsLogin(true);
       }
     } catch (err) {
       setError(err.message);
     }
-  };
+  }
 
-  return (
-    <div className="container">
-      <div className="card" style={{ maxWidth: '450px', margin: '3rem auto' }}>
-        <h1>{isLogin ? 'Login' : 'Register'}</h1>
-        <form onSubmit={onSubmit}>
-          {!isLogin && (
-            <div className="form-group">
-              <label htmlFor="name">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className="form-control"
-                value={name}
-                onChange={onChange}
-                required
-              />
-            </div>
-          )}
-          <div className="form-group">
-            <label htmlFor="username_email">Email</label>
-            <input
-              type="email"
-              id="username_email"
-              name="username_email"
-              className="form-control"
-              value={username_email}
-              onChange={onChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="form-control"
-              value={password}
-              onChange={onChange}
-              minLength="6"
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-            {isLogin ? 'Login' : 'Create Account'}
-          </button>
-        </form>
-        {error && <p className="error-message">{error}</p>}
-        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}
-          <a href="#" onClick={() => setIsLogin(!isLogin)} style={{ marginLeft: '5px' }}>
-            {isLogin ? 'Register' : 'Login'}
-          </a>
-        </p>
-      </div>
-    </div>
+  // NOTE: The rendering uses React.createElement for compatibility with main.cdn.js style
+  return React.createElement(
+    "div",
+    { className: "container" },
+    React.createElement(
+      "div",
+      { className: "card", style: { maxWidth: "450px", margin: "3rem auto" } },
+      React.createElement("h1", null, isLogin ? "Login" : "Register"),
+      React.createElement(
+        "form",
+        { onSubmit: onSubmit },
+        !isLogin &&
+          React.createElement(
+            "div",
+            { className: "form-group" },
+            React.createElement("label", { htmlFor: "name" }, "Full Name"),
+            React.createElement("input", {
+              type: "text",
+              id: "name",
+              name: "name",
+              className: "form-control",
+              value: formData.name,
+              onChange: onChange,
+              required: true,
+            })
+          ),
+        React.createElement(
+          "div",
+          { className: "form-group" },
+          React.createElement("label", { htmlFor: "username_email" }, "Email"),
+          React.createElement("input", {
+            type: "email",
+            id: "username_email",
+            name: "username_email",
+            className: "form-control",
+            value: formData.username_email,
+            onChange: onChange,
+            required: true,
+          })
+        ),
+        React.createElement(
+          "div",
+          { className: "form-group" },
+          React.createElement("label", { htmlFor: "password" }, "Password"),
+          React.createElement("input", {
+            type: "password",
+            id: "password",
+            name: "password",
+            className: "form-control",
+            value: formData.password,
+            onChange: onChange,
+            minLength: 6,
+            required: true,
+          })
+        ),
+        React.createElement(
+          "button",
+          {
+            type: "submit",
+            className: "btn btn-primary",
+            style: { width: "100%" },
+          },
+          isLogin ? "Login" : "Create Account"
+        )
+      ),
+      error && React.createElement("p", { className: "error-message" }, error),
+      React.createElement(
+        "p",
+        { style: { marginTop: "1rem", textAlign: "center" } },
+        isLogin ? "Don't have an account?" : "Already have an account?",
+        React.createElement(
+          "a",
+          {
+            href: "#",
+            onClick: function (e) {
+              e.preventDefault();
+              setIsLogin(!isLogin);
+            },
+            style: { marginLeft: "5px" },
+          },
+          isLogin ? "Register" : "Login"
+        )
+      )
+    )
   );
-};
-
-export default LoginRegister;
+}

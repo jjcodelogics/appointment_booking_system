@@ -1,84 +1,80 @@
-// /public/js/components/AdminDashboard.js
-import React, { useState, useEffect } from 'react';
-import * as api from '../api.js';
+// AdminDashboard.js
+const React = window.React;
+const { useState, useEffect, createElement } = window.React;
 
-const AdminDashboard = () => {
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+export default function AdminDashboard() {
+  const [appointments, setAppointments] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState('');
 
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const data = await api.getAllAppointments();
-                setAppointments(data);
-            } catch (err) {
-                setError('Access denied or failed to fetch data. Are you logged in as an admin?');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAppointments();
-    }, []);
+  React.useEffect(() => {
+    window.api.getAllAppointments()
+      .then(data => {
+        setAppointments(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message || 'Failed to load appointments');
+        setLoading(false);
+      });
+  }, []);
 
-    React.useEffect(() => {
-        window.api.getMyAppointments()
-            .then(data => {
-            console.log('Appointments:', data); // Add this line
-            setAppointments(data);
-            setLoading(false);
-        })
-            .catch(err => {
-            setError(err.message || 'Failed to load appointments');
-            setLoading(false);
-        });
-    }, []);
+  async function handleDelete(id) {
+    try {
+      await window.api.deleteAppointmentAsAdmin(id);
+      setAppointments(appointments.filter(appt => appt.appointment_id !== id));
+    } catch (err) {
+      setError(err.message || 'Failed to delete appointment');
+    }
+  }
 
-    const handleDelete = async (id) => {
-        if(window.confirm('Are you sure you want to delete this appointment permanently?')) {
-            try {
-                await api.deleteAppointmentAsAdmin(id);
-                setAppointments(appointments.filter(a => a.appointment_id !== id));
-            } catch (err) {
-                setError('Failed to delete appointment.');
-            }
-        }
-    };
-    
-    if (loading) return <p>Loading all appointments...</p>;
-    if (error) return <p className="error-message">{error}</p>;
+  if (loading) {
+    return React.createElement("div", null, "Loading...");
+  }
+  if (error) {
+    return React.createElement("div", { className: "error-message" }, error);
+  }
 
-    return (
-        <div className="container">
-            <h1>Admin Dashboard: All Appointments</h1>
-            <div className="card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {appointments.map(app => (
-                            <tr key={app.appointment_id}>
-                                <td>{app.user_id}</td>
-                                <td>{new Date(app.appointment_date).toLocaleString()}</td>
-                                <td>{app.status}</td>
-                                <td>
-                                    <button className="btn" onClick={() => handleDelete(app.appointment_id)}>
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-};
-
-export default AdminDashboard;
+  return React.createElement(
+    "div",
+    { className: "container" },
+    React.createElement("h1", null, "All Appointments (Admin)"),
+    appointments.length === 0
+      ? React.createElement("p", null, "No appointments found.")
+      : React.createElement(
+          "table",
+          null,
+          React.createElement(
+            "thead",
+            null,
+            React.createElement(
+              "tr",
+              null,
+              React.createElement("th", null, "Date"),
+              React.createElement("th", null, "Status"),
+              React.createElement("th", null, "Notes"),
+              React.createElement("th", null, "Actions")
+            )
+          ),
+          React.createElement(
+            "tbody",
+            null,
+            appointments.map(appt =>
+              React.createElement(
+                "tr",
+                { key: appt.appointment_id },
+                React.createElement("td", null, new Date(appt.appointment_date).toLocaleString()),
+                React.createElement("td", null, appt.status),
+                React.createElement("td", null, appt.notes || ""),
+                React.createElement("td", null,
+                  React.createElement("button", {
+                    className: "btn btn-danger",
+                    onClick: () => handleDelete(appt.appointment_id)
+                  }, "Delete")
+                )
+              )
+            )
+          )
+        )
+  );
+}
