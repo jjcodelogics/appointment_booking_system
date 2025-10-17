@@ -64,6 +64,7 @@ router.post(
       cut: z.boolean(),
       status: z.enum(['scheduled', 'completed', 'canceled']).optional(),
       employee_name: z.string().optional(),
+      employee_id: z.number().default(1),
       notes: z.string().trim().max(255).optional(),
     }),
     params: z.object({}).optional(),
@@ -122,6 +123,7 @@ router.post(
     const serviceId = selectedService.service_id;
     const DEFAULT_EMPLOYEE_ID = 1;
 
+    
     // 5. Create the appointment using only the foreign keys (service_id, employee_id)
     const newAppointment = await Appointment.create({
       user_id: req.user.user_id,
@@ -131,8 +133,7 @@ router.post(
       employee_id: DEFAULT_EMPLOYEE_ID,
       notes
     });
-    
-    // Send confirmation email (fire-and-forget)
+  
     try {
       sendBookingConfirmation(req.user.username_email, newAppointment);
     } catch (err) {
