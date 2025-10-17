@@ -131,7 +131,7 @@ router.post(
       employee_id: DEFAULT_EMPLOYEE_ID,
       notes
     });
-
+    
     // Send confirmation email (fire-and-forget)
     try {
       sendBookingConfirmation(req.user.username_email, newAppointment);
