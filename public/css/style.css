@@ -1,0 +1,166 @@
+/* /public/css/style.css */
+
+/* 1. Design Variables from Brand Profile */
+:root {
+  --primary-color: #121212;   /* Deep Charcoal Black */
+  --accent-color: #B8860B;    /* Muted Elegant Gold */
+  --neutral-bg: #FFFFFF;      /* Pure White */
+  --secondary-bg: #F9F7F4;  /* Light Cream/Grey */
+  
+  --heading-font: 'Playfair Display', serif;
+  --body-font: 'Roboto', sans-serif;
+}
+
+/* 2. Base Styles & Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--body-font);
+  background-color: var(--neutral-bg);
+  color: var(--primary-color);
+  line-height: 1.6;
+}
+
+/* 3. Typography */
+h1, h2, h3 {
+  font-family: var(--heading-font);
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+/* 4. Utility & Layout */
+.container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.card {
+  background: var(--secondary-bg);
+  border: 1px solid #eee;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+/* 5. Components (Forms, Buttons, Tables) */
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s ease-in;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.error-message {
+    color: #d9534f;
+    background: #f2dede;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+th, td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+thead {
+    background-color: var(--secondary-bg);
+}
+
+/* 6. Header & Navigation */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.logo {
+    max-height: 400px; /* Controls the size of your logo */
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 1.5rem; /* Space between nav items */
+    align-items: center;
+}
+
+nav a {
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+nav a:hover {
+    color: var(--primary-color);
+}
+
+/* 7. Hero Section */
+.hero {
+    text-align: center;
+    padding: 6rem 0;
+    background-color: var(--secondary-bg); /* Uses the Light Cream/Grey */
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+/* 8. Footer */
+footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+}

@@ -2,7 +2,7 @@
 import { z } from 'zod';
 
 // Zod schema for a valid future date
-const appointmentDateSchema = z.string().refine(
+export const appointmentDateSchema = z.string().refine(
     (val) => !isNaN(new Date(val).getTime()), 
     { message: "A valid appointment date is required." }
 ).transform((val) => new Date(val)); // Transform to Date object for consistency
@@ -12,14 +12,13 @@ const idSchema = z.number().int().min(1, { message: 'A valid ID is required.' })
 
 // Schema for creating a new appointment (POST /appointments)
 const CreateAppointmentSchema = z.object({
-    body: z.object({
-        user_id: idSchema,
-        appointment_date: appointmentDateSchema,
-        service_id: idSchema,
-        employee_id: idSchema,
-    }),
-    params: z.object({}).optional(),
-    query: z.object({}).optional(),
+    appointment_date: appointmentDateSchema,
+    gender: z.enum(['male', 'female']),
+    washing: z.boolean(),
+    coloring: z.boolean(),
+    cut: z.boolean(),
+    employee_name: z.string().optional(),
+    notes: z.string().optional()
 });
 
 // Schema for updating an appointment (PUT /appointments/:id)
@@ -51,4 +50,5 @@ export default {
     CreateAppointmentSchema,
     UpdateAppointmentSchema,
     IdParamSchema,
+    idSchema
 };
