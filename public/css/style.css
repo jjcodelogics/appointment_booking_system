@@ -188,7 +188,7 @@ header {
 
 /* Large logo visually lifted above the header */
 .logo {
-  height: 300px;
+  height: 100px;
   max-height: none;
   width: auto;
   margin-right: auto;
@@ -247,7 +247,181 @@ nav a:hover {
 /* 8. Footer */
 footer {
     text-align: center;
-    padding: 2rem 0;
-    margin-top: 2rem;
-    border-top: 1px solid #eee;
+    padding: 1rem 0;
+    margin-top: 0.5rem;
+    border-top: 0.5px solid #eee;
+}
+
+/* index.html main picture */
+/* Styling for the Hero Section */
+.hero {
+    /* 1. Set the image */
+    background-image: url('../images/shop.jpeg'); /* Adjust the path to picture.jpg */
+
+    /* 2. Control how the image fills the space */
+    background-size: cover;
+
+    /* 3. Center the image */
+    background-position: center;
+
+    /* 4. Keep the image fixed when scrolling (Optional, but gives a nice effect) */
+    background-attachment: fixed; 
+
+    /* 5. Set the height for a visible hero section */
+    height: 80vh; /* 'vh' means viewport height. This makes it take up 80% of the screen height. */
+    
+    /* 6. Text alignment and layout for the content */
+    display: flex; /* Helps center the content inside */
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    text-align: center; /* Centers the text */
+    color: white; /* Make text readable on a dark background */
+}
+
+/* Optional: Add a subtle overlay for better text readability */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Creates a dark, slightly transparent layer */
+    background-color: rgba(0, 0, 0, 0.4); 
+    z-index: 1; /* Puts the overlay behind the text/content */
+}
+
+/* Ensure content is above the overlay */
+.hero .container {
+    z-index: 2; 
+    position: relative; /* Needed for z-index to work */
+}
+
+/* Adjust text styles for the best look */
+.hero h1 {
+    font-size: 3em; /* Larger heading */
+    margin-bottom: 0.5em;
+}
+
+.hero p {
+    font-size: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+/* Reset the hero section's position context for the ::before pseudo-element */
+.hero {
+    position: relative; 
+}
+
+/* 9. Dashboard Styling */
+
+/* The main body style for the dashboard, book, and reschedule pages */
+.dashboard-page {
+    /* 1. Set the background to your primary light color */
+    background-color: var(--secondary-bg); 
+    
+    /* 2. Set the background image (UPDATE THE FILENAME HERE) */
+    background-image: url('../images/clean-seamless-tools.png');
+    
+    /* 3. CRITICAL: Ensures the image tiles repeatedly */
+    background-repeat: repeat;
+    
+    /* 4. SCALING: Shrinks the pattern image to make the tools look small */
+    /* Adjust '20%' to a lower value (e.g., 15%) if you want them smaller */
+    background-size: 20%; 
+    
+    /* 5. MUTING: Blends the pattern with the background color to make it faint */
+    /* This is what controls the visibility: */
+   
+    
+    background-attachment: fixed;
+    background-position: center top; 
+    padding-bottom: 6rem;
+}
+
+/* Ensure the main content containers (cards) have a solid white background 
+   for high readability over the pattern */
+.dashboard-page .reschedule-card,
+.dashboard-page .card {
+    background-color: var(--neutral-bg); /* Use Pure White variable */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Soft, professional shadow */
+}
+/* --- FOOTER STYLING --- */
+
+.site-footer {
+    background-color: var(--primary-charcoal); /* Deep Charcoal Black for the footer background */
+    color: var(--neutral-cream-grey); /* Light Cream/Grey for main footer text */
+    padding: 1em; /* Vertical padding */
+    font-family: var(--body-font); /* Body font for readability */
+    font-size: 0.95em;
+}
+
+.site-footer .container {
+    max-width: 1200px; /* Aligns with your main content width */
+    margin: 0 auto;
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Distribute items with space between them */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 2em; /* Spacing between footer columns */
+    padding: 0.8em; /* Horizontal padding for smaller screens */
+}
+
+.footer-brand,
+.footer-links,
+.footer-contact {
+    flex: 1; /* Each section takes equal space initially */
+    min-width: 250px; /* Minimum width before wrapping */
+}
+
+.footer-logo {
+    max-width: 150px; /* Adjust logo size */
+    margin-bottom: 1em;
+    filter: brightness(0) invert(1); /* Makes a black SVG logo appear white on dark background */
+}
+
+.site-footer h4 {
+    font-family: var(--heading-font); /* Heading font for section titles */
+    color: var(--neutral-white); /* Pure White for headings */
+    font-size: 1.2em;
+    margin-bottom: 1em;
+    font-weight: normal; /* Often good for elegant headings */
+}
+
+.site-footer ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+.site-footer ul li {
+    margin-bottom: 0.7em;
+}
+
+.site-footer a {
+    color: var(--neutral-cream-grey); /* Light Cream/Grey for links */
+    text-decoration: none; /* No underline by default */
+    transition: color 0.3s ease; /* Smooth hover effect */
+}
+
+.site-footer a:hover {
+    color: var(--accent-gold); /* Muted Elegant Gold on hover for elegance */
+    text-decoration: underline; /* Add underline on hover */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .site-footer .container {
+        flex-direction: column; /* Stack columns vertically on small screens */
+        text-align: center;
+    }
+
+    .footer-brand,
+    .footer-links,
+    .footer-contact {
+        min-width: auto; /* Remove min-width to allow full stacking */
+    }
+
+    .footer-brand p {
+        margin-top: 1em; /* Add some space between logo and copyright */
+    }
 }
