@@ -1,55 +1,29 @@
-export default (sequelize, DataTypes) => {
-    const Appointment = sequelize.define('Appointment', {
-        // --- All your fields go inside this object ---
-        appointment_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            foreignKey: true,
-        },
-        appointment_date: { 
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
-        status: {
-            type: DataTypes.ENUM('scheduled', 'completed', 'canceled'),
-            allowNull: false,
-            defaultValue: 'scheduled',
-        },
-        notes: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-        },
-        service_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            foreignKey: true,
-        },
-        employee_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            foreignKey: true,
-        },
-        // CORRECT: The new field is placed here, with the other columns.
-        reminder_sent: { 
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-            allowNull: false,
-        }
-    }, {
-        tableName: 'appointments',
-        timestamps: false,
-    });
+import { DataTypes } from 'sequelize';
+import db from './index.js';
 
-    Appointment.associate = (models) => {
-        Appointment.belongsTo(models.User, { foreignKey: 'user_id' });
-        Appointment.belongsTo(models.Service, { foreignKey: 'service_id' });
-        Appointment.belongsTo(models.Employee, { foreignKey: 'employee_id' });
-    };
+const { sequelize } = db;
 
-    return Appointment;
-}
+const Appointment = sequelize.define('Appointment', {
+  appointment_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  appointment_date: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+  },
+  time_slot: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  client_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+}, {
+  tableName: 'appointments',
+  timestamps: false,
+});
+
+export default Appointment;

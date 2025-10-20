@@ -1,8 +1,8 @@
-const API_BASE_URL = ''; // <-- This is the non-hardcoded solution for production
+const API_BASE_URL = 'http://localhost:3000'; // Updated to point to the backend server
 
 async function request(endpoint, options = {}) {
   let timeout; // Declare it up here to ensure function scope visibility
-  const url = `${API_BASE_URL}${endpoint}`; // <-- Uses the empty string
+  const url = `${API_BASE_URL}${endpoint}`; // Updated to use the correct base URL
   options.credentials = 'include';
   options.headers = {
     'Content-Type': 'application/json',
@@ -16,7 +16,7 @@ async function request(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, options);
-    clearTimeout(timeout)
+    clearTimeout(timeout);
     const text = await response.text();
     try {
       const data = JSON.parse(text);

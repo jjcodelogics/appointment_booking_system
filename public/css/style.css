@@ -1,17 +1,14 @@
-/* /public/css/style.css */
-
-/* 1. Design Variables from Brand Profile */
+/* --- Design Variables --- */
 :root {
-  --primary-color: #121212;   /* Deep Charcoal Black */
-  --accent-color: #B8860B;    /* Muted Elegant Gold */
-  --neutral-bg: #FFFFFF;      /* Pure White */
-  --secondary-bg: #F9F7F4;  /* Light Cream/Grey */
-  
+  --primary-color: #121212; /* Deep Charcoal Black */
+  --accent-color: #B8860B; /* Muted Elegant Gold */
+  --neutral-bg: #FFFFFF; /* Pure White */
+  --secondary-bg: #F9F7F4; /* Light Cream/Grey */
   --heading-font: 'Playfair Display', serif;
   --body-font: 'Roboto', sans-serif;
 }
 
-/* 2. Base Styles & Reset */
+/* --- Base Styles --- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -23,10 +20,8 @@ body {
   background-color: var(--neutral-bg);
   color: var(--primary-color);
   line-height: 1.6;
-  z-index: 20;
 }
 
-/* 3. Typography */
 h1, h2, h3 {
   font-family: var(--heading-font);
   color: var(--primary-color);
@@ -36,14 +31,18 @@ h1, h2, h3 {
 a {
   color: var(--accent-color);
   text-decoration: none;
+  transition: color 0.2s ease-in-out;
 }
 
-/* 4. Utility & Layout */
+a:hover {
+  color: var(--primary-color);
+}
+
+/* --- Layout --- */
 .container {
   max-width: 1100px;
   margin: 2rem auto;
   padding: 0 2rem;
-  z-index: 20;
 }
 
 .card {
@@ -52,66 +51,10 @@ a {
   padding: 1.5rem;
   margin-bottom: 1rem;
   border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.map-frame { width:100%; height:280px; border:0; display:block; }
-.map-card { position:relative; z-index:10; overflow:visible; }
-
-.main {
-  position: relative;
-  z-index: 50;
-}
-
-.main .container,
-section.container.split {
-  position: relative;
-  z-index: 60;
-}
-.scroll-indicator {
-  position: absolute;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.9rem;
-  color: var(--primary-color);
-  opacity: 0.7;
-  animation: bounce 2s infinite;
-}
-
-.script-credit {
-  font-size: 0.8rem;
-  color: var(--primary-color);
-  opacity: 0.6;
-  text-align: center;
-  margin-top: 1rem;
-  z-index: 20;
-}
-
-
-/* center the reschedule app in the viewport */
-#root {
-  min-height: calc(100vh - 160px); /* leave room for header/footer */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  z-index: 10;
-}
-
-/* optional: style the reschedule card */
-.reschedule-card {
-  width: 100%;
-  max-width: 720px;
-  background: var(--secondary-bg);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-
-
-
-/* 5. Components (Forms, Buttons, Tables) */
+/* --- Buttons --- */
 .btn {
   display: inline-block;
   padding: 0.8rem 1.5rem;
@@ -131,6 +74,12 @@ section.container.split {
   opacity: 0.9;
 }
 
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Forms --- */
 .form-group {
   margin-bottom: 1rem;
 }
@@ -148,280 +97,141 @@ section.container.split {
 }
 
 .error-message {
-    color: #d9534f;
-    background: #f2dede;
-    padding: 0.75rem;
-    border-radius: 4px;
-    margin-top: 1rem;
+  color: #d9534f;
+  background: #f2dede;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 1rem;
 }
 
+/* --- Tables --- */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
 }
 
 th, td {
-    padding: 0.8rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 thead {
-    background-color: var(--secondary-bg);
+  background-color: var(--secondary-bg);
 }
 
-/* 6. Navigation & Header */
-/* Header & thin navigation bar */
-/* 6. Navigation & Header */
-/* Header & thin navigation bar */
-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  height: 48px;
-  padding: 0 1rem;
-  box-sizing: border-box;
-  position: relative;
-  overflow: visible;
-}
-
-/* Large logo visually lifted above the header */
-.logo {
-  height: 100px;
-  max-height: none;
-  width: auto;
-  margin-right: auto;
-  margin-top: -20px;
-  display: block;
-  z-index: 1; 
-  position: relative;
-}
-
-.actions-right {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.5rem;
-}
-
-/* Navigation */
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-}
-
-nav a {
-  font-weight: 500;
-  line-height: 1;
-  display: inline-block;
-  padding: 6px 8px;
-  transition: color 0.2s ease-in-out;
-}
-
-nav a:hover {
-  color: var(--primary-color);
-}
-
-
-
-/* 7. Hero Section */
+/* --- Hero Section --- */
 .hero {
-    text-align: center;
-    padding: 6rem 0;
-    background-color: var(--secondary-bg); /* Uses the Light Cream/Grey */
+  text-align: center;
+  padding: 6rem 0;
+  background: url('../images/shop.jpeg') center/cover fixed;
+  color: white;
+  position: relative;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.hero h1 {
-    font-size: 3.5rem;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-/* 8. Footer */
-footer {
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: 0.5rem;
-    border-top: 0.5px solid #eee;
-}
-
-/* index.html main picture */
-/* Styling for the Hero Section */
-.hero {
-    /* 1. Set the image */
-    background-image: url('../images/shop.jpeg'); /* Adjust the path to picture.jpg */
-
-    /* 2. Control how the image fills the space */
-    background-size: cover;
-
-    /* 3. Center the image */
-    background-position: center;
-
-    /* 4. Keep the image fixed when scrolling (Optional, but gives a nice effect) */
-    background-attachment: fixed; 
-
-    /* 5. Set the height for a visible hero section */
-    height: 80vh; /* 'vh' means viewport height. This makes it take up 80% of the screen height. */
-    
-    /* 6. Text alignment and layout for the content */
-    display: flex; /* Helps center the content inside */
-    justify-content: center; /* Centers horizontally */
-    align-items: center; /* Centers vertically */
-    text-align: center; /* Centers the text */
-    color: white; /* Make text readable on a dark background */
-}
-
-/* Optional: Add a subtle overlay for better text readability */
 .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Creates a dark, slightly transparent layer */
-    background-color: rgba(0, 0, 0, 0.4); 
-    z-index: 1; /* Puts the overlay behind the text/content */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
 }
 
-/* Ensure content is above the overlay */
 .hero .container {
-    z-index: 2; 
-    position: relative; /* Needed for z-index to work */
+  z-index: 2;
+  position: relative;
 }
 
-/* Adjust text styles for the best look */
 .hero h1 {
-    font-size: 3em; /* Larger heading */
-    margin-bottom: 0.5em;
+  font-size: 3em;
+  margin-bottom: 0.5em;
 }
 
 .hero p {
-    font-size: 1.5em;
-    margin-bottom: 1.5em;
+  font-size: 1.5em;
+  margin-bottom: 1.5em;
 }
 
-/* Reset the hero section's position context for the ::before pseudo-element */
-.hero {
-    position: relative; 
+/* --- Footer --- */
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: 0.5rem;
+  border-top: 0.5px solid #eee;
 }
-
-/* 9. Dashboard Styling */
-
-/* The main body style for the dashboard, book, and reschedule pages */
-.dashboard-page {
-    /* 1. Set the background to your primary light color */
-    background-color: var(--secondary-bg); 
-    
-    /* 2. Set the background image (UPDATE THE FILENAME HERE) */
-    background-image: url('../images/clean-seamless-tools.png');
-    
-    /* 3. CRITICAL: Ensures the image tiles repeatedly */
-    background-repeat: repeat;
-    
-    /* 4. SCALING: Shrinks the pattern image to make the tools look small */
-    /* Adjust '20%' to a lower value (e.g., 15%) if you want them smaller */
-    background-size: 20%; 
-    
-    /* 5. MUTING: Blends the pattern with the background color to make it faint */
-    /* This is what controls the visibility: */
-   
-    
-    background-attachment: fixed;
-    background-position: center top; 
-    padding-bottom: 6rem;
-}
-
-/* Ensure the main content containers (cards) have a solid white background 
-   for high readability over the pattern */
-.dashboard-page .reschedule-card,
-.dashboard-page .card {
-    background-color: var(--neutral-bg); /* Use Pure White variable */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Soft, professional shadow */
-}
-/* --- FOOTER STYLING --- */
 
 .site-footer {
-    background-color: var(--primary-charcoal); /* Deep Charcoal Black for the footer background */
-    color: var(--neutral-cream-grey); /* Light Cream/Grey for main footer text */
-    padding: 1em; /* Vertical padding */
-    font-family: var(--body-font); /* Body font for readability */
-    font-size: 0.95em;
+  background-color: var(--primary-color);
+  color: var(--secondary-bg);
+  padding: 1em;
+  font-family: var(--body-font);
+  font-size: 0.95em;
 }
 
 .site-footer .container {
-    max-width: 1200px; /* Aligns with your main content width */
-    margin: 0 auto;
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Distribute items with space between them */
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-    gap: 2em; /* Spacing between footer columns */
-    padding: 0.8em; /* Horizontal padding for smaller screens */
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2em;
 }
 
-.footer-brand,
-.footer-links,
-.footer-contact {
-    flex: 1; /* Each section takes equal space initially */
-    min-width: 250px; /* Minimum width before wrapping */
+.footer-brand, .footer-links, .footer-contact {
+  flex: 1;
+  min-width: 250px;
 }
 
 .footer-logo {
-    max-width: 150px; /* Adjust logo size */
-    margin-bottom: 1em;
-    filter: brightness(0) invert(1); /* Makes a black SVG logo appear white on dark background */
+  max-width: 150px;
+  margin-bottom: 1em;
+  filter: brightness(0) invert(1);
 }
 
 .site-footer h4 {
-    font-family: var(--heading-font); /* Heading font for section titles */
-    color: var(--neutral-white); /* Pure White for headings */
-    font-size: 1.2em;
-    margin-bottom: 1em;
-    font-weight: normal; /* Often good for elegant headings */
+  font-family: var(--heading-font);
+  color: var(--neutral-bg);
+  font-size: 1.2em;
+  margin-bottom: 1em;
 }
 
 .site-footer ul {
-    list-style: none; /* Remove bullet points */
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .site-footer ul li {
-    margin-bottom: 0.7em;
+  margin-bottom: 0.7em;
 }
 
 .site-footer a {
-    color: var(--neutral-cream-grey); /* Light Cream/Grey for links */
-    text-decoration: none; /* No underline by default */
-    transition: color 0.3s ease; /* Smooth hover effect */
+  color: var(--secondary-bg);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .site-footer a:hover {
-    color: var(--accent-gold); /* Muted Elegant Gold on hover for elegance */
-    text-decoration: underline; /* Add underline on hover */
+  color: var(--accent-color);
+  text-decoration: underline;
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-    .site-footer .container {
-        flex-direction: column; /* Stack columns vertically on small screens */
-        text-align: center;
-    }
+  .site-footer .container {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    .footer-brand,
-    .footer-links,
-    .footer-contact {
-        min-width: auto; /* Remove min-width to allow full stacking */
-    }
-
-    .footer-brand p {
-        margin-top: 1em; /* Add some space between logo and copyright */
-    }
+  .footer-brand, .footer-links, .footer-contact {
+    min-width: auto;
+  }
 }
