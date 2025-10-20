@@ -8,9 +8,17 @@ import 'dotenv/config';
 import helmet from 'helmet';
 import session from 'express-session';
 import { join } from 'path';
-import db from './src/models/index.js';
 
+import { initializeModels } from './src/models/index.js';
+
+// Initialize models before importing db/passport
+await initializeModels();
+
+// import db after models are initialized
+import db from './src/models/index.js';
 const { sequelize } = db;
+
+import passport from './src/middleware/passport.js';
 
 app.use(
   helmet({
@@ -44,15 +52,17 @@ app.use(express.static(join(process.cwd(), 'public')));
 
 app.use(
   session({
+    name: 'sessionId',
     secret: process.env.SESSION_SECRET || 'your_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 172800000, // Set cookie expiration (e.g., 2 days)
-      sameSite: 'lax',
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
     },
+    // store: new (require('connect-pg-simple')(session))({ conObject: process.env.DATABASE_URL }) // optional
   })
 );
 
@@ -62,20 +72,22 @@ sequelize
   .then(() => console.log('Database connected successfully.'))
   .catch((err) => console.error('Unable to connect to the database:', err));
 
-import passport from './src/middleware/passport.js';
-
 app.use(passport.initialize());
 app.use(passport.session());
 
-import { startReminderScheduler } from './scheduler.js';
-startReminderScheduler();
-
+// mount routes AFTER passport.session()
 import loginRouter from './src/controllers/loginQueries.js';
 app.use('/auth', loginRouter);
-import pageRouter from './src/controllers/appointmentQueriesU.js';
-app.use('/myappointments', pageRouter);
-import contestRouter from './src/controllers/appointmentsQueriesA.js';
-app.use('/appointments', contestRouter);
+import myappointmentsRouter from './src/controllers/appointmentQueriesU.js';
+app.use('/myappointments', myappointmentsRouter);
+import adminAppointmentsRouter from './src/controllers/appointmentsQueriesA.js';
+app.use('/appointments', adminAppointmentsRouter);
+
+import debugSessionRouter from './src/controllers/debugSession.js';
+app.use('/debug', debugSessionRouter);
+
+import { startReminderScheduler } from './scheduler.js';
+startReminderScheduler();
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

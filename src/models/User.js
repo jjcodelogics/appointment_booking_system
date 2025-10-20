@@ -48,9 +48,8 @@ export default (sequelize, DataTypes) => {
 
   // Define associations (Relationships)
   User.associate = (models) => {
-    User.hasMany(models.Appointment, { foreignKey: 'user_id' });
+    User.hasMany(models.Appointment, { foreignKey: 'user_id', as: 'Appointments' });
   };
 
-
   return User;
-}
+};

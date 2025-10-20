@@ -1,37 +1,62 @@
 import { Router } from 'express';
-const router = Router();
-import { isAuthenticated } from '../middleware/authMiddleware.js';
-import { canAccess } from '../middleware/authZMiddleware.js'; // This is a correct Named Export from its file
 import asyncHandler from 'express-async-handler';
-import { sendBookingConfirmation, sendAppointmentReminder } from '../services/emailService.js';
 import { z } from 'zod';
 import validate from '../middleware/validate.js';
+import { isAuthenticated } from '../middleware/authMiddleware.js';
+import { canAccess } from '../middleware/authZMiddleware.js';
+import dbModels from '../models/index.js';
+import appointmentsSchemas from '../middleware/appointments.schemas.js';
 
-// Correct Schema Destructuring from default export
-import { appointmentDateSchema } from '../middleware/appointments.schemas.js';
-import schemas from '../middleware/appointments.schemas.js'; 
-const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema, idSchema } = schemas;
+// add schema destructuring and a small runtime model loader
+const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema, appointmentDateSchema } = appointmentsSchemas || {};
 
-// Correct Model Destructuring from default export
-import dbModels from '../models/index.js'; 
-const { User, Appointment, Service } = dbModels; 
+async function loadModels() {
+  const dbModule = (await import('../models/index.js')).default || dbModels;
+  return dbModule;
+}
 
+const router = Router();
 
 // routes for users to manage their own appointments
 
 // GET /myappointments - Fetches all appointments for the logged-in user
 
 router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(async (req, res) => {
+  // load models at runtime to avoid import/order/circular issues
+  const dbModule = (await import('../models/index.js')).default || dbModels;
+  const { Appointment, User, Service } = dbModule;
+
+  if (!Appointment) {
+    console.error('Appointment model not loaded in /myappointments handler', Object.keys(dbModule || {}));
+    return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
+  }
+
+  console.log('/myappointments request - isAuthenticated:', req.isAuthenticated && req.isAuthenticated());
+  console.log('/myappointments req.user:', req.user);
+
   try {
-    console.log('User:', req.user);
-    const appointments = await Appointment.findAll({
-      where: { user_id: req.user.user_id },
-    });
-    console.log('Appointments:', appointments);
+    let appointments;
+    if (req.user && req.user.role === 'admin') {
+      // admin: return all appointments with basic user info
+      appointments = await Appointment.findAll({
+        include: [{ model: User, as: 'User', attributes: ['user_id', 'username_email', 'name'] }],
+        order: [['appointment_date', 'ASC']],
+      });
+    } else {
+      // regular user: only their appointments
+      appointments = await Appointment.findAll({
+        where: { user_id: req.user.user_id },
+        order: [['appointment_date', 'ASC']],
+      });
+    }
+
     res.json(appointments);
   } catch (err) {
+    // verbose logging for DB errors
     console.error('Error fetching appointments:', err);
-    res.status(500).json({ msg: 'Server error fetching appointments.' });
+    if (err && err.sql) console.error('SQL:', err.sql);
+    if (err && err.parent) console.error('DB error parent:', err.parent);
+    return res.status(500).json({ msg: 'Server error fetching appointments.', error: err?.message });
   }
 }));
 
@@ -42,11 +67,17 @@ router.get('/me', isAuthenticated, (req, res) => {
 
 // GET /appointments/slots - returns all booked slots (date/time only)
 router.get('/appointments/slots', asyncHandler(async (req, res) => {
-  const appointments = await Appointment.findAll({
+  const db = await loadModels();
+  const { Appointment } = db || {};
+  if (!Appointment) return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
+
+  // use valid enum values (replace 'booked' with 'scheduled' or use Op.in for multiple)
+  const slots = await Appointment.findAll({
     attributes: ['appointment_date'],
-    where: { status: 'booked' }
+    where: { status: 'scheduled' }, // <-- was 'booked' which is invalid for the enum
   });
-  res.json(appointments);
+
+  res.json(slots);
 }));
 
 // POST /myappointments/book - Creates a new appointment
@@ -54,7 +85,6 @@ router.post(
   '/book',
   isAuthenticated,
   canAccess(['user', 'admin']),
-  // NEW ZOD VALIDATION (Inline Schema Composition)
   validate(z.object({
     body: z.object({
       appointment_date: appointmentDateSchema,
@@ -71,6 +101,11 @@ router.post(
     query: z.object({}).optional(),
   })),
   asyncHandler(async (req, res) => {
+    // load models at runtime
+    const db = await loadModels();
+    const { Appointment, Service } = db || {};
+    if (!Appointment || !Service) return res.status(500).json({ msg: 'Server error: models not loaded' });
+
     // 1. Extract validated fields from the body
     const { appointment_date, gender, washing, coloring, cut, employee_name, notes } = req.body;
     const newDate = new Date(appointment_date);
@@ -145,8 +180,8 @@ router.post(
       msg: 'Appointment booked successfully!',
       appointment: newAppointment,
     });
-  }) // end asyncHandler
-); // end router.post
+  })
+);
 
 // --- Helper function for business hours ---
 function isBusinessOpen(day, hour) {
@@ -178,6 +213,11 @@ router.put(
     }),
   })),
   asyncHandler(async (req, res) => {
+    const db = await loadModels();
+    const { Appointment, Sequelize } = db || {};
+    const Op = Sequelize?.Op;
+    if (!Appointment) return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
+
     const appointmentId = req.params.id;
     const { appointment_date } = req.body;
     const newDate = new Date(appointment_date);

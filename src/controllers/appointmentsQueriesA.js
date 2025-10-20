@@ -1,26 +1,32 @@
 import { Router } from 'express';
-const router = Router();
-import { isAuthenticated } from '../middleware/authMiddleware.js';
-import { isAdmin } from '../middleware/authZMiddleware.js';
 import asyncHandler from 'express-async-handler';
-import validate from '../middleware/validate.js';
 import { z } from 'zod';
-import { canAccess } from '../middleware/authZMiddleware.js'; 
-
-// FIX 1: Import the schemas object (default export)
+import validate from '../middleware/validate.js';
+import { isAuthenticated } from '../middleware/authMiddleware.js';
+import { isAdmin, canAccess } from '../middleware/authZMiddleware.js';
+import dbModels from '../models/index.js';
 import appointmentsSchemas from '../middleware/appointments.schemas.js';
-// FIX 2: Destructure the needed schemas from the object
-const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas;
 
-import dbModels from '../models/index.js'; 
-// FIX 3: Destructure all needed models from dbModels
-const { User, Appointment } = dbModels; 
-
+const router = Router();
+const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas || {};
+const { User, Appointment } = dbModels || {};
 
 //routes for admin to manage all appointments
 // GET /appointments - Fetches all appointments (Admin only)
 router.get('/', isAuthenticated, canAccess(['admin']), asyncHandler(async (req, res) => {
-  const appointments = await Appointment.findAll();
+  // runtime import to avoid ordering/circular problems
+  const dbModule = (await import('../models/index.js')).default;
+  const { Appointment, User } = dbModule || {};
+  if (!Appointment) {
+    console.error('Appointment model not loaded in admin GET /appointments', Object.keys(dbModule || {}));
+    return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
+  }
+
+  // include user so admin sees who booked each appointment
+  const appointments = await Appointment.findAll({
+    include: [{ model: User, as: 'User', attributes: ['user_id', 'username_email', 'name'] }],
+    order: [['appointment_date', 'ASC']],
+  });
   res.json(appointments);
 }));
 

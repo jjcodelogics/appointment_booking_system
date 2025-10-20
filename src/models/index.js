@@ -5,6 +5,9 @@ import { basename as _basename, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import Sequelize from 'sequelize';
 import { env as _env } from 'process';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Recreate __filename and __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -16,44 +19,52 @@ const configModule = await import(`file://${configPath}`);
 const config = configModule[_env.NODE_ENV || 'development'];
 
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+const sequelize = new Sequelize(process.env.DATABASE_URL || DB_CONNECTION_STRING, {
+  dialect: process.env.DB_DIALECT || 'postgres',
+  logging: console.log, // <-- enable SQL logging (temporary)
+  // ...other options...
+});
+
+const db = {};
+
+export const initializeModels = async () => {
+  const modelsDir = join(process.cwd(), 'src', 'models');
+  const modelFiles = readdirSync(modelsDir).filter((file) =>
+    file !== 'index.js' && /\.(js|mjs|cjs)$/.test(file)
+  );
+
+  for (const file of modelFiles) {
+    const filePath = join(modelsDir, file);
+    console.log(`Loading model from file: ${filePath}`);
+    // ensure ESM loader resolves local file paths correctly
+    const modelModule = await import(`file://${filePath}`);
+    const modelDefinition = modelModule.default;
+
+    if (typeof modelDefinition === 'function') {
+      const model = modelDefinition(sequelize, Sequelize.DataTypes);
+      if (!model) {
+        console.error(`Model factory in ${file} returned undefined`);
+      } else {
+        console.log(`Model loaded: ${model.name}`);
+        db[model.name] = model;
+      }
+    } else {
+      console.error(`Model file ${file} does not export a default function.`);
+    }
   }
-);
 
-sequelize
-  .authenticate()
-  .then(() => console.log('Database connected successfully.'))
-  .catch((err) => console.error('Unable to connect to the database:', err));
-
-const db = { sequelize, Sequelize };
-
-// Wrap the dynamic import in an async function
-const initializeModels = async () => {
-  const files = readdirSync(__dirname).filter((file) => {
-    return file.indexOf('.') !== 0 && file !== _basename(__filename) && file.slice(-3) === '.js';
-  });
-
-  for (const file of files) {
-    const filePath = join(__dirname, file);
-    const modelDefinition = (await import(`file://${filePath}`)).default;
-    const model = modelDefinition(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
-  }
-
+  // Set up associations if any
   Object.keys(db).forEach((modelName) => {
-    if (db[modelName].associate) {
+    if (typeof db[modelName].associate === 'function') {
       db[modelName].associate(db);
     }
   });
 
-  console.log('Models initialized successfully.');
+  // expose sequelize instances
+  db.sequelize = sequelize;
+  db.Sequelize = Sequelize;
+
+  console.log('Loaded models:', Object.keys(db));
 };
 
-export { initializeModels };
 export default db;

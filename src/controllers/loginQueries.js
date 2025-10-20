@@ -45,23 +45,23 @@ router.post('/register',
 });
 
 // login route
-// login route
-router.post(
-  '/login',
-  validate(UserLoginSchema),
-  // --- FIX: Add "passport." before the authenticate call ---
-  passport.authenticate('local', { session: true }),
-  (req, res) => {
-    res.json({
+router.post('/login', validate(UserLoginSchema), (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ msg: info?.message || 'Invalid credentials' });
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      console.log('Login success - user:', { id: user.user_id, email: user.username_email, role: user.role });
+      console.log('session.passport after login:', req.session.passport);
+      // respond after login so express-session sets cookie
+      return res.json({
         msg: 'Logged in successfully',
-        user: {
-            id: req.user.user_id,
-            username: req.user.username_email,
-        },
-      redirection: '/dashboard', 
+        user: { user_id: user.user_id, username_email: user.username_email, role: user.role },
+      });
     });
-  }
-);
+  })(req, res, next);
+});
 
 // New route to check if a user is logged in
 router.get('/user', (req, res) => {
