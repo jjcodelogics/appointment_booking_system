@@ -42,7 +42,7 @@ a:hover {
 .container {
   max-width: 1100px;
   margin: 2rem auto;
-  padding: 0 2rem;
+  padding: 0 1.25rem;
 }
 
 .card {
@@ -57,9 +57,9 @@ a:hover {
 /* --- Buttons --- */
 .btn {
   display: inline-block;
-  padding: 0.8rem 1.5rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 500;
   transition: opacity 0.2s ease-in;
@@ -77,6 +77,12 @@ a:hover {
 .btn[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn-inline {
+  background: var(--accent-color);
+  color: white;
+  display: inline-block;
 }
 
 /* --- Forms --- */
@@ -123,15 +129,17 @@ thead {
 
 /* --- Hero Section --- */
 .hero {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
   text-align: center;
   padding: 6rem 0;
-  background: url('../images/shop.jpeg') center/cover fixed;
+  background: url('../images/shop.jpeg') center/cover fixed no-repeat;
   color: white;
-  position: relative;
-  height: 80vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  z-index: 0;
 }
 
 .hero::before {
@@ -148,6 +156,9 @@ thead {
 .hero .container {
   z-index: 2;
   position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
 }
 
 .hero h1 {
@@ -160,69 +171,208 @@ thead {
   margin-bottom: 1.5em;
 }
 
-/* --- Footer --- */
+/* Hero lead paragraph styling (restore elegant style) */
+.hero p.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+  max-width: 70ch;
+  margin: 0 auto 1.2rem auto;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.01em;
+}
+
+/* --- Header (thinner) --- */
+.site-header {
+  background: var(--neutral-bg);
+  color: var(--primary-color);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  height: 96px; /* increased to fit larger logo */
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  height: 100%;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* enforce logo sizing across all pages / image types */
+.logo {
+  display: block;
+  height: 80px;     /* doubled from 20px */
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand img.logo,
+.brand svg.logo,
+img.logo {
+  height: 80px !important;
+  max-height: 80px !important;
+  width: auto !important;
+  display: block;
+}
+
+/* Hide site title visually (we removed the text from HTML but keep this as a fallback) */
+.brand .title {
+  display: none;
+}
+
+/* Nav: modern pill buttons */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.site-nav li {
+  list-style: none;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px; /* pill shape */
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.site-nav a:hover,
+.site-nav a:focus {
+  background: var(--accent-color);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  outline: none;
+}
+
+.site-nav a.active {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+/* keep the header CTA as a stronger button variant */
+.btn-header {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(184,134,11,0.12);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .site-header .container {
+    padding: 0 0.75rem;
+  }
+
+  .site-nav ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 1rem;
+    background: var(--neutral-bg);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    flex-direction: column;
+    padding: 0.5rem;
+    min-width: 180px;
+  }
+
+  .site-nav.open ul {
+    display: flex;
+  }
+
+  .site-nav.open ul a {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* --- Footer (thinner) --- */
 footer {
   text-align: center;
-  padding: 1rem 0;
-  margin-top: 0.5rem;
+  padding: 0.4rem 0;
+  margin-top: 0.25rem;
   border-top: 0.5px solid #eee;
 }
 
 .site-footer {
-  background-color: var(--primary-color);
-  color: var(--secondary-bg);
-  padding: 1em;
+  background-color: var(--neutral-bg); /* same as main */
+  color: var(--primary-color);
+  padding: 0.9rem 1rem; /* slightly larger so the centered text has breathing room */
   font-family: var(--body-font);
   font-size: 0.95em;
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 
 .site-footer .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 2em;
+  justify-content: center; /* center content */
+  align-items: center;
 }
 
-.footer-brand, .footer-links, .footer-contact {
-  flex: 1;
-  min-width: 250px;
+.site-footer p { margin: 0; text-align: center; }
+
+/* Compact footer variant for index page to reveal more hero */
+.site-footer--compact {
+  padding: 0.35rem 1rem;
 }
 
-.footer-logo {
-  max-width: 150px;
-  margin-bottom: 1em;
-  filter: brightness(0) invert(1);
+/* --- Page layout consistency --- */
+main, .page {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 0 1.25rem;
 }
 
-.site-footer h4 {
-  font-family: var(--heading-font);
-  color: var(--neutral-bg);
-  font-size: 1.2em;
-  margin-bottom: 1em;
-}
-
-.site-footer ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.site-footer ul li {
-  margin-bottom: 0.7em;
-}
-
-.site-footer a {
-  color: var(--secondary-bg);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.site-footer a:hover {
-  color: var(--accent-color);
-  text-decoration: underline;
-}
+/* Page-specific background for about/services/contact - reverted to default site background */
+/* (removed background_page.png rule) */
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
@@ -234,4 +384,153 @@ footer {
   .footer-brand, .footer-links, .footer-contact {
     min-width: auto;
   }
+}
+
+/* Improve layout for split sections (about, services) */
+.container.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.container.split .col {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  line-height: 1.7;
+}
+
+/* Further readability tweaks for split and service sections */
+.container.split .col p {
+  max-width: 60ch;
+  margin-bottom: 1rem;
+}
+
+/* Services cards */
+.service-card {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.service-card h3 { margin-top: 0; }
+.service-card .meta { color: #555; margin-bottom: 0.75rem; }
+.service-card .note { color: #333; margin-top: 0.75rem; font-size: 0.95rem; }
+
+/* Contact grid (left details / right map) */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.contact-card {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.map-card iframe { width: 100%; height: 320px; border-radius: 6px; }
+
+/* Team list styling */
+.team ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.team li {
+  background: #fff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Responsive adjustments for split/contact */
+@media (max-width: 900px) {
+  .container.split,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero { padding: 4rem 0; }
+  .hero .container { padding: 0 1rem; }
+}
+
+/* Content typography improvements */
+main, .container, .card, .contact-card, .service-card, .col {
+  color: var(--primary-color);
+  font-family: var(--body-font);
+}
+
+.container p, .container li, .contact-card p, .service-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(18,18,18,0.9);
+}
+
+/* Constrain long paragraphs for better readability */
+.container p {
+  max-width: 70ch;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+  position: relative;
+  padding-bottom: 0.35rem;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 48px;
+  height: 2px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+
+/* Improve lists */
+.team ul, .social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.social-list li a {
+  color: var(--primary-color);
+  padding: 0.45rem 0.6rem;
+  display: inline-block;
+}
+
+/* Contact meta formatting: split into grid of small blocks */
+.contact-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.contact-meta div { background: transparent; padding: 0; }
+
+/* Utility: make buttons consistent in header and content */
+.btn, .btn-primary, .btn-inline {
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
 }
