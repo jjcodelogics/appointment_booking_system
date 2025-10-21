@@ -80,11 +80,7 @@ import loginRouter from './src/controllers/loginQueries.js';
 app.use('/auth', loginRouter);
 import myappointmentsRouter from './src/controllers/appointmentQueriesU.js';
 app.use('/myappointments', myappointmentsRouter);
-import adminAppointmentsRouter from './src/controllers/appointmentsQueriesA.js';
-app.use('/appointments', adminAppointmentsRouter);
 
-import debugSessionRouter from './src/controllers/debugSession.js';
-app.use('/debug', debugSessionRouter);
 
 import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();

@@ -31,10 +31,6 @@ async function getAllBookedSlots() {
   return request('/myappointments/appointments/slots', { method: 'GET' });
 }
 
-async function getAllAppointments() {
-  return request('/appointments', { method: 'GET' }); // admin endpoint
-}
-
 async function getMyAppointments() {
   return request('/myappointments', { method: 'GET' }); // user endpoint
 }
@@ -60,9 +56,6 @@ window.api = {
     }),
   cancelAppointment: (id) =>
     request(`/myappointments/cancel/${id}`, { method: 'DELETE' }),
-  getAllAppointments: getAllAppointments,
-  deleteAppointmentAsAdmin: (id) =>
-    request(`/appointments/${id}`, { method: 'DELETE' }),
   getCurrentUser: getCurrentUser,
   getAllBookedSlots: getAllBookedSlots,
 };
