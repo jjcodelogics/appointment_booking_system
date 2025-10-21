@@ -5,10 +5,10 @@ import validate from '../middleware/validate.js';
 import { isAuthenticated } from '../middleware/authMiddleware.js';
 import { canAccess } from '../middleware/authZMiddleware.js';
 import dbModels from '../models/index.js';
-import appointmentsSchemas from '../middleware/appointments.schemas.js';
+import appointmentsSchemas, { appointmentDateSchema } from '../middleware/appointments.schemas.js';
 
 // add schema destructuring and a small runtime model loader
-const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema, appointmentDateSchema } = appointmentsSchemas || {};
+const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas || {};
 
 async function loadModels() {
   const dbModule = (await import('../models/index.js')).default || dbModels;
@@ -166,6 +166,7 @@ router.post(
       status: 'scheduled',
       service_id: serviceId,
       employee_id: DEFAULT_EMPLOYEE_ID,
+      client_id: req.user.user_id, // <-- ensure non-null client_id (use current user)
       notes
     });
   

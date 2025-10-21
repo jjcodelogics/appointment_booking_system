@@ -6,36 +6,111 @@
     <title>Book Appointment - The Modern Shear</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/book-appointment.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
+    <header class="site-header minimal">
+        <div class="container header-inner">
             <a href="index.html" class="brand">
                 <img src="images/logo.jpg" alt="The Modern Shear" class="logo">
             </a>
-            <nav class="site-nav">
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
         </div>
     </header>
 
-    <div id="book-appointment-root" class="dashboard-page"></div>
+    <main class="page-root">
+        <section class="book-card-wrapper">
+            <div class="book-card" role="region" aria-labelledby="book-heading">
+                <h1 id="book-heading" class="card-title">Book Appointment</h1>
+
+                <div id="warning-banner" class="warning-banner" role="alert" aria-hidden="true">
+                </div>
+
+                <div class="form-grid">
+                    <!-- Time selection -->
+                    <div class="time-section card-section">
+                        <h2 class="section-title">Time Selection</h2>
+
+                        <!-- Day picker + choose-date control -->
+                        <div class="day-picker-row">
+                            <div id="day-picker" class="day-picker" role="tablist" aria-label="Select day"></div>
+                            <div class="choose-date-wrap">
+                                <button id="choose-date" class="btn-link" type="button">Choose date…</button>
+                                <input id="date-input" type="date" aria-hidden="true" class="visually-hidden">
+                            </div>
+                        </div>
+
+                        <div class="selected-slot-row">
+                            <div>
+                                <label class="small-label">Selected Slot</label>
+                                <div id="selected-slot" class="selected-slot">None</div>
+                            </div>
+                            <button id="clear-selection" class="btn-link" type="button">Clear</button>
+                        </div>
+
+                        <div id="slot-grid" class="slot-grid" aria-live="polite" aria-label="Available time slots">
+                            <!-- slots populated by JS -->
+                        </div>
+
+                        <div class="slot-legend">
+                            <span class="legend-item"><span class="legend-swatch available"></span>Available</span>
+                            <span class="legend-item"><span class="legend-swatch selected"></span>Selected</span>
+                            <span class="legend-item"><span class="legend-swatch unavailable"></span>Booked / Unavailable</span>
+                        </div>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="services-section card-section">
+                        <h2 class="section-title">Services</h2>
+
+                        <div class="form-row">
+                            <label class="small-label">Gender</label>
+                            <div class="radio-row">
+                                <label><input type="radio" name="gender" value="male" checked> Male</label>
+                                <label><input type="radio" name="gender" value="female"> Female</label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="small-label">Options</label>
+                            <div class="checkbox-row">
+                                <label><input type="checkbox" name="washing" checked> Washing</label>
+                                <label><input type="checkbox" name="coloring"> Coloring</label>
+                                <label><input type="checkbox" name="cut" checked> Cut</label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="small-label">Employee Name (optional)</label>
+                            <input id="employee_name" name="employee_name" type="text" class="input">
+                        </div>
+
+                        <div class="form-row">
+                            <label class="small-label">Notes</label>
+                            <input id="notes" name="notes" type="text" class="input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button id="back-btn" class="btn-secondary" type="button">Back</button>
+                    <button id="book-btn" class="btn-primary" type="button" disabled>Book</button>
+                    <div id="form-msg" class="form-msg" aria-live="polite"></div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer minimal">
+        <div class="container">
+            <p>&copy; 2025 The Modern Shear</p>
+        </div>
+    </footer>
+
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="js/api.cdn.js"></script>
     <script src="js/main.cdn.js" type="module"></script>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2025 The Modern Shear. All Rights Reserved.</p>
-        </div>
-    </footer>
-
+    <script src="js/book-appointment.js" defer></script>
 </body>
-
 </html>
