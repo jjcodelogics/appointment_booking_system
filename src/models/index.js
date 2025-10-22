@@ -14,10 +14,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Dynamically import the CJS config file
-const configPath = join(__dirname, '..', '..', 'config', 'config.js');
+const configPath = join(__dirname, '..', '..', 'config', 'config.cjs');
 const configModule = await import(`file://${configPath}`);
-const config = configModule[_env.NODE_ENV || 'development'];
+// FIX 1: The CJS exports are on the .default property
+const config = configModule.default[_env.NODE_ENV || 'development'];
 
+// FIX 2: Define the DB_CONNECTION_STRING using the config object
+const DB_CONNECTION_STRING = `postgres://${config.username}:${config.password}@${config.host}:${process.env.DB_PORT || 5432}/${config.database}`;
 
 const sequelize = new Sequelize(process.env.DATABASE_URL || DB_CONNECTION_STRING, {
   dialect: process.env.DB_DIALECT || 'postgres',
@@ -35,21 +38,16 @@ export const initializeModels = async () => {
 
   for (const file of modelFiles) {
     const filePath = join(modelsDir, file);
-    console.log(`Loading model from file: ${filePath}`);
+
     // ensure ESM loader resolves local file paths correctly
     const modelModule = await import(`file://${filePath}`);
     const modelDefinition = modelModule.default;
 
     if (typeof modelDefinition === 'function') {
       const model = modelDefinition(sequelize, Sequelize.DataTypes);
-      if (!model) {
-        console.error(`Model factory in ${file} returned undefined`);
-      } else {
-        console.log(`Model loaded: ${model.name}`);
+      if (model) {
         db[model.name] = model;
       }
-    } else {
-      console.error(`Model file ${file} does not export a default function.`);
     }
   }
 

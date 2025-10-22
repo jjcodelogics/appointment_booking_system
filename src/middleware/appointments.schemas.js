@@ -49,6 +49,16 @@ export const appointmentsSchemas = {
         }),
     }),
 
+    // Add this new schema for the reschedule route
+    reschedule: z.object({
+        params: z.object({
+            id: idParamSchema,
+        }),
+        body: z.object({
+            appointment_date: appointmentDateSchema,
+        }).strict(), // Only allow appointment_date in the body
+    }),
+
     // For routes with only an ID param, like GET /:id or DELETE /:id
     byId: z.object({
         params: z.object({

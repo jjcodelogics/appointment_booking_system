@@ -1,12 +1,10 @@
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { z } from 'zod';
-import { validate } from '../middleware/validate.js';
+// Correctly import the default export (no curly braces)
+import validate from '../middleware/validate.js';
 import { isAuthenticated, canAccess } from '../middleware/auth.js';
-import { appointmentsSchemas, appointmentDateSchema } from '../schemas/appointmentSchemas.js';
-import db from '../models/index.js'; // Import db instance directly
-
-const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas || {};
+import { appointmentsSchemas } from '../middleware/appointments.schemas.js';
+import db from '../models/index.js';
 
 const router = Router();
 
@@ -18,12 +16,8 @@ router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(asyn
   const { Appointment, User } = db;
 
   if (!Appointment) {
-    console.error('Appointment model not loaded in /myappointments handler', Object.keys(db || {}));
     return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
   }
-
-  console.log('/myappointments request - isAuthenticated:', req.isAuthenticated && req.isAuthenticated());
-  console.log('/myappointments req.user:', req.user);
 
   try {
     let appointments;
@@ -44,8 +38,6 @@ router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(asyn
     res.json(appointments);
   } catch (err) {
     console.error('Error fetching appointments:', err);
-    if (err && err.sql) console.error('SQL:', err.sql);
-    if (err && err.parent) console.error('DB error parent:', err.parent);
     return res.status(500).json({ msg: 'Server error fetching appointments.', error: err?.message });
   }
 }));
@@ -72,18 +64,8 @@ router.post(
   '/book',
   isAuthenticated,
   canAccess(['user', 'admin']),
-  validate(z.object({
-    body: z.object({
-      appointment_date: appointmentDateSchema,
-      gender: z.enum(['male', 'female']),
-      washing: z.boolean(),
-      coloring: z.boolean(),
-      cut: z.boolean(),
-      notes: z.string().trim().max(255).optional(),
-    }),
-    params: z.object({}).optional(),
-    query: z.object({}).optional(),
-  })),
+  // Use the correct schema path
+  validate(appointmentsSchemas.create),
   asyncHandler(async (req, res) => {
     const { Appointment, Service } = db;
     if (!Appointment || !Service) return res.status(500).json({ msg: 'Server error: models not loaded' });
@@ -159,12 +141,8 @@ router.put(
   '/reschedule/:id',
   isAuthenticated,
   canAccess(['user', 'admin']),
-  validate(z.object({
-    params: IdParamSchema.shape.params,
-    body: z.object({
-      appointment_date: appointmentDateSchema,
-    }),
-  })),
+  // Use the new, correct schema
+  validate(appointmentsSchemas.reschedule),
   asyncHandler(async (req, res) => {
     const { Appointment, Sequelize } = db;
     const Op = Sequelize?.Op;
@@ -219,13 +197,14 @@ router.delete(
   '/cancel/:id',
   isAuthenticated,
   canAccess(['user', 'admin']),
-  validate(IdParamSchema),
+  // Use the correct schema for validating an ID in the URL parameters
+  validate(appointmentsSchemas.byId),
   asyncHandler(async (req, res) => {
     const { Appointment } = db;
-    const appointmentId = req.params.id;
+    const { id } = req.params;
 
     const result = await Appointment.destroy({
-      where: { appointment_id: appointmentId, user_id: req.user.user_id },
+      where: { appointment_id: id, user_id: req.user.user_id },
     });
 
     if (result === 0) {

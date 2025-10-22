@@ -1,24 +1,24 @@
 import { Router } from 'express';
-const router = Router();
-import passport from '../middleware/passport.js'; 
 import asyncHandler from 'express-async-handler';
+import passport from '../middleware/passport.js';
+// Correctly import the default export (no curly braces)
 import validate from '../middleware/validate.js';
-import userSchemas from '../middleware/user.schemas.js';
-const { UserRegisterSchema, UserLoginSchema } = userSchemas;
-import dbModels from '../models/index.js'; 
+import { userSchemas } from '../middleware/user.schemas.js';
+import db from '../models/index.js';
 
+const router = Router();
 
 // Route for user registration.
 router.post('/register', 
-  // NEW ZOD VALIDATION
-  validate(UserRegisterSchema),
+  // Use the correct schema path
+  validate(userSchemas.register),
   
   async (req, res) => {
     
     const { username_email, name, password } = req.body; 
     try {
       // Data is now guaranteed to be valid and sanitized by Zod
-      const newUser = await dbModels.User.create({
+      const newUser = await db.User.create({
         username_email,
         name,
         password, 
@@ -45,7 +45,8 @@ router.post('/register',
 });
 
 // login route
-router.post('/login', validate(UserLoginSchema), (req, res, next) => {
+// Use the correct schema path
+router.post('/login', validate(userSchemas.login), (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
     if (!user) return res.status(401).json({ msg: info?.message || 'Invalid credentials' });
