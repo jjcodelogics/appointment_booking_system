@@ -15,7 +15,6 @@ passport.use(
         const { User } = dbModule;
         if (!User) return done(new Error('User model not loaded'));
 
-        console.log('username_email:', username_email);
         const user = await User.findOne({ where: { username_email } });
         
         if (!user) {
@@ -47,7 +46,6 @@ passport.deserializeUser(async (id, done) => {
     const db = (await import('../models/index.js')).default;
     const { User } = db;
     const user = await User.findByPk(id);
-    console.log('deserializeUser ->', user ? { id: user.user_id, role: user.role } : null);
     done(null, user || null);
   } catch (err) {
     done(err);

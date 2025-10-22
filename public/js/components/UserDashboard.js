@@ -8,8 +8,17 @@ export default function UserDashboardComponent() {
   const [error, setError] = React.useState('');
   const [user, setUser] = React.useState(null);
   const [bookedSlots, setBookedSlots] = React.useState([]);
+  const [successMessage, setSuccessMessage] = React.useState('');
 
   React.useEffect(() => {
+    // Check for success message from booking redirect
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('booked') === 'true') {
+      setSuccessMessage('Appointment booked successfully!');
+      // Clean the URL
+      window.history.replaceState({}, document.title, "/dashboard.html");
+    }
+
     // Fetch user info
     window.api.getCurrentUser()
       .then(setUser)
@@ -52,6 +61,7 @@ export default function UserDashboardComponent() {
     "div",
     { className: "container" },
     user && React.createElement("h2", null, `Welcome, ${user.name}!`),
+    successMessage && React.createElement("div", { className: "alert alert-success" }, successMessage),
     React.createElement("div", { className: "actions-right" },
       React.createElement("button", { className: "btn btn-primary", onClick: handleBook }, "Book New Appointment")
     ),

@@ -4,6 +4,7 @@
 import LoginRegister from './components/LoginRegister.js';
 import UserDashboardComponent from './components/UserDashboard.js'; 
 import BookAppointment from './components/BookAppointment.js'; 
+import RescheduleAppointment from './components/RescheduleAppointment.js';
 
 // 2. Render logic for Login/Register
 const loginRootEl = document.getElementById('login-register-root');
@@ -29,7 +30,15 @@ if (bookRootEl) {
   );
 }
 
-// 5. Logout button logic 
+// 5. Render logic for Reschedule page
+const rescheduleRootEl = document.getElementById('reschedule-appointment-root');
+if (rescheduleRootEl) {
+  ReactDOM.createRoot(rescheduleRootEl).render(
+    React.createElement(RescheduleAppointment)
+  );
+}
+
+// 6. Logout button logic 
 const logoutBtn = document.getElementById('logout-button');
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async (e) => {

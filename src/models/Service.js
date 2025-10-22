@@ -6,7 +6,6 @@ export default (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
-        // Renamed 'man_female' to 'gender_target' for clarity
         gender_target: {
             type: DataTypes.ENUM('male', 'female'),
             allowNull: false,
@@ -26,15 +25,10 @@ export default (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: false,
         },
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-            defaultValue: 0.00
-        },
     }, {
         tableName: 'services',
-        timestamps: false,
     });
+        
 
     // Define associations (Relationships)
     Service.associate = (models) => {

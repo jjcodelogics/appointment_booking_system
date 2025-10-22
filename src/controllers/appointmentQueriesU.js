@@ -1,19 +1,12 @@
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
 import { z } from 'zod';
-import validate from '../middleware/validate.js';
-import { isAuthenticated } from '../middleware/authMiddleware.js';
-import { canAccess } from '../middleware/authZMiddleware.js';
-import dbModels from '../models/index.js';
-import appointmentsSchemas, { appointmentDateSchema } from '../middleware/appointments.schemas.js';
+import { validate } from '../middleware/validate.js';
+import { isAuthenticated, canAccess } from '../middleware/auth.js';
+import { appointmentsSchemas, appointmentDateSchema } from '../schemas/appointmentSchemas.js';
+import db from '../models/index.js'; // Import db instance directly
 
-// add schema destructuring and a small runtime model loader
 const { CreateAppointmentSchema, UpdateAppointmentSchema, IdParamSchema } = appointmentsSchemas || {};
-
-async function loadModels() {
-  const dbModule = (await import('../models/index.js')).default || dbModels;
-  return dbModule;
-}
 
 const router = Router();
 
@@ -22,12 +15,10 @@ const router = Router();
 // GET /myappointments - Fetches all appointments for the logged-in user
 
 router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(async (req, res) => {
-  // load models at runtime to avoid import/order/circular issues
-  const dbModule = (await import('../models/index.js')).default || dbModels;
-  const { Appointment, User, Service } = dbModule;
+  const { Appointment, User } = db;
 
   if (!Appointment) {
-    console.error('Appointment model not loaded in /myappointments handler', Object.keys(dbModule || {}));
+    console.error('Appointment model not loaded in /myappointments handler', Object.keys(db || {}));
     return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
   }
 
@@ -52,7 +43,6 @@ router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(asyn
 
     res.json(appointments);
   } catch (err) {
-    // verbose logging for DB errors
     console.error('Error fetching appointments:', err);
     if (err && err.sql) console.error('SQL:', err.sql);
     if (err && err.parent) console.error('DB error parent:', err.parent);
@@ -67,14 +57,11 @@ router.get('/me', isAuthenticated, (req, res) => {
 
 // GET /appointments/slots - returns all booked slots (date/time only)
 router.get('/appointments/slots', asyncHandler(async (req, res) => {
-  const db = await loadModels();
-  const { Appointment } = db || {};
+  const { Appointment } = db;
   if (!Appointment) return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
 
-  // use valid enum values (replace 'booked' with 'scheduled' or use Op.in for multiple)
   const slots = await Appointment.findAll({
     attributes: ['appointment_date'],
-    where: { status: 'scheduled' }, // <-- was 'booked' which is invalid for the enum
   });
 
   res.json(slots);
@@ -92,30 +79,22 @@ router.post(
       washing: z.boolean(),
       coloring: z.boolean(),
       cut: z.boolean(),
-      status: z.enum(['scheduled', 'completed', 'canceled']).optional(),
-      employee_name: z.string().optional(),
-      employee_id: z.number().default(1),
       notes: z.string().trim().max(255).optional(),
     }),
     params: z.object({}).optional(),
     query: z.object({}).optional(),
   })),
   asyncHandler(async (req, res) => {
-    // load models at runtime
-    const db = await loadModels();
-    const { Appointment, Service } = db || {};
+    const { Appointment, Service } = db;
     if (!Appointment || !Service) return res.status(500).json({ msg: 'Server error: models not loaded' });
 
-    // 1. Extract validated fields from the body
-    const { appointment_date, gender, washing, coloring, cut, employee_name, notes } = req.body;
+    const { appointment_date, gender, washing, coloring, cut, notes } = req.body;
     const newDate = new Date(appointment_date);
 
-    // 2. Basic date validation
     if (Number.isNaN(newDate.getTime())) {
       return res.status(400).json({ msg: 'Invalid appointment_date.' });
     }
 
-    // --- FIX #6: CHECK FOR DOUBLE BOOKING ---
     const existing = await Appointment.findOne({
       where: { appointment_date: newDate }
     });
@@ -124,21 +103,12 @@ router.post(
       return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
-    // --- FIX #5: CHECK BUSINESS HOURS ---
-    const day = newDate.getDay(); // 0 = Sunday, ..., 6 = Saturday
+    const day = newDate.getDay();
     const hour = newDate.getHours();
 
     if (!isBusinessOpen(day, hour)) {
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
     }
-
-    // 3. Look up the Service ID based on the client's selected attributes
-    console.log('Service Lookup Parameters:', {
-      gender_target: gender,
-      washing: washing,
-      coloring: coloring,
-      cutting: cut
-    });
 
     const selectedService = await Service.findOne({
       where: {
@@ -149,34 +119,19 @@ router.post(
       }
     });
 
-    // 4. Handle case where no service matches the criteria
     if (!selectedService) {
       return res.status(404).json({ msg: 'No matching service found for your selected options.' });
     }
 
-    // Define defaults/retrieved IDs
     const serviceId = selectedService.service_id;
-    const DEFAULT_EMPLOYEE_ID = 1;
 
-    
-    // 5. Create the appointment using only the foreign keys (service_id, employee_id)
     const newAppointment = await Appointment.create({
       user_id: req.user.user_id,
       appointment_date: newDate,
-      status: 'scheduled',
       service_id: serviceId,
-      employee_id: DEFAULT_EMPLOYEE_ID,
-      client_id: req.user.user_id, // <-- ensure non-null client_id (use current user)
       notes
     });
-  
-    try {
-      sendBookingConfirmation(req.user.username_email, newAppointment);
-    } catch (err) {
-      console.error('Error sending confirmation email:', err);
-    }
 
-    // 6. Return success
     return res.status(201).json({
       msg: 'Appointment booked successfully!',
       appointment: newAppointment,
@@ -186,15 +141,12 @@ router.post(
 
 // --- Helper function for business hours ---
 function isBusinessOpen(day, hour) {
-  // Sun (0) or Mon (1)
   if (day === 0 || day === 1) return false;
 
-  // Tue-Fri (2-5): 9:00 - 18:59
   if (day >= 2 && day <= 5) {
     return hour >= 9 && hour < 19;
   }
 
-  // Sat (6): 8:00 - 16:59
   if (day === 6) {
     return hour >= 8 && hour < 17;
   }
@@ -214,8 +166,7 @@ router.put(
     }),
   })),
   asyncHandler(async (req, res) => {
-    const db = await loadModels();
-    const { Appointment, Sequelize } = db || {};
+    const { Appointment, Sequelize } = db;
     const Op = Sequelize?.Op;
     if (!Appointment) return res.status(500).json({ msg: 'Server error: Appointment model not loaded' });
 
@@ -223,12 +174,10 @@ router.put(
     const { appointment_date } = req.body;
     const newDate = new Date(appointment_date);
 
-    // Validate date
     if (Number.isNaN(newDate.getTime())) {
       return res.status(400).json({ msg: 'Invalid appointment_date.' });
     }
 
-    // Find appointment and check ownership
     const appointment = await Appointment.findOne({
       where: { appointment_id: appointmentId, user_id: req.user.user_id },
     });
@@ -237,23 +186,20 @@ router.put(
       return res.status(404).json({ msg: 'Appointment not found or you do not have permission to edit it.' });
     }
 
-    // Prevent rescheduling to the same slot (optional)
     if (appointment.appointment_date && new Date(appointment.appointment_date).getTime() === newDate.getTime()) {
       return res.status(400).json({ msg: 'New appointment date is the same as the current one.' });
     }
 
-    // --- CHECK BUSINESS HOURS ---
     const day = newDate.getDay();
     const hour = newDate.getHours();
     if (!isBusinessOpen(day, hour)) {
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
     }
 
-    // --- CHECK FOR DOUBLE BOOKING (exclude current appointment) ---
     const existing = await Appointment.findOne({
       where: {
         appointment_date: newDate,
-        appointment_id: { [Op.ne]: appointmentId }, // requires Sequelize.Op (import as Op)
+        appointment_id: { [Op.ne]: appointmentId },
       }
     });
 
@@ -261,7 +207,6 @@ router.put(
       return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
-    // Save new date
     appointment.appointment_date = newDate;
     await appointment.save();
 
@@ -274,11 +219,11 @@ router.delete(
   '/cancel/:id',
   isAuthenticated,
   canAccess(['user', 'admin']),
-  // NEW ZOD VALIDATION
   validate(IdParamSchema),
   asyncHandler(async (req, res) => {
+    const { Appointment } = db;
     const appointmentId = req.params.id;
-    
+
     const result = await Appointment.destroy({
       where: { appointment_id: appointmentId, user_id: req.user.user_id },
     });

@@ -5,12 +5,12 @@ export async function up(queryInterface, Sequelize) {
   const now = new Date();
 
   // 1. Insert Users
-  // NOTE: In a real app, 'password' MUST be hashed (e.g., using bcrypt).
+  // NOTE: In a real app, 'password' MUST be hashed. Your User model hook handles this.
   await queryInterface.bulkInsert('users', [
     {
       username_email: 'admin@salon.com',
       name: 'Admin User',
-      password: 'secure_admin_password',
+      password: 'secure_admin_password', // Will be hashed by the model
       role: 'admin',
       createdAt: now,
       updatedAt: now,
@@ -18,7 +18,7 @@ export async function up(queryInterface, Sequelize) {
     {
       username_email: 'client1@email.com',
       name: 'Client One',
-      password: 'client1pass',
+      password: 'client1pass', // Will be hashed by the model
       role: 'user',
       createdAt: now,
       updatedAt: now,
@@ -26,7 +26,7 @@ export async function up(queryInterface, Sequelize) {
     {
       username_email: 'client2@email.com',
       name: 'Client Two',
-      password: 'client2pass',
+      password: 'client2pass', // Will be hashed by the model
       role: 'user',
       createdAt: now,
       updatedAt: now,
@@ -58,7 +58,6 @@ export async function up(queryInterface, Sequelize) {
       washing: true,
       cutting: true,
       coloring: false,
-      price: 45.00,
       createdAt: now,
       updatedAt: now,
     },
@@ -67,7 +66,6 @@ export async function up(queryInterface, Sequelize) {
       washing: true,
       cutting: true,
       coloring: false,
-      price: 30.00,
       createdAt: now,
       updatedAt: now,
     },
@@ -76,7 +74,6 @@ export async function up(queryInterface, Sequelize) {
       washing: true,
       cutting: true,
       coloring: true,
-      price: 120.00,
       createdAt: now,
       updatedAt: now,
     }
@@ -91,21 +88,17 @@ export async function up(queryInterface, Sequelize) {
   await queryInterface.bulkInsert('appointments', [
     {
       user_id: 2, // Corresponds to client1@email.com
+      service_id: 1, // Corresponds to female, wash, cut
       appointment_date: futureDate,
-      status: 'scheduled',
       notes: 'Needs a layered cut.',
-      service_id: 1, // Corresponds to Female Wash/Cut
-      employee_id: 1, // Corresponds to Jane Smith
       createdAt: now,
       updatedAt: now,
     },
     {
       user_id: 3, // Corresponds to client2@email.com
+      service_id: 2, // Corresponds to male, wash, cut
       appointment_date: futureDate,
-      status: 'scheduled',
       notes: 'Buzz cut.',
-      service_id: 2, // Corresponds to Male Wash/Cut
-      employee_id: 1, // Corresponds to Jane Smith
       createdAt: now,
       updatedAt: now,
     }
@@ -113,7 +106,7 @@ export async function up(queryInterface, Sequelize) {
 
 }
 export async function down(queryInterface, Sequelize) {
-  // Delete all records from tables
+  // Delete all records from tables in reverse order
   await queryInterface.bulkDelete('appointments', null, {});
   await queryInterface.bulkDelete('services', null, {});
   await queryInterface.bulkDelete('employees', null, {});

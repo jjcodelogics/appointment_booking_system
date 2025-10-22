@@ -1,4 +1,4 @@
- // services/emailService.js
+// services/emailService.js
 
 import { createTransport } from 'nodemailer';
 import dotenv from 'dotenv';
@@ -57,7 +57,6 @@ const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
         <p><b>Date:</b> ${new Date(appointmentDetails.appointment_date).toDateString()}</p>
         <p><b>Time:</b> ${new Date(appointmentDetails.appointment_date).toLocaleTimeString()}</p>
         <p>We look forward to seeing you!</p>
-        <img src="../../public/images/logo.jpg" alt="logo" style="width:300px;height:auto;"/>
       `,
     };
   

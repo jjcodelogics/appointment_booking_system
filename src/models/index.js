@@ -21,7 +21,7 @@ const config = configModule[_env.NODE_ENV || 'development'];
 
 const sequelize = new Sequelize(process.env.DATABASE_URL || DB_CONNECTION_STRING, {
   dialect: process.env.DB_DIALECT || 'postgres',
-  logging: console.log, // <-- enable SQL logging (temporary)
+  logging: false, // Disabled SQL logging for production
   // ...other options...
 });
 
@@ -64,7 +64,7 @@ export const initializeModels = async () => {
   db.sequelize = sequelize;
   db.Sequelize = Sequelize;
 
-  console.log('Loaded models:', Object.keys(db));
+  console.log('Database models initialized successfully.');
 };
 
 export default db;

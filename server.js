@@ -62,7 +62,10 @@ app.use(
       sameSite: 'lax',
       maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
     },
-    // store: new (require('connect-pg-simple')(session))({ conObject: process.env.DATABASE_URL }) // optional
+    // WARNING: The default MemoryStore is not for production.
+    // It will leak memory and not persist across restarts.
+    // For production, uncomment and configure a persistent store like this:
+    // store: new (require('connect-pg-simple')(session))({ conObject: process.env.DATABASE_URL })
   })
 );
 

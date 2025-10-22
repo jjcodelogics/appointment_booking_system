@@ -6,7 +6,7 @@ import validate from '../middleware/validate.js';
 import userSchemas from '../middleware/user.schemas.js';
 const { UserRegisterSchema, UserLoginSchema } = userSchemas;
 import dbModels from '../models/index.js'; 
-const { User } = dbModels; 
+
 
 // Route for user registration.
 router.post('/register', 
@@ -18,7 +18,7 @@ router.post('/register',
     const { username_email, name, password } = req.body; 
     try {
       // Data is now guaranteed to be valid and sanitized by Zod
-      const newUser = await User.create({
+      const newUser = await dbModels.User.create({
         username_email,
         name,
         password, 

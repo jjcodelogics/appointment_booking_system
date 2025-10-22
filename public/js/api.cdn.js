@@ -3,11 +3,13 @@ const API_BASE_URL = 'http://localhost:3000';
 async function request(endpoint, options = {}) {
   const url = API_BASE_URL + endpoint;
   const opts = {
-    credentials: 'include', // send session cookie
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     ...options,
   };
-  if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
+  if (opts.body && typeof opts.body !== 'string') {
+    opts.body = JSON.stringify(opts.body);
+  }
   const res = await fetch(url, opts);
   const text = await res.text();
   if (!text) {
@@ -21,30 +23,30 @@ async function request(endpoint, options = {}) {
 
 // Get current user info
 async function getCurrentUser() {
-  // backend exposes /myappointments/me (router mounted at /myappointments)
   return request('/myappointments/me', { method: 'GET' });
 }
 
 // Get all booked appointment slots (no personal details)
 async function getAllBookedSlots() {
-  // slots route is defined inside the myappointments router:
-  return request('/myappointments/appointments/slots', { method: 'GET' });
+  return request('/myappointments/slots', { method: 'GET' });
 }
 
 async function getMyAppointments() {
-  return request('/myappointments', { method: 'GET' }); // user endpoint
+  return request('/myappointments', { method: 'GET' });
 }
 
 window.api = {
   login: (username_email, password) =>
     request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username_email, password }),
+      // The request function handles stringifying the body
+      body: { username_email, password },
     }),
   register: (username_email, name, password) =>
     request('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ username_email, name, password }),
+      // The request function handles stringifying the body
+      body: { username_email, name, password },
     }),
   logout: () => request('/auth/logout', { method: 'POST' }),
   checkAuthStatus: () => request('/auth/user'),
@@ -52,7 +54,7 @@ window.api = {
   bookAppointment: (appointmentData) =>
     request('/myappointments/book', {
       method: 'POST',
-      body: JSON.stringify(appointmentData),
+      body: appointmentData,
     }),
   cancelAppointment: (id) =>
     request(`/myappointments/cancel/${id}`, { method: 'DELETE' }),
@@ -63,6 +65,7 @@ window.api = {
 window.api.rescheduleAppointment = async function (id, newDateISO) {
   return request(`/myappointments/reschedule/${encodeURIComponent(id)}`, {
     method: 'PUT',
-    body: JSON.stringify({ appointment_date: newDateISO })
+    // The request function handles stringifying the body
+    body: { appointment_date: newDateISO }
   });
 };
