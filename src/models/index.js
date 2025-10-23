@@ -1,31 +1,24 @@
 'use strict';
 
+import { Sequelize } from 'sequelize';
 import { readdirSync } from 'fs';
-import { basename as _basename, join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import Sequelize from 'sequelize';
-import { env as _env } from 'process';
+import { dirname, join } from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Recreate __filename and __dirname for ES Modules
+// Throw an error if the DATABASE_URL is not set. This is safer.
+if (!process.env.DATABASE_URL) {
+  throw new Error('FATAL ERROR: DATABASE_URL is not defined in your .env file.');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Dynamically import the CJS config file
-const configPath = join(__dirname, '..', '..', 'config', 'config.cjs');
-const configModule = await import(`file://${configPath}`);
-// FIX 1: The CJS exports are on the .default property
-const config = configModule.default[_env.NODE_ENV || 'development'];
-
-// FIX 2: Define the DB_CONNECTION_STRING using the config object
-const DB_CONNECTION_STRING = `postgres://${config.username}:${config.password}@${config.host}:${process.env.DB_PORT || 5432}/${config.database}`;
-
-const sequelize = new Sequelize(process.env.DATABASE_URL || DB_CONNECTION_STRING, {
-  dialect: process.env.DB_DIALECT || 'postgres',
-  logging: false, // Disabled SQL logging for production
-  // ...other options...
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres', // Assuming postgres
+  logging: false,
 });
 
 const db = {};

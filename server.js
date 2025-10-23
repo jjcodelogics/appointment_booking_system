@@ -18,6 +18,17 @@ await initializeModels();
 import db from './src/models/index.js';
 const { sequelize } = db;
 
+// Sync all defined models to the database.
+// This will create the tables if they don't exist.
+try {
+  await sequelize.sync({ alter: true }); // Use { force: true } to drop and recreate tables
+  console.log('All models were synchronized successfully.');
+} catch (error) {
+  console.error('Unable to synchronize the database:', error);
+  process.exit(1); // Exit if we can't sync
+}
+
+// import passport after db is ready
 import passport from './src/middleware/passport.js';
 
 app.use(
