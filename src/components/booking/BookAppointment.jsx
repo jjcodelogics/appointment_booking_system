@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../utils/api';
+import api from '../../utils/api';
 
 // onBookingSuccess is a function passed from the parent to tell it to go back to the dashboard
 const BookAppointment = ({ onBookingSuccess }) => {

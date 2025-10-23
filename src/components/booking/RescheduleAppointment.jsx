@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../utils/api';
+import api from '../../utils/api';
 
 // Receives the appointment ID and a function to call on success
 const RescheduleAppointment = ({ appointmentId, onRescheduleSuccess }) => {

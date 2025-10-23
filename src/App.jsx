@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import Login from './components/Login';
-import Appointments from './components/Appointments';
-import BookAppointment from './components/BookAppointment';
-import RescheduleAppointment from './components/RescheduleAppointment';
 import api from './utils/api';
+
+// Layout Components
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+
+// Page Components
+import HomePage from './components/pages/HomePage';
+import AboutPage from './components/pages/AboutPage';
+import ServicesPage from './components/pages/ServicesPage';
+import ContactPage from './components/pages/ContactPage';
+
+// Auth & User Components
+import Login from './components/auth/Login';
+import Appointments from './components/Appointments';
+import BookAppointment from './components/booking/BookAppointment';
+import RescheduleAppointment from './components/booking/RescheduleAppointment';
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // State to manage which "page" is visible
-  const [view, setView] = useState('dashboard'); // 'dashboard', 'booking', 'rescheduling'
+  const [view, setView] = useState('home'); // Start on the home page
   const [rescheduleId, setRescheduleId] = useState(null);
-  // Add a key that we can change to force a refresh
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -31,56 +41,75 @@ const App = () => {
   const handleLogout = async () => {
     await api.logout();
     setUser(null);
+    setView('home');
   };
 
-  // When returning to the dashboard, increment the key to trigger a refresh
+  const navigate = (targetView) => setView(targetView);
+
   const navigateToDashboard = () => {
     setRefreshKey(prevKey => prevKey + 1);
     setView('dashboard');
   };
 
-  // Functions to navigate between views
   const navigateToBooking = () => setView('booking');
   const navigateToReschedule = (id) => {
     setRescheduleId(id);
     setView('rescheduling');
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const renderView = () => {
+    if (loading) {
+      return <div>Loading...</div>;
+    }
 
-  // If not logged in, always show the Login component
-  if (!user) {
-    return (
-      <div className="container">
-        <Login onLogin={handleLogin} />
-      </div>
-    );
-  }
+    if (!user) {
+      switch (view) {
+        case 'services':
+          return <ServicesPage onNavigate={navigate} />;
+        case 'about':
+          return <AboutPage onNavigate={navigate} />;
+        case 'contact':
+          return <ContactPage onNavigate={navigate} />;
+        case 'login':
+          return <Login onLogin={handleLogin} />;
+        case 'home':
+        default:
+          return <HomePage onNavigate={navigate} />;
+      }
+    }
 
-  // If logged in, render the correct view
+    switch (view) {
+      case 'dashboard':
+        return (
+          <Appointments
+            key={refreshKey}
+            user={user}
+            onLogout={handleLogout}
+            onBookNew={navigateToBooking}
+            onReschedule={navigateToReschedule}
+          />
+        );
+      case 'booking':
+        return <BookAppointment onBookingSuccess={navigateToDashboard} />;
+      case 'rescheduling':
+        return (
+          <RescheduleAppointment
+            appointmentId={rescheduleId}
+            onRescheduleSuccess={navigateToDashboard}
+          />
+        );
+      case 'home':
+      default:
+        return <HomePage onNavigate={navigate} />;
+    }
+  };
+
   return (
-    <div className="container mt-4">
-      {view === 'dashboard' && (
-        <Appointments
-          key={refreshKey} // Add the key here
-          user={user}
-          onLogout={handleLogout}
-          onBookNew={navigateToBooking}
-          onReschedule={navigateToReschedule}
-        />
-      )}
-      {view === 'booking' && (
-        <BookAppointment onBookingSuccess={navigateToDashboard} />
-      )}
-      {view === 'rescheduling' && (
-        <RescheduleAppointment
-          appointmentId={rescheduleId}
-          onRescheduleSuccess={navigateToDashboard}
-        />
-      )}
-    </div>
+    <>
+      <Header onNavigate={navigate} />
+      <div className="container mt-4">{renderView()}</div>
+      <Footer />
+    </>
   );
 };
 
