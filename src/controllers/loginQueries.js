@@ -10,39 +10,31 @@ const router = Router();
 
 // Route for user registration.
 router.post('/register', 
-  // Use the correct schema path
   validate(userSchemas.register),
-  
-  async (req, res) => {
-    
+  asyncHandler(async (req, res, next) => {
     const { username_email, name, password } = req.body; 
-    try {
-      // Data is now guaranteed to be valid and sanitized by Zod
-      const newUser = await db.User.create({
-        username_email,
-        name,
-        password, 
-      });
-
-      res.status(201).json({
-        msg: 'New user created!',
-        user: {
-          id: newUser.user_id,
-          // Use username_email for consistency with model
-          username: newUser.username_email, 
-        },
-      });
-    } catch (err) {
-      if (err.name === 'SequelizeUniqueConstraintError') {
-          return res.status(409).json({ msg: 'This email is already registered.' });
-      }
-      console.error(err);
-      res.status(500).json({
-        msg: 'User was not created',
-        error: err.message,
-      });
+    
+    const existingUser = await db.User.findOne({ where: { username_email } });
+    if (existingUser) {
+      return res.status(409).json({ message: 'A user with this email already exists.' });
     }
-});
+
+    const newUser = await db.User.create({
+      username_email,
+      name,
+      password, 
+    });
+
+    // Automatically log the user in after successful registration
+    req.login(newUser, (err) => {
+      if (err) {
+        return next(err);
+      }
+      // Return the new user object to the frontend
+      return res.status(201).json(newUser);
+    });
+  })
+);
 
 // login route
 // Use the correct schema path

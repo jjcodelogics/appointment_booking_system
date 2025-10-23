@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../../utils/api';
+import '../../css/book-appointment.css'; // CSS is already imported, which is great.
 
-// onBookingSuccess is a function passed from the parent to tell it to go back to the dashboard
 const BookAppointment = ({ onBookingSuccess }) => {
   const [form, setForm] = useState({
     appointment_date: '',
@@ -26,7 +26,7 @@ const BookAppointment = ({ onBookingSuccess }) => {
     setLoading(true);
     try {
       await api.bookAppointment(form);
-      onBookingSuccess(); // Tell the parent component the booking was successful
+      onBookingSuccess();
     } catch (err) {
       setError(err.message || 'Failed to book appointment.');
     } finally {
@@ -34,13 +34,15 @@ const BookAppointment = ({ onBookingSuccess }) => {
     }
   };
 
+  // The new, cleaner JSX structure
   return (
-    <div className="container">
-      <h1>Book Appointment</h1>
-      {error && <div className="alert alert-danger">{error}</div>}
-      <form onSubmit={handleSubmit} className="card p-3" style={{ maxWidth: '450px', margin: '2rem auto' }}>
-        <div className="mb-3">
-          <label htmlFor="appointment_date" className="form-label">Date & Time</label>
+    <main className="booking-page-container">
+      <form onSubmit={handleSubmit} className="booking-card">
+        <h1 className="booking-title">Book Your Appointment</h1>
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="form-section">
+          <label htmlFor="appointment_date" className="section-label">1. Select Date & Time</label>
           <input
             id="appointment_date"
             type="datetime-local"
@@ -48,57 +50,62 @@ const BookAppointment = ({ onBookingSuccess }) => {
             value={form.appointment_date}
             onChange={handleChange}
             required
-            className="form-control"
+            className="date-input"
           />
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Gender</label>
-          <div>
-            <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name="gender" id="male" value="male" checked={form.gender === 'male'} onChange={handleChange} />
-              <label className="form-check-label" htmlFor="male">Male</label>
-            </div>
-            <div className="form-check form-check-inline">
-              <input className="form-check-input" type="radio" name="gender" id="female" value="female" checked={form.gender === 'female'} onChange={handleChange} />
-              <label className="form-check-label" htmlFor="female">Female</label>
-            </div>
+        <div className="form-section">
+          <label className="section-label">2. Choose Services</label>
+          <div className="choice-group">
+            {/* We wrap inputs in labels to make the whole area clickable */}
+            <label className="choice-pill">
+              <input type="checkbox" name="washing" checked={form.washing} onChange={handleChange} />
+              <span>Washing</span>
+            </label>
+            <label className="choice-pill">
+              <input type="checkbox" name="coloring" checked={form.coloring} onChange={handleChange} />
+              <span>Coloring</span>
+            </label>
+            <label className="choice-pill">
+              <input type="checkbox" name="cut" checked={form.cut} onChange={handleChange} />
+              <span>Cut</span>
+            </label>
           </div>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Services</label>
-          <div className="form-check">
-            <input className="form-check-input" type="checkbox" name="washing" id="washing" checked={form.washing} onChange={handleChange} />
-            <label className="form-check-label" htmlFor="washing">Washing</label>
-          </div>
-          <div className="form-check">
-            <input className="form-check-input" type="checkbox" name="coloring" id="coloring" checked={form.coloring} onChange={handleChange} />
-            <label className="form-check-label" htmlFor="coloring">Coloring</label>
-          </div>
-          <div className="form-check">
-            <input className="form-check-input" type="checkbox" name="cut" id="cut" checked={form.cut} onChange={handleChange} />
-            <label className="form-check-label" htmlFor="cut">Cut</label>
+        <div className="form-section">
+          <label className="section-label">3. Client Type</label>
+          <div className="choice-group">
+            <label className="choice-pill">
+              <input type="radio" name="gender" value="male" checked={form.gender === 'male'} onChange={handleChange} />
+              <span>Men's Cut</span>
+            </label>
+            <label className="choice-pill">
+              <input type="radio" name="gender" value="female" checked={form.gender === 'female'} onChange={handleChange} />
+              <span>Women's Cut</span>
+            </label>
           </div>
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="notes" className="form-label">Notes</label>
+        <div className="form-section">
+          <label htmlFor="notes" className="section-label">4. Add Notes (Optional)</label>
           <textarea
             id="notes"
             name="notes"
             value={form.notes}
             onChange={handleChange}
-            className="form-control"
-            rows="3"
+            className="notes-textarea"
+            placeholder="e.g., specific style requests, allergies..."
           ></textarea>
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Booking...' : 'Book Appointment'}
-        </button>
+        <div className="booking-actions">
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? 'Booking...' : 'Confirm Appointment'}
+          </button>
+        </div>
       </form>
-    </div>
+    </main>
   );
 };
 

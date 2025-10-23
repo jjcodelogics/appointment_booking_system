@@ -1,37 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import api from './utils/api';
 
-// Layout Components
+// Layout
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 
-// Page Components
-import HomePage from './components/pages/HomePage';
-import AboutPage from './components/pages/AboutPage';
-import ServicesPage from './components/pages/ServicesPage';
-import ContactPage from './components/pages/ContactPage';
+// Public Pages - Corrected import paths
+import HomePage from './components/pages/Home';
+import AboutPage from './components/pages/About';
+import ServicesPage from './components/pages/Services';
+import ContactPage from './components/pages/Contact';
 
-// Auth & User Components
-import Login from './components/auth/Login';
-import Appointments from './components/Appointments';
+// Auth & Booking - Corrected import paths
+import AuthPage from './components/auth/Auth';
+import Dashboard from './components/user/Dashboard';
 import BookAppointment from './components/booking/BookAppointment';
 import RescheduleAppointment from './components/booking/RescheduleAppointment';
 
 const App = () => {
+  const [view, setView] = useState('home');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState('home'); // Start on the home page
   const [rescheduleId, setRescheduleId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Check for logged-in user on initial load
   useEffect(() => {
     api.checkAuthStatus()
       .then(userData => {
-        if (userData) setUser(userData);
+        if (userData) {
+          setUser(userData);
+          setView('dashboard'); // If logged in, go to dashboard
+        }
       })
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
+  const navigate = (targetView) => setView(targetView);
 
   const handleLogin = (loggedInUser) => {
     setUser(loggedInUser);
@@ -44,60 +50,43 @@ const App = () => {
     setView('home');
   };
 
-  const navigate = (targetView) => setView(targetView);
-
   const navigateToDashboard = () => {
-    setRefreshKey(prevKey => prevKey + 1);
+    setRefreshKey(prevKey => prevKey + 1); // Force dashboard to refresh data
     setView('dashboard');
   };
 
-  const navigateToBooking = () => setView('booking');
-  const navigateToReschedule = (id) => {
+  const handleReschedule = (id) => {
     setRescheduleId(id);
     setView('rescheduling');
   };
 
   const renderView = () => {
-    if (loading) {
-      return <div>Loading...</div>;
-    }
+    if (loading) return <div className="container"><p>Loading...</p></div>;
 
-    if (!user) {
+    // Logged-in user views
+    if (user) {
       switch (view) {
-        case 'services':
-          return <ServicesPage onNavigate={navigate} />;
-        case 'about':
-          return <AboutPage onNavigate={navigate} />;
-        case 'contact':
-          return <ContactPage onNavigate={navigate} />;
-        case 'login':
-          return <Login onLogin={handleLogin} />;
-        case 'home':
-        default:
-          return <HomePage onNavigate={navigate} />;
+        case 'dashboard':
+          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+        case 'booking':
+          return <BookAppointment onBookingSuccess={navigateToDashboard} />;
+        case 'rescheduling':
+          return <RescheduleAppointment appointmentId={rescheduleId} onRescheduleSuccess={navigateToDashboard} />;
+        default: // If logged in, default to dashboard
+          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
       }
     }
 
+    // Public views
     switch (view) {
-      case 'dashboard':
-        return (
-          <Appointments
-            key={refreshKey}
-            user={user}
-            onLogout={handleLogout}
-            onBookNew={navigateToBooking}
-            onReschedule={navigateToReschedule}
-          />
-        );
-      case 'booking':
-        return <BookAppointment onBookingSuccess={navigateToDashboard} />;
-      case 'rescheduling':
-        return (
-          <RescheduleAppointment
-            appointmentId={rescheduleId}
-            onRescheduleSuccess={navigateToDashboard}
-          />
-        );
+      case 'login':
+        return <AuthPage onLogin={handleLogin} onNavigate={navigate} />;
+      case 'services':
+        return <ServicesPage onNavigate={navigate} />;
+      case 'about':
+        return <AboutPage onNavigate={navigate} />;
+      case 'contact':
+        return <ContactPage onNavigate={navigate} />;
       case 'home':
       default:
         return <HomePage onNavigate={navigate} />;
@@ -106,8 +95,8 @@ const App = () => {
 
   return (
     <>
-      <Header onNavigate={navigate} />
-      <div className="container mt-4">{renderView()}</div>
+      <Header user={user} onNavigate={navigate} onLogout={handleLogout} />
+      {renderView()}
       <Footer />
     </>
   );

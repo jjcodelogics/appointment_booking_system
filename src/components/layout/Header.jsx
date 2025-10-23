@@ -1,21 +1,29 @@
 import React from 'react';
 
-// `onNavigate` is a function from App.jsx to change pages
-const Header = ({ onNavigate }) => {
+// Now accepts a `user` object and a `onLogout` function
+const Header = ({ user, onNavigate, onLogout }) => {
   return (
     <header className="site-header">
       <div className="container">
         <a href="#" onClick={() => onNavigate('home')} className="brand">
-          {/* Vite correctly serves images from the public folder */}
           <img src="/images/logo.jpg" alt="The Modern Shear" className="logo" />
         </a>
         <nav className="site-nav">
           <ul>
-            {/* Use onClick to navigate instead of href */}
-            <li><button onClick={() => onNavigate('services')} className="nav-button">Services</button></li>
-            <li><button onClick={() => onNavigate('about')} className="nav-button">About</button></li>
-            <li><button onClick={() => onNavigate('contact')} className="nav-button">Contact</button></li>
-            <li><button onClick={() => onNavigate('login')} className="btn btn-header">Login &amp; Register</button></li>
+            {/* Public links - Changed from button to a */}
+            <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('services'); }} className="nav-button">Services</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('about'); }} className="nav-button">About</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('contact'); }} className="nav-button">Contact</a></li>
+
+            {/* Conditional links based on user state */}
+            {user ? (
+              <>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('dashboard'); }} className="nav-button">Dashboard</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); onLogout(); }} className="btn btn-header">Logout</a></li>
+              </>
+            ) : (
+              <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('login'); }} className="btn btn-header">Login &amp; Register</a></li>
+            )}
           </ul>
         </nav>
       </div>

@@ -49,6 +49,11 @@ const api = {
       method: 'PUT',
       body: { appointment_date: newDateISO },
     }),
+  
+  cancelAppointment: (id) =>
+    request(`/myappointments/cancel/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 export default api;

@@ -1,26 +1,4 @@
 /* Basic page reset & helpers */
-:root{
-  --bg:#ffffff;
-  --card:#ffffff;
-  --muted:#7b7b7b;
-  --green-1:#d8ead6;    /* light available */
-  --green-2:#71804c;    /* selected darker olive */
-  --green-3:#4b5b31;    /* selected text */
-  --btn-green:#6b8a3b;  /* button */
-  --red:#c93a3a;
-  --shadow: 0 8px 24px rgba(42,50,38,0.08);
-  --radius:14px;
-  font-family: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: #222;
-}
-
-/* subtle patterned background using SVG data-uri (repeating shears/combs motif) */
-body{
-  margin:0;
-  background: var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><g fill='%23f6f6f6'><path d='M8 40c12 8 30 4 40-6' opacity='.9'/><circle cx='160' cy='40' r='2' opacity='.07'/></g></svg>") repeat;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
 
 /* header */
 .site-header.minimal{
@@ -253,3 +231,153 @@ body{
 .day-picker-row{ display:flex; align-items:center; gap:12px; margin-bottom:12px; justify-content:space-between; }
 .choose-date-wrap{ display:flex; align-items:center; gap:8px; }
 .visually-hidden{ position:absolute !important; left:-9999px !important; width:1px !important; height:1px !important; overflow:hidden !important; }
+
+
+/* Main container for the page, provides background and spacing */
+.booking-page-container {
+  width: 100%;
+  min-height: 80vh;
+  padding: 2rem 1rem;
+  background-color: var(--secondary-bg); /* Use cream from style.css */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* The main booking card */
+.booking-card {
+  width: 100%;
+  max-width: 600px; /* A comfortable width for a form */
+  background: var(--neutral-bg); /* Pure white */
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.booking-title {
+  font-family: var(--heading-font); /* Playfair Display */
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+/* Styling for each section (Date, Services, etc.) */
+.form-section {
+  margin-bottom: 2.5rem;
+}
+
+.section-label {
+  display: block;
+  font-family: var(--body-font);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Modern Pill-style Buttons for Choices */
+.choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.choice-pill {
+  display: inline-flex;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Hide the actual radio/checkbox input */
+.choice-pill input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.choice-pill span {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px; /* Pill shape */
+  background-color: var(--secondary-bg);
+  border: 1px solid #e0e0e0;
+  color: #555;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Style for when a pill is hovered */
+.choice-pill:hover span {
+  border-color: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+/* Style for when a pill is selected */
+.choice-pill input:checked + span {
+  background-color: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
+}
+
+/* Modern Inputs for Date and Notes */
+.date-input,
+.notes-textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: var(--body-font);
+  font-size: 1rem;
+  background-color: #fcfcfc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.date-input:focus,
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.15);
+}
+
+.notes-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Final Action Button */
+.booking-actions {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 1rem;
+  font-family: var(--body-font);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 25px rgba(184, 134, 11, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
