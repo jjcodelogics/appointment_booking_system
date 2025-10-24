@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../../utils/api';
+import api from '../../utils/api'; // Corrected import path
 
 // This component handles both Login and Registration
 const AuthPage = ({ onLogin, onNavigate }) => {
@@ -46,20 +46,21 @@ const AuthPage = ({ onLogin, onNavigate }) => {
     }
 
     try {
-      let user;
+      let response;
       if (isLoginView) {
-        user = await api.login(formData.username_email, formData.password);
+        response = await api.login(formData.username_email, formData.password);
       } else {
-        user = await api.register(formData.username_email, formData.name, formData.password);
+        response = await api.register(formData.username_email, formData.name, formData.password);
       }
-      onLogin(user); // Notify App.jsx that login was successful
+      onLogin(response.data); // Pass the user data from the response
     } catch (err) {
-      setError('Invalid credentials or server error. Please try again.');
+      const errorMsg = err.response?.data?.message || 'Invalid credentials or server error. Please try again.';
+      setError(errorMsg);
     }
   };
 
   return (
-    <main className="container auth-page">
+    <main className="page-container-centered">
       <div className="auth-card">
         <h2>{isLoginView ? 'Login' : 'Create Account'}</h2>
         {error && <div className="error-message">{error}</div>}

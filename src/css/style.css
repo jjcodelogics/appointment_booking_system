@@ -252,10 +252,14 @@ thead {
 .site-header .container {
   display: flex;
   align-items: center;
+  height: 100%; /* Ensure container fills header height */
+}
+
+.header-inner {
+  display: flex;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0 0.75rem;
-  height: 100%;
+  align-items: center;
+  width: 100%;
 }
 
 .brand {
@@ -618,6 +622,42 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
   align-items: center;
   min-height: 75vh; /* Ensures it takes up most of the screen height */
   padding: 2rem 1rem;
+}
+
+/* Style for the authentication card */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--neutral-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #EAEAEA;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.btn.full-width {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 /* 2. Style the main content block on the dashboard */

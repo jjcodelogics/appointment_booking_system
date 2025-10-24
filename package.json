@@ -17,6 +17,7 @@
     "@dr.pogodin/csurf": "^1.16.6",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dompurify": "^3.3.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",

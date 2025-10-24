@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from '../../assets/logo.png';
 
 // Now accepts a `user` object and a `onLogout` function
 const Header = ({ user, onNavigate, onLogout }) => {
@@ -8,7 +7,7 @@ const Header = ({ user, onNavigate, onLogout }) => {
       <div className="container">
         <div className="header-inner">
           <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('home'); }}>
-            <img src={logo} alt="The Modern Shear Logo" className="logo" />
+            <img src="/images/logo.jpg" alt="The Modern Shear Logo" className="logo" />
           </a>
           <nav className="site-nav">
             <ul>

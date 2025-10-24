@@ -8,6 +8,8 @@ import 'dotenv/config';
 import helmet from 'helmet';
 import session from 'express-session';
 import csurf from '@dr.pogodin/csurf';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
 import { join } from 'path';
 
 import { initializeModels } from './src/models/index.js';
@@ -30,7 +32,7 @@ try {
 }
 
 // import passport after db is ready
-import passport from './src/middleware/passport.js';
+import passportMiddleware from './src/middleware/passport.js';
 
 app.use(
   helmet({
@@ -62,16 +64,20 @@ app.use(urlencoded({ extended: true }));
 // Serve static files from the 'public' directory
 app.use(express.static(join(process.cwd(), 'public')));
 
+// Initialize cookie-parser
+app.use(cookieParser());
+
+// Initialize session middleware
 app.use(
   session({
     name: 'sessionId',
-    secret: process.env.SESSION_SECRET || 'your_secret_key',
+    secret: process.env.SESSION_SECRET || 'a-secure-default-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
     },
     // WARNING: The default MemoryStore is not for production.
@@ -87,10 +93,10 @@ sequelize
   .then(() => console.log('Database connected successfully.'))
   .catch((err) => console.error('Unable to connect to the database:', err));
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passportMiddleware.initialize());
+app.use(passportMiddleware.session());
 
-// Initialize CSRF protection after session and passport
+// Initialize CSRF protection after session and cookieParser
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
@@ -99,6 +105,12 @@ const csrfProtection = csurf({
   },
 });
 app.use(csrfProtection);
+
+// Middleware to attach CSRF token to all responses
+app.use((req, res, next) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  next();
+});
 
 // API endpoint for the frontend to get the CSRF token
 app.get('/api/csrf-token', (req, res) => {

@@ -1,59 +1,35 @@
-// This replaces the need for public/js/api.cdn.js
+import axios from 'axios';
 
-async function request(endpoint, options = {}) {
-  // The base URL is handled by Vite's proxy in development
-  const url = endpoint;
-  const opts = {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  };
-  if (opts.body && typeof opts.body !== 'string') {
-    opts.body = JSON.stringify(opts.body);
-  }
+// Create an Axios instance with default settings
+const api = axios.create({
+  baseURL: '/api', // Use a relative URL; Vite's proxy will handle it
+  withCredentials: true, // This is crucial! It tells Axios to send cookies with requests
+});
 
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ msg: res.statusText }));
-    throw new Error(errorData.msg || 'An error occurred');
-  }
-  // Handle empty responses for actions like logout
-  if (res.status === 204 || res.headers.get('content-length') === '0') {
-    return null;
-  }
-  return res.json();
-}
+// Axios will now automatically handle the CSRF token for you.
+// It reads the 'XSRF-TOKEN' cookie and sets the 'X-XSRF-TOKEN' header.
 
-const api = {
+export default {
+  // --- User Authentication ---
   login: (username_email, password) =>
-    request('/auth/login', {
-      method: 'POST',
-      body: { username_email, password },
-    }),
+    api.post('/auth/login', { username_email, password }),
+  
   register: (username_email, name, password) =>
-    request('/auth/register', {
-      method: 'POST',
-      body: { username_email, name, password },
-    }),
-  logout: () => request('/auth/logout', { method: 'POST' }),
-  checkAuthStatus: () => request('/auth/user'),
-  getAllAppointments: () => request('/myappointments'), // Assuming this endpoint exists
+    api.post('/auth/register', { username_email, name, password }),
+  
+  logout: () => api.post('/auth/logout'),
+  
+  checkAuthStatus: () => api.get('/auth/user'),
+
+  // --- Appointments ---
+  getAllAppointments: () => api.get('/myappointments'),
 
   bookAppointment: (appointmentData) =>
-    request('/myappointments/book', {
-      method: 'POST',
-      body: appointmentData,
-    }),
+    api.post('/myappointments/book', appointmentData),
 
   rescheduleAppointment: (id, newDateISO) =>
-    request(`/myappointments/reschedule/${id}`, {
-      method: 'PUT',
-      body: { appointment_date: newDateISO },
-    }),
+    api.put(`/myappointments/reschedule/${id}`, { appointment_date: newDateISO }),
   
   cancelAppointment: (id) =>
-    request(`/myappointments/cancel/${id}`, {
-      method: 'DELETE',
-    }),
+    api.delete(`/myappointments/cancel/${id}`),
 };
-
-export default api;
