@@ -52,7 +52,8 @@ const AuthPage = ({ onLogin, onNavigate }) => {
       } else {
         response = await api.register(formData.username_email, formData.name, formData.password);
       }
-      onLogin(response.data); // Pass the user data from the response
+      // Pass the user data from the response (including role for role-based redirect)
+      onLogin(response.data.user || response.data);
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Invalid credentials or server error. Please try again.';
       setError(errorMsg);

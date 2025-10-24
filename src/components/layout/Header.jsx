@@ -20,7 +20,11 @@ const Header = ({ user, onNavigate, onLogout }) => {
               {/* --- Conditional links based on user login status --- */}
               {user ? (
                 <>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('dashboard'); }} className="nav-button">Dashboard</a></li>
+                  {user.role === 'admin' ? (
+                    <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('admin-dashboard'); }} className="nav-button">Admin Dashboard</a></li>
+                  ) : (
+                    <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('dashboard'); }} className="nav-button">Dashboard</a></li>
+                  )}
                   <li><button onClick={onLogout} className="btn btn-secondary">Logout</button></li>
                 </>
               ) : (
