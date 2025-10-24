@@ -18,6 +18,33 @@ const AuthPage = ({ onLogin, onNavigate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Password strength validation for registration view
+    if (!isLoginView) {
+      const { password } = formData;
+      const errors = [];
+      if (password.length < 8) {
+        errors.push('be at least 8 characters long');
+      }
+      if (!/[A-Z]/.test(password)) {
+        errors.push('contain an uppercase letter');
+      }
+      if (!/[a-z]/.test(password)) {
+        errors.push('contain a lowercase letter');
+      }
+      if (!/[0-9]/.test(password)) {
+        errors.push('contain a number');
+      }
+      if (!/[^A-Za-z0-9]/.test(password)) {
+        errors.push('contain a special character');
+      }
+
+      if (errors.length > 0) {
+        setError(`Password must ${errors.join(', ')}.`);
+        return; // Stop the form submission
+      }
+    }
+
     try {
       let user;
       if (isLoginView) {
@@ -27,7 +54,7 @@ const AuthPage = ({ onLogin, onNavigate }) => {
       }
       onLogin(user); // Notify App.jsx that login was successful
     } catch (err) {
-      setError(err.message || 'An error occurred.');
+      setError('Invalid credentials or server error. Please try again.');
     }
   };
 

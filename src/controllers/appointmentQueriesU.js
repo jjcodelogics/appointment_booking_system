@@ -28,9 +28,16 @@ router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(asyn
         order: [['appointment_date', 'ASC']],
       });
     } else {
-      // regular user: only their appointments
+      // regular user: only their appointments, now including service details
       appointments = await Appointment.findAll({
         where: { user_id: req.user.user_id },
+        // Add this 'include' to join the Service model
+        include: [{
+          model: db.Service,
+          as: 'Service',
+          // You can specify attributes if you only need certain fields
+          // attributes: ['gender', 'cut', 'washing', 'coloring'] 
+        }],
         order: [['appointment_date', 'ASC']],
       });
     }
@@ -43,9 +50,23 @@ router.get('/', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(asyn
 }));
 
 // GET /me - returns current user info
-router.get('/me', isAuthenticated, (req, res) => {
-  res.json({ name: req.user.name, email: req.user.username_email });
-});
+router.get('/me', isAuthenticated, asyncHandler(async (req, res) => {
+  // The user ID is attached to req.user by the isAuthenticated middleware
+  const userId = req.user.user_id;
+
+  // Find the user in the database using their ID
+  const user = await db.User.findByPk(userId, {
+    // We only need to return these specific, non-sensitive fields
+    attributes: ['name', 'username_email']
+  });
+
+  if (!user) {
+    return res.status(404).json({ msg: 'User not found.' });
+  }
+
+  // Send the user's details as a JSON response
+  res.json(user);
+}));
 
 // GET /appointments/slots - returns all booked slots (date/time only)
 router.get('/appointments/slots', asyncHandler(async (req, res) => {
@@ -67,7 +88,8 @@ router.post(
   // Use the correct schema path
   validate(appointmentsSchemas.create),
   asyncHandler(async (req, res) => {
-    const { Appointment, Service } = db;
+    const { Appointment, Service, Sequelize } = db;
+    const Op = Sequelize?.Op;
     if (!Appointment || !Service) return res.status(500).json({ msg: 'Server error: models not loaded' });
 
     const { appointment_date, gender, washing, coloring, cut, notes } = req.body;
@@ -92,13 +114,32 @@ router.post(
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
     }
 
+    // Build a more flexible query for finding a matching service.
+    // This finds a service that satisfies the user's request, even if it includes more options.
+    // For example, a request for only 'cutting' can match a service that offers 'cutting' and 'washing'.
+    const serviceQuery = {
+      gender_target: gender,
+      // If user wants cutting, find a service where cutting is true.
+      // If user doesn't want cutting, this condition is omitted, matching any service.
+      ...(cut && { cutting: true }),
+      // Same logic for washing and coloring.
+      ...(washing && { washing: true }),
+      ...(coloring && { coloring: true }),
+    };
+
+    // Ensure at least one service option is selected
+    if (!cut && !washing && !coloring) {
+      return res.status(400).json({ msg: 'You must select at least one service (cut, wash, or color).' });
+    }
+
     const selectedService = await Service.findOne({
-      where: {
-        gender_target: gender,
-        washing: washing,
-        coloring: coloring,
-        cutting: cut,
-      }
+      where: serviceQuery,
+      // Prioritize the service that is the closest match to the user's request
+      order: [
+        ['cutting', 'DESC'],
+        ['washing', 'DESC'],
+        ['coloring', 'DESC'],
+      ],
     });
 
     if (!selectedService) {

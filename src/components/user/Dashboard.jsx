@@ -19,6 +19,43 @@ const formatAppointmentDate = (isoString) => {
   return `${day} ${dayOfMonth}${getOrdinal(dayOfMonth)} at ${hour}:${minute}`;
 };
 
+// --- Add Price Calculation Logic ---
+const calculatePrice = (appointment) => {
+  // If the Service data isn't included for some reason, return 0
+  if (!appointment.Service) {
+    return 0;
+  }
+
+  let total = 0;
+  const prices = {
+    cut_male: 15,
+    cut_female: 45,
+    washing: 10,
+    coloring: 80,
+  };
+
+  // Access properties from the nested 'Service' object
+  const { cut, gender, washing, coloring } = appointment.Service;
+
+  if (cut) {
+    if (gender === 'male') {
+      total += prices.cut_male;
+    } else {
+      total += prices.cut_female;
+    }
+  }
+
+  if (washing) {
+    total += prices.washing;
+  }
+
+  if (coloring) {
+    total += prices.coloring;
+  }
+
+  return total;
+};
+
 // This is the main dashboard for a logged-in user
 const Dashboard = ({ user, onBookNew, onReschedule }) => {
   const [appointments, setAppointments] = useState([]);
@@ -27,7 +64,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
   const fetchAppointments = () => {
     api.getAllAppointments()
       .then((data) => setAppointments(data))
-      .catch((err) => setError(err.message || 'Error fetching appointments.'));
+      .catch((err) => setError('Could not load your appointments. Please try refreshing the page.'));
   };
 
   useEffect(() => {
@@ -40,7 +77,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
         await api.cancelAppointment(id);
         fetchAppointments(); // Re-fetch appointments to update the list
       } catch (err) {
-        setError(err.message || 'Failed to cancel appointment.');
+        setError('Failed to cancel the appointment. Please try again later.');
       }
     }
   };
@@ -60,6 +97,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
             <thead>
               <tr>
                 <th>Date & Time</th>
+                <th>Amount</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -67,6 +105,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
               {appointments.map((app) => (
                 <tr key={app.appointment_id}>
                   <td>{formatAppointmentDate(app.appointment_date)}</td>
+                  <td>${calculatePrice(app)}</td>
                   <td className="actions-cell">
                     <button onClick={() => onReschedule(app.appointment_id)} className="btn btn-secondary btn-sm">
                       Reschedule

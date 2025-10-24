@@ -58,7 +58,7 @@ const BookAppointment = ({ onBookingSuccess }) => {
       await api.bookAppointment(form);
       onBookingSuccess();
     } catch (err) {
-      setError(err.message || 'Failed to book appointment.');
+      setError('Failed to book appointment. Please check the details and try again.');
     } finally {
       setLoading(false);
     }
@@ -86,23 +86,28 @@ const BookAppointment = ({ onBookingSuccess }) => {
             type="date"
             value={selectedDate}
             onChange={handleDateChange}
+            min={new Date().toISOString().split('T')[0]}
             required
             className="date-input"
           />
           <div className="slot-grid">
-            {availableSlots.map(time => {
-              const isUnavailable = unavailableSlots.includes(time);
-              const isSelected = selectedTime === time;
-              return (
-                <div
-                  key={time}
-                  className={`slot ${isUnavailable ? 'unavailable' : ''} ${isSelected ? 'selected' : ''}`}
-                  onClick={() => !isUnavailable && handleTimeSelect(time)}
-                >
-                  {time}
-                </div>
-              );
-            })}
+            {availableSlots.length > 0 ? (
+              availableSlots.map((time) => {
+                const isUnavailable = unavailableSlots.includes(time);
+                const isSelected = selectedTime === time;
+                return (
+                  <div
+                    key={time}
+                    className={`slot ${isUnavailable ? 'unavailable' : ''} ${isSelected ? 'selected' : ''}`}
+                    onClick={() => !isUnavailable && handleTimeSelect(time)}
+                  >
+                    {time}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="no-slots">No available slots</div>
+            )}
           </div>
         </div>
 

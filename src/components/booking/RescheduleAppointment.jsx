@@ -15,7 +15,7 @@ const RescheduleAppointment = ({ appointmentId, onRescheduleSuccess }) => {
       await api.rescheduleAppointment(appointmentId, datetime);
       onRescheduleSuccess(); // Go back to the dashboard
     } catch (err) {
-      setError(err.message || 'Failed to reschedule.');
+      setError('Failed to reschedule. The time slot may no longer be available.');
     } finally {
       setLoading(false);
     }

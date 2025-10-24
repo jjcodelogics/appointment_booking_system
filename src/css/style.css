@@ -174,7 +174,7 @@ thead {
   position: relative;
   width: 100%; /* Simplified from the vw method */
   text-align: center;
-  padding: 7rem 0; /* More vertical space */
+  padding: 12rem 0; /* Increased from 7rem to make the hero image taller */
   color: white;
   overflow: hidden; /* Important for the zoom effect */
 }
@@ -399,7 +399,7 @@ footer {
 .site-footer {
   background-color: var(--neutral-bg); /* same as main */
   color: var(--primary-color);
-  padding: 0.9rem 1rem; /* slightly larger so the centered text has breathing room */
+  padding: 0.5rem 1rem; /* Reduced from 0.9rem to make the footer thinner */
   font-family: var(--body-font);
   font-size: 0.95em;
   border-top: 1px solid rgba(0,0,0,0.06);
@@ -606,4 +606,74 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
 
 .dashboard-header .btn {
   margin-left: auto; /* Ensures the button is pushed to the right */
+}
+
+/* --- New Styles for Centering and Dashboard --- */
+
+/* 1. Utility class to center a form or content block on the page */
+.page-container-centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 75vh; /* Ensures it takes up most of the screen height */
+  padding: 2rem 1rem;
+}
+
+/* 2. Style the main content block on the dashboard */
+.dashboard-content {
+  width: 100%;
+  max-width: 900px; /* Set a max-width for the dashboard content */
+  background: var(--neutral-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid #EAEAEA;
+}
+
+/* 3. Modern UI for the appointments table */
+.appointments-table {
+  width: 100%;
+  border-collapse: separate; /* Use separate for rounded corners */
+  border-spacing: 0 0.5rem; /* Add vertical space between rows */
+  margin-top: 1.5rem;
+}
+
+.appointments-table th,
+.appointments-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: none; /* Remove the default bottom border */
+}
+
+.appointments-table thead th {
+  background-color: transparent; /* Cleaner header */
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #eee;
+}
+
+.appointments-table tbody tr {
+  background-color: var(--secondary-bg);
+  border-radius: 8px; /* This won't work with border-collapse: collapse */
+}
+
+/* Style the first and last cells for rounded corners */
+.appointments-table tbody td:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.appointments-table tbody td:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* 4. Evenly space out the action buttons */
+.actions-cell {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 0.5rem; /* Space between buttons */
 }

@@ -7,6 +7,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import helmet from 'helmet';
 import session from 'express-session';
+import csurf from '@dr.pogodin/csurf';
 import { join } from 'path';
 
 import { initializeModels } from './src/models/index.js';
@@ -89,15 +90,39 @@ sequelize
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Initialize CSRF protection after session and passport
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  },
+});
+app.use(csrfProtection);
+
+// API endpoint for the frontend to get the CSRF token
+app.get('/api/csrf-token', (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
 // mount routes AFTER passport.session()
 import loginRouter from './src/controllers/loginQueries.js';
 app.use('/auth', loginRouter);
 import myappointmentsRouter from './src/controllers/appointmentQueriesU.js';
 app.use('/myappointments', myappointmentsRouter);
 
-
 import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();
+
+// CSRF error handler
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    console.error('CSRF token error:', err.message);
+    res.status(403).json({ msg: 'Invalid CSRF token. Please refresh and try again.' });
+  } else {
+    next(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
