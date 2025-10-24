@@ -98,18 +98,6 @@ sequelize
 app.use(passportMiddleware.initialize());
 app.use(passportMiddleware.session());
 
-// mount API routes BEFORE CSRF protection
-import { loginRateLimit } from './src/middleware/rateLimiter.js';
-import loginRouter from './src/controllers/loginQueries.js';
-// Apply rate limiting to login/register endpoints
-app.use('/api/auth/login', loginRateLimit);
-app.use('/api/auth/register', loginRateLimit);
-app.use('/api/auth', loginRouter); // Standardized path to /api/auth
-import appointmentRouter from './src/controllers/appointmentRoutes.js'; // Import the new router
-app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointments
-import adminRouter from './src/controllers/adminRoutes.js'; // Import admin routes
-app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
-
 // Initialize CSRF protection after session and cookieParser
 const csrfProtection = csurf({
   cookie: {
@@ -118,7 +106,24 @@ const csrfProtection = csurf({
     sameSite: 'strict',
   },
 });
+
+// Apply CSRF protection to all routes except auth endpoints
+// Auth endpoints need to be accessible without CSRF token for initial login
+import { loginRateLimit } from './src/middleware/rateLimiter.js';
+import loginRouter from './src/controllers/loginQueries.js';
+// Apply rate limiting to login/register endpoints
+app.use('/api/auth/login', loginRateLimit);
+app.use('/api/auth/register', loginRateLimit);
+app.use('/api/auth', loginRouter); // Standardized path to /api/auth
+
+// Apply CSRF protection to protected routes
 app.use(csrfProtection);
+
+// Mount protected API routes AFTER CSRF protection
+import appointmentRouter from './src/controllers/appointmentRoutes.js'; // Import the new router
+app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointments
+import adminRouter from './src/controllers/adminRoutes.js'; // Import admin routes
+app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
 
 // Middleware to attach CSRF token to all responses for non-API GET requests
 app.use((req, res, next) => {
