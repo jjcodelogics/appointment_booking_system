@@ -2,11 +2,18 @@ import React, { useState } from 'react';
 import api from '../../utils/api';
 import '../../css/book-appointment.css';
 
-// Mock data for available time slots
-const availableSlots = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00',
-];
+// Mock data for available time slots based on opening hours
+const openingHours = {
+  Tuesday: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'],
+  Wednesday: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'],
+  Thursday: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'],
+  Friday: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'],
+  Saturday: ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
+  Sunday: [], // Closed
+  Monday: [] // Closed
+};
+
+// Example of unavailable slots
 const unavailableSlots = ['11:00', '14:30']; // Example of already booked slots
 
 const BookAppointment = ({ onBookingSuccess }) => {
@@ -56,6 +63,15 @@ const BookAppointment = ({ onBookingSuccess }) => {
       setLoading(false);
     }
   };
+
+  // Get available slots for the selected day
+  const getDayOfWeek = (dateString) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const date = new Date(dateString);
+    return days[date.getDay()];
+  };
+
+  const availableSlots = openingHours[getDayOfWeek(selectedDate)] || [];
 
   return (
     <main className="booking-page-container">

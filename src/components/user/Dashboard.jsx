@@ -48,7 +48,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
   return (
     <main className="container dashboard-page">
       <div className="dashboard-header">
-        <h1>Welcome, {user?.name}!</h1>
+        <h1>Welcome, {user?.name || 'Guest'}!</h1>
         <button onClick={onBookNew} className="btn btn-primary">Book New Appointment</button>
       </div>
 

@@ -67,6 +67,22 @@ a:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
+/* Split Layout */
+.container.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+/* Columns inside the split layout */
+.container.split .col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 /* --- Buttons --- */
 .btn {
   display: inline-block;
@@ -574,4 +590,20 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
 .btn, .btn-primary, .btn-inline {
   border-radius: 999px;
   padding: 0.5rem 1rem;
+}
+
+/* Align the button to the right in the dashboard header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+}
+
+.dashboard-header .btn {
+  margin-left: auto; /* Ensures the button is pushed to the right */
 }
