@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import '../../css/book-appointment.css';
 
@@ -13,9 +13,6 @@ const openingHours = {
   Monday: [] // Closed
 };
 
-// Example of unavailable slots
-const unavailableSlots = ['11:00', '14:30']; // Example of already booked slots
-
 const BookAppointment = ({ onBookingSuccess }) => {
   const [form, setForm] = useState({
     appointment_date: '',
@@ -25,19 +22,41 @@ const BookAppointment = ({ onBookingSuccess }) => {
     cut: true,
     notes: '',
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTime, setSelectedTime] = useState('');
+  const [unavailableSlots, setUnavailableSlots] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Fetch unavailable slots when the selected date changes
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      if (!selectedDate) return;
+      try {
+        const response = await api.getSlotsForDate(selectedDate);
+        setUnavailableSlots(response.data.map(slot => {
+          const date = new Date(slot.appointment_date);
+          return date.toTimeString().slice(0, 5);
+        }));
+      } catch (err) {
+        console.error("Failed to fetch unavailable slots:", err);
+      }
+    };
+
+    fetchBookedSlots();
+  }, [selectedDate]);
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
-    setSelectedTime(''); // Reset time when date changes
+    setSelectedTime('');
   };
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
-    setForm(prev => ({ ...prev, appointment_date: `${selectedDate}T${time}` }));
+    // FIX: Combine selectedDate and time to create a full date-time string.
+    // The backend can parse this into a valid Date object.
+    const fullDateTime = `${selectedDate}T${time}:00`;
+    setForm(prev => ({ ...prev, appointment_date: fullDateTime }));
   };
 
   const handleChange = (e) => {
@@ -52,19 +71,30 @@ const BookAppointment = ({ onBookingSuccess }) => {
       setError('Please select a time slot.');
       return;
     }
+
     setError('');
     setLoading(true);
+
+    const appointmentData = {
+      appointment_date: form.appointment_date,
+      notes: form.notes,
+      gender: form.gender,
+      washing: form.washing,
+      coloring: form.coloring,
+      cut: form.cut,
+    };
+
     try {
-      await api.bookAppointment(form);
+      await api.bookAppointment(appointmentData);
       onBookingSuccess();
     } catch (err) {
-      setError('Failed to book appointment. Please check the details and try again.');
+      const errorMsg = err.response?.data?.message || 'Failed to book appointment. Please try again.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  // Get available slots for the selected day
   const getDayOfWeek = (dateString) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const date = new Date(dateString);

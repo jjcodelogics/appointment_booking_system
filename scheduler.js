@@ -3,8 +3,6 @@ import { Op } from 'sequelize';
 import db from './src/models/index.js';
 import { sendAppointmentReminder } from './src/services/emailService.js';
 
-
-
 const { Appointment, User } = db;
 
 // Schedule a task to run every hour, at the start of the hour.
@@ -22,14 +20,20 @@ const startReminderScheduler = () => {
     todayEnd.setHours(23, 59, 59, 999);
 
     try {
-      const appointmentsToSend = await Appointment.findAll({
-        where: {
-          appointment_date: {
-            [Op.between]: [todayStart, todayEnd],
-          },
-          reminder_sent: false, // The crucial part!
+      // only add reminder_sent filter if the column exists on the model
+      const whereClause = {
+        appointment_date: {
+          [Op.between]: [todayStart, todayEnd],
         },
-        include: [{ model: User, attributes: ['username_email'] }] // Get the user's email
+      };
+
+      if (Appointment && Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
+        whereClause.reminder_sent = false;
+      }
+
+      const appointmentsToSend = await Appointment.findAll({
+        where: whereClause,
+        include: [{ model: User, attributes: ['username_email'] }]
       });
 
       if (appointmentsToSend.length === 0) {
@@ -40,12 +44,14 @@ const startReminderScheduler = () => {
       console.log(`Found ${appointmentsToSend.length} reminders to send.`);
 
       for (const appt of appointmentsToSend) {
-        // Send the reminder
-        await emailService.sendAppointmentReminder(appt.User.username_email, appt);
+        // use the imported function directly
+        await sendAppointmentReminder(appt.User.username_email, appt);
 
-        // Update the flag in the database to prevent re-sending
-        appt.reminder_sent = true;
-        await appt.save();
+        // Update the flag in the database to prevent re-sending if the column exists
+        if (Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
+          appt.reminder_sent = true;
+          await appt.save();
+        }
       }
 
     } catch (error) {

@@ -22,14 +22,16 @@ export default {
   checkAuthStatus: () => api.get('/auth/user'),
 
   // --- Appointments ---
-  getAllAppointments: () => api.get('/myappointments'),
+  getSlotsForDate: (date) => api.get(`/appointments/slots?date=${date}`),
+
+  getAllAppointments: () => api.get('/appointments/my-appointments'),
 
   bookAppointment: (appointmentData) =>
-    api.post('/myappointments/book', appointmentData),
+    api.post('/appointments/book', appointmentData),
 
   rescheduleAppointment: (id, newDateISO) =>
-    api.put(`/myappointments/reschedule/${id}`, { appointment_date: newDateISO }),
+    api.put(`/appointments/reschedule/${id}`, { appointment_date: newDateISO }),
   
   cancelAppointment: (id) =>
-    api.delete(`/myappointments/cancel/${id}`),
+    api.delete(`/appointments/cancel/${id}`),
 };

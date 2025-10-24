@@ -54,6 +54,7 @@ app.use(
       process.env.FRONTEND_URL,
       'http://localhost:3000',
       'http://127.0.0.1:5500',
+      'http://localhost:5173', // <-- add Vite dev server origin
     ],
     credentials: true,
   })
@@ -77,7 +78,8 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      // Use stricter sameSite in production, relax in development so cookies are forwarded during local dev
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
     },
     // WARNING: The default MemoryStore is not for production.
@@ -96,6 +98,12 @@ sequelize
 app.use(passportMiddleware.initialize());
 app.use(passportMiddleware.session());
 
+// mount API routes BEFORE CSRF protection
+import loginRouter from './src/controllers/loginQueries.js';
+app.use('/api/auth', loginRouter); // Standardized path to /api/auth
+import appointmentRouter from './src/controllers/appointmentRoutes.js'; // Import the new router
+app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointments
+
 // Initialize CSRF protection after session and cookieParser
 const csrfProtection = csurf({
   cookie: {
@@ -106,22 +114,16 @@ const csrfProtection = csurf({
 });
 app.use(csrfProtection);
 
-// Middleware to attach CSRF token to all responses
+// Middleware to attach CSRF token to all responses for non-API GET requests
 app.use((req, res, next) => {
   res.cookie('XSRF-TOKEN', req.csrfToken());
   next();
 });
 
-// API endpoint for the frontend to get the CSRF token
+// API endpoint for the frontend to get the CSRF token (if needed, though Axios handles it)
 app.get('/api/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
-
-// mount routes AFTER passport.session()
-import loginRouter from './src/controllers/loginQueries.js';
-app.use('/auth', loginRouter);
-import myappointmentsRouter from './src/controllers/appointmentQueriesU.js';
-app.use('/myappointments', myappointmentsRouter);
 
 import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();

@@ -26,16 +26,25 @@ const App = () => {
 
   // Check for logged-in user on initial load
   useEffect(() => {
-    api.checkAuthStatus()
-      .then(userData => {
-        if (userData) {
-          setUser(userData);
-          setView('dashboard'); // If logged in, go to dashboard
+    const checkLoginStatus = async () => {
+      try {
+        // This endpoint should return the user data if a session is active
+        const response = await api.checkAuthStatus(); 
+        if (response.data && response.data.user) {
+          setUser(response.data.user);
+          // We no longer automatically navigate to the dashboard here.
+          // The user is logged in, but the page remains 'home'.
         }
-      })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+      } catch (error) {
+        // No active session, which is fine.
+        console.log('No active session found.');
+      } finally {
+        setLoading(false); // Corrected from setIsLoading to setLoading
+      }
+    };
+
+    checkLoginStatus();
+  }, []); // The empty dependency array ensures this runs only once on mount
 
   const navigate = (targetView) => setView(targetView);
 
@@ -63,7 +72,25 @@ const App = () => {
   const renderView = () => {
     if (loading) return <div className="container"><p>Loading...</p></div>;
 
-    // Logged-in user views
+    // Prioritize rendering public pages first
+    switch (view) {
+      case 'home':
+        return <HomePage onNavigate={navigate} />;
+      case 'services':
+        return <ServicesPage onNavigate={navigate} />;
+      case 'about':
+        return <AboutPage onNavigate={navigate} />;
+      case 'contact':
+        return <ContactPage onNavigate={navigate} />;
+      case 'login':
+        // If user is already logged in, redirect them from login page to dashboard
+        if (user) {
+          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+        }
+        return <AuthPage onLogin={handleLogin} onNavigate={navigate} />;
+    }
+
+    // If the view is not a public one, then check for user-specific views
     if (user) {
       switch (view) {
         case 'dashboard':
@@ -72,25 +99,11 @@ const App = () => {
           return <BookAppointment onBookingSuccess={navigateToDashboard} />;
         case 'rescheduling':
           return <RescheduleAppointment appointmentId={rescheduleId} onRescheduleSuccess={navigateToDashboard} />;
-        default: // If logged in, default to dashboard
-          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
       }
     }
 
-    // Public views
-    switch (view) {
-      case 'login':
-        return <AuthPage onLogin={handleLogin} onNavigate={navigate} />;
-      case 'services':
-        return <ServicesPage onNavigate={navigate} />;
-      case 'about':
-        return <AboutPage onNavigate={navigate} />;
-      case 'contact':
-        return <ContactPage onNavigate={navigate} />;
-      case 'home':
-      default:
-        return <HomePage onNavigate={navigate} />;
-    }
+    // Fallback to home page if no other view matches
+    return <HomePage onNavigate={navigate} />;
   };
 
   return (
