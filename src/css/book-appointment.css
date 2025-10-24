@@ -101,40 +101,41 @@
 
 /* slot grid */
 .slot-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
-  gap:10px;
-  margin:8px 0 12px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 .slot{
-  padding:10px;
-  border-radius:10px;
-  text-align:center;
-  font-weight:600;
-  cursor:pointer;
-  border: 1px solid rgba(0,0,0,0.04);
-  user-select:none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  color: #333;
+  user-select: none;
+  transition: all 0.2s ease;
 }
-
-/* states */
-.slot.available{
-  background: var(--green-1);
-  color: #21321a;
-}
-.slot.available:hover{
+.slot:hover:not(.unavailable):not(.selected){
   transform: translateY(-2px);
-  transition: transform .12s ease;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
 }
 .slot.selected{
-  background: var(--green-2);
-  color: #f5f3e8;
-  box-shadow: 0 6px 18px rgba(75,91,49,0.18);
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.25);
+  transform: translateY(-2px);
 }
 .slot.unavailable{
-  background:#f4f4f4;
-  color:#9b9b9b;
-  text-decoration:line-through;
-  cursor:not-allowed;
+  background: #f0f0f0;
+  color: #aaa;
+  text-decoration: line-through;
+  cursor: not-allowed;
 }
 
 /* legend */

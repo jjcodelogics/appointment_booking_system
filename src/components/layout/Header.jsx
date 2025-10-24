@@ -11,6 +11,7 @@ const Header = ({ user, onNavigate, onLogout }) => {
         <nav className="site-nav">
           <ul>
             {/* Public links - Changed from button to a */}
+            <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('home'); }} className="nav-button">Home</a></li>
             <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('services'); }} className="nav-button">Services</a></li>
             <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('about'); }} className="nav-button">About</a></li>
             <li><a href="#" onClick={(e) => { e.preventDefault(); onNavigate('contact'); }} className="nav-button">Contact</a></li>
