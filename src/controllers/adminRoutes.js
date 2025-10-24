@@ -10,6 +10,8 @@ import db from '../models/index.js';
 const router = Router();
 
 // Apply rate limiting to all admin routes
+// This middleware applies to ALL routes defined below in this router
+// Rate limit: 200 requests per 15 minutes per IP address
 router.use(adminRateLimit);
 
 // Helper function for business hours (same as in appointmentRoutes)
