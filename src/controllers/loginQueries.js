@@ -1,51 +1,44 @@
 import { Router } from 'express';
-const router = Router();
-import passport from '../middleware/passport.js'; 
 import asyncHandler from 'express-async-handler';
+import passport from '../middleware/passport.js';
+// Correctly import the default export (no curly braces)
 import validate from '../middleware/validate.js';
-import userSchemas from '../middleware/user.schemas.js';
-const { UserRegisterSchema, UserLoginSchema } = userSchemas;
-import dbModels from '../models/index.js'; 
-const { User } = dbModels; 
+import { userSchemas } from '../middleware/user.schemas.js';
+import db from '../models/index.js';
+
+const router = Router();
 
 // Route for user registration.
 router.post('/register', 
-  // NEW ZOD VALIDATION
-  validate(UserRegisterSchema),
-  
-  async (req, res) => {
-    
+  validate(userSchemas.register),
+  asyncHandler(async (req, res, next) => {
     const { username_email, name, password } = req.body; 
-    try {
-      // Data is now guaranteed to be valid and sanitized by Zod
-      const newUser = await User.create({
-        username_email,
-        name,
-        password, 
-      });
-
-      res.status(201).json({
-        msg: 'New user created!',
-        user: {
-          id: newUser.user_id,
-          // Use username_email for consistency with model
-          username: newUser.username_email, 
-        },
-      });
-    } catch (err) {
-      if (err.name === 'SequelizeUniqueConstraintError') {
-          return res.status(409).json({ msg: 'This email is already registered.' });
-      }
-      console.error(err);
-      res.status(500).json({
-        msg: 'User was not created',
-        error: err.message,
-      });
+    
+    const existingUser = await db.User.findOne({ where: { username_email } });
+    if (existingUser) {
+      return res.status(409).json({ message: 'A user with this email already exists.' });
     }
-});
+
+    const newUser = await db.User.create({
+      username_email,
+      name,
+      password, 
+    });
+
+    // Automatically log the user in after successful registration
+    req.login(newUser, (err) => {
+      if (err) {
+        return next(err);
+      }
+      // Return the new user object to the frontend
+      return res.status(201).json(newUser);
+    });
+  })
+);
 
 // login route
-router.post('/login', validate(UserLoginSchema), (req, res, next) => {
+// Use the correct schema path
+router.post('/login', validate(userSchemas.login), (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
     if (!user) return res.status(401).json({ msg: info?.message || 'Invalid credentials' });

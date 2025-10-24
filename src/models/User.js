@@ -1,5 +1,4 @@
 import { genSalt, hash, compare } from 'bcrypt';
-import { z } from 'zod';
 
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -22,13 +21,12 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'user'),
-      allowNull: false,
+      type: DataTypes.STRING,
       defaultValue: 'user',
     },
+
   }, {
-    tableName: 'users',
-    timestamps: false,
+    modelName: 'User',
   });
 
   // Hook to hash password before saving a new user or updating an existing user's password

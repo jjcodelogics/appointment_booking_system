@@ -9,10 +9,6 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    employee_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     service_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -21,25 +17,16 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    //time_slot: {
-      //type: DataTypes.STRING,
-      //allowNull: false,
-    //},
-    client_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  }, {
-    tableName: 'appointments',
-    timestamps: false,
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    }
   });
 
   // Associations - called from models/index after all models are loaded
   Appointment.associate = (models) => {
     Appointment.belongsTo(models.User, { foreignKey: 'user_id', as: 'User' });
-    if (models.Employee) {
-      Appointment.belongsTo(models.Employee, { foreignKey: 'employee_id', as: 'Employee' });
-    }
+
     if (models.Service) {
       Appointment.belongsTo(models.Service, { foreignKey: 'service_id', as: 'Service' });
     }

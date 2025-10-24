@@ -1,0 +1,719 @@
+/* --- Design Variables --- */
+:root {
+  --primary-color: #121212; /* Deep Charcoal Black */
+  --accent-color: #B8860B; /* Muted Elegant Gold */
+  --neutral-bg: #FFFFFF; /* Pure White */
+  --secondary-bg: #F9F7F4; /* Light Cream/Grey */
+  --heading-font: 'Playfair Display', serif;
+  --body-font: 'Roboto', sans-serif;
+}
+
+/* --- Base Styles --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--body-font);
+  background-color: var(--neutral-bg);
+  color: var(--primary-color);
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--heading-font);
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: var(--primary-color);
+}
+
+/* --- Layout --- */
+.container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1.25rem;
+}
+
+.card,
+.service-card,
+.contact-card,
+.container.split .col {
+  background: var(--neutral-bg); /* Use pure white for a cleaner look */
+  border: 1px solid #EAEAEA;
+  padding: 1.75rem; /* More padding */
+  margin-bottom: 1rem;
+  border-radius: 12px; /* Softer radius */
+  /* A more complex, modern shadow */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover,
+.service-card:hover,
+.contact-card:hover,
+.container.split .col:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Split Layout */
+.container.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+
+/* Columns inside the split layout */
+.container.split .col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s ease-in;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-inline {
+  background: var(--accent-color);
+  color: white;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  opacity: 1; /* Override the default opacity change */
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(184, 134, 11, 0.3);
+}
+
+/* --- Forms --- */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.error-message {
+  color: #d9534f;
+  background: #f2dede;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+/* --- Tables --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+}
+
+th, td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+thead {
+  background-color: var(--secondary-bg);
+}
+
+/* --- Hero Section --- */
+.hero {
+  position: relative;
+  width: 100%; /* Simplified from the vw method */
+  text-align: center;
+  padding: 12rem 0; /* Increased from 7rem to make the hero image taller */
+  color: white;
+  overflow: hidden; /* Important for the zoom effect */
+}
+
+/* The background image container */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/images/shop.jpeg') center/cover no-repeat; /* Use correct path */
+  z-index: 1;
+  transition: transform 0.4s ease-out; /* Smooth zoom transition */
+}
+
+.hero:hover::before {
+  transform: scale(1.03); /* Subtle zoom on hover */
+}
+
+/* The gradient overlay */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* A more sophisticated gradient */
+  background: linear-gradient(to top, rgba(18, 18, 18, 0.7) 0%, rgba(18, 18, 18, 0.3) 60%, rgba(18, 18, 18, 0.7) 100%);
+  z-index: 2;
+}
+
+.hero .container {
+  position: relative; /* Was z-index: 2, now this is cleaner */
+  z-index: 3;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.hero h1 {
+  font-size: 3em;
+  margin-bottom: 0.5em;
+}
+
+.hero p {
+  font-size: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+/* Hero lead paragraph styling (restore elegant style) */
+.hero p.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+  max-width: 70ch;
+  margin: 0 auto 1.2rem auto;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: 0.01em;
+}
+
+/* --- Header (thinner) --- */
+.site-header {
+  background: var(--neutral-bg);
+  color: var(--primary-color);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  height: 96px; /* increased to fit larger logo */
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  height: 100%; /* Ensure container fills header height */
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* enforce logo sizing across all pages / image types */
+.logo {
+  display: block;
+  height: 80px;     /* doubled from 20px */
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand img.logo,
+.brand svg.logo,
+img.logo {
+  height: 80px !important;
+  max-height: 80px !important;
+  width: auto !important;
+  display: block;
+}
+
+/* Hide site title visually (we removed the text from HTML but keep this as a fallback) */
+.brand .title {
+  display: none;
+}
+
+/* Nav: modern pill buttons */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.site-nav li {
+  list-style: none;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px; /* pill shape */
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.site-nav a:hover,
+.site-nav a:focus {
+  background: var(--accent-color);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  outline: none;
+}
+
+.site-nav a.active {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+/* keep the header CTA as a stronger button variant */
+.btn-header {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(184,134,11,0.12);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .site-header .container {
+    padding: 0 0.75rem;
+  }
+
+  .site-nav ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 1rem;
+    background: var(--neutral-bg);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    flex-direction: column;
+    padding: 0.5rem;
+    min-width: 180px;
+  }
+
+  .site-nav.open ul {
+    display: flex;
+  }
+
+  .site-nav.open ul a {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* --- Footer (thinner) --- */
+footer {
+  text-align: center;
+  padding: 0.4rem 0;
+  margin-top: 0.25rem;
+  border-top: 0.5px solid #eee;
+}
+
+.site-footer {
+  background-color: var(--neutral-bg); /* same as main */
+  color: var(--primary-color);
+  padding: 0.5rem 1rem; /* Reduced from 0.9rem to make the footer thinner */
+  font-family: var(--body-font);
+  font-size: 0.95em;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.site-footer .container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center; /* center content */
+  align-items: center;
+}
+
+.site-footer p { margin: 0; text-align: center; }
+
+/* Compact footer variant for index page to reveal more hero */
+.site-footer--compact {
+  padding: 0.35rem 1rem;
+}
+
+/* --- Page layout consistency --- */
+main, .page {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 0 1.25rem;
+}
+
+/* Page-specific background for about/services/contact - reverted to default site background */
+/* (removed background_page.png rule) */
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .site-footer .container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-brand, .footer-links, .footer-contact {
+    min-width: auto;
+  }
+}
+
+/* Improve layout for split sections (about, services) */
+.container.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.container.split .col {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  line-height: 1.7;
+}
+
+/* Further readability tweaks for split and service sections */
+.container.split .col p {
+  max-width: 60ch;
+  margin-bottom: 1rem;
+}
+
+/* Services cards */
+.service-card {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.service-card h3 { margin-top: 0; }
+.service-card .meta { color: #555; margin-bottom: 0.75rem; }
+.service-card .note { color: #333; margin-top: 0.75rem; font-size: 0.95rem; }
+
+/* Contact grid (left details / right map) */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.contact-card {
+  background: var(--secondary-bg);
+  padding: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.map-card iframe { width: 100%; height: 320px; border-radius: 6px; }
+
+/* Team list styling */
+.team ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.team li {
+  background: #fff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* Responsive adjustments for split/contact */
+@media (max-width: 900px) {
+  .container.split,
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero { padding: 4rem 0; }
+  .hero .container { padding: 0 1rem; }
+}
+
+/* Content typography improvements */
+main, .container, .card, .contact-card, .service-card, .col {
+  color: var(--primary-color);
+  font-family: var(--body-font);
+}
+
+.container p, .container li, .contact-card p, .service-card p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(18,18,18,0.9);
+}
+
+/* Constrain long paragraphs for better readability */
+.container p {
+  max-width: 70ch;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.8rem; /* Slightly larger */
+  margin-bottom: 1.5rem; /* More space below */
+  letter-spacing: 0.02em;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px; /* Longer line */
+  height: 3px; /* Thicker line */
+  /* A subtle gradient for the underline */
+  background: linear-gradient(90deg, var(--accent-color), #D4AF37);
+  border-radius: 3px;
+}
+
+h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+
+/* Improve lists */
+.team ul, .social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.social-list li a {
+  color: var(--primary-color);
+  padding: 0.45rem 0.6rem;
+  display: inline-block;
+}
+
+/* Contact meta formatting: split into grid of small blocks */
+.contact-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.contact-meta div { background: transparent; padding: 0; }
+
+/* Utility: make buttons consistent in header and content */
+.btn, .btn-primary, .btn-inline {
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+}
+
+/* Align the button to the right in the dashboard header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+}
+
+.dashboard-header .btn {
+  margin-left: auto; /* Ensures the button is pushed to the right */
+}
+
+/* --- New Styles for Centering and Dashboard --- */
+
+/* 1. Utility class to center a form or content block on the page */
+.page-container-centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 75vh; /* Ensures it takes up most of the screen height */
+  padding: 2rem 1rem;
+}
+
+/* Style for the authentication card */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--neutral-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #EAEAEA;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-toggle {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.btn.full-width {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* 2. Style the main content block on the dashboard */
+.dashboard-content {
+  width: 100%;
+  max-width: 900px; /* Set a max-width for the dashboard content */
+  background: var(--neutral-bg);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid #EAEAEA;
+}
+
+/* 3. Modern UI for the appointments table */
+.appointments-table {
+  width: 100%;
+  border-collapse: separate; /* Use separate for rounded corners */
+  border-spacing: 0 0.5rem; /* Add vertical space between rows */
+  margin-top: 1.5rem;
+}
+
+.appointments-table th,
+.appointments-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: none; /* Remove the default bottom border */
+}
+
+.appointments-table thead th {
+  background-color: transparent; /* Cleaner header */
+  color: #555;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #eee;
+}
+
+.appointments-table tbody tr {
+  background-color: var(--secondary-bg);
+  border-radius: 8px; /* This won't work with border-collapse: collapse */
+}
+
+/* Style the first and last cells for rounded corners */
+.appointments-table tbody td:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+.appointments-table tbody td:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* 4. Evenly space out the action buttons */
+.actions-cell {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 0.5rem; /* Space between buttons */
+}
