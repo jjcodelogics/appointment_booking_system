@@ -28,23 +28,22 @@ const BookAppointment = ({ onBookingSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch unavailable slots when the selected date changes
-  useEffect(() => {
-    const fetchBookedSlots = async () => {
-      if (!selectedDate) return;
-      try {
-        const response = await api.getSlotsForDate(selectedDate);
-        setUnavailableSlots(response.data.map(slot => {
-          const date = new Date(slot.appointment_date);
-          return date.toTimeString().slice(0, 5);
-        }));
-      } catch (err) {
-        console.error("Failed to fetch unavailable slots:", err);
-      }
-    };
+// Fetch unavailable slots when the selected date changes
+useEffect(() => {
+  const fetchBookedSlots = async () => {
+    if (!selectedDate) return;
+    try {
+      const response = await api.getSlotsForDate(selectedDate);
+      setUnavailableSlots(response.data)
+    } catch (err) {
+      // Handle fetch errors
+      const errorMsg = err.response?.data?.message || 'Failed to fetch booked slots. Please try again.';
+      setError(errorMsg);
+    }
+  };
 
-    fetchBookedSlots();
-  }, [selectedDate]);
+  fetchBookedSlots();
+}, [selectedDate]);
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
@@ -86,6 +85,8 @@ const BookAppointment = ({ onBookingSuccess }) => {
 
     try {
       await api.bookAppointment(appointmentData);
+      // Log the backend response before calling onBookingSuccess
+      console.log('Booking successful:', appointmentData);
       onBookingSuccess();
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Failed to book appointment. Please try again.';

@@ -46,7 +46,16 @@ router.get('/slots', asyncHandler(async (req, res) => {
         attributes: ['appointment_date'],
     });
 
-    res.json(slots.map(slot => slot.appointment_date));
+    // Return time in HH:MM format, which is what the frontend needs for comparison.
+    // This avoids timezone and formatting issues on the client.
+    const bookedTimes = slots.map(slot => {
+        const date = new Date(slot.appointment_date);
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    });
+
+    res.json(bookedTimes);
 }));
 
 
@@ -86,11 +95,19 @@ router.post(
     const { appointment_date, gender, washing, coloring, cut, notes } = req.body;
     const newDate = new Date(appointment_date);
 
+    // Add logging to debug the booking process
+    console.log('Request body:', req.body);
+    console.log('User:', req.user);
+
     if (isNaN(newDate.getTime())) {
       return res.status(400).json({ msg: 'Invalid appointment_date.' });
     }
 
-    const existing = await Appointment.findOne({ where: { appointment_date: newDate } });
+    // Convert appointment_date to UTC+2
+    const utcPlus2Date = new Date(newDate.getTime() + 2 * 60 * 60 * 1000);
+
+    // This check is still useful for a quick response without hitting the DB
+    const existing = await Appointment.findOne({ where: { appointment_date: utcPlus2Date } });
     if (existing) {
       return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
     }
@@ -102,11 +119,11 @@ router.post(
     }
 
     const serviceQuery = {
-      gender_target: gender,
-      ...(cut && { cutting: true }),
-      ...(washing && { washing: true }),
-      ...(coloring && { coloring: true }),
-    };
+  gender_target: gender,
+  cutting: cut,
+  washing: washing,
+  coloring: coloring,
+};
 
     if (!cut && !washing && !coloring) {
       return res.status(400).json({ msg: 'You must select at least one service (cut, wash, or color).' });
@@ -121,14 +138,40 @@ router.post(
       return res.status(404).json({ msg: 'No matching service found for your selected options.' });
     }
 
-    const newAppointment = await Appointment.create({
+    // Log the service query result
+    console.log('Service query result:', selectedService);
+
+    // Log before creating the appointment
+    console.log('Creating appointment with data:', {
       user_id: req.user.user_id,
-      appointment_date: newDate,
-      service_id: selectedService.service_id,
+      appointment_date: utcPlus2Date,
+      service_id: selectedService?.service_id,
       notes,
     });
 
-    res.status(201).json({ msg: 'Appointment booked successfully!', appointment: newAppointment });
+    try {
+      const newAppointment = await Appointment.create({
+        user_id: req.user.user_id,
+        appointment_date: utcPlus2Date,
+        service_id: selectedService.service_id,
+        notes,
+      });
+
+      // Log the result of the Appointment.create call
+      console.log('New appointment created:', newAppointment);
+
+      res.status(201).json({ msg: 'Appointment booked successfully!', appointment: newAppointment });
+    } catch (error) {
+      if (error instanceof Sequelize.UniqueConstraintError) {
+        return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+      }
+      // For other unexpected errors
+      console.error('Error booking appointment:', error);
+      if (error.errors) {
+        console.error('Validation errors:', error.errors.map(e => e.message));
+      }
+      res.status(500).json({ msg: 'An unexpected error occurred while booking the appointment.' });
+    }
   })
 );
 
@@ -148,6 +191,9 @@ router.put(
       return res.status(400).json({ msg: 'Invalid appointment_date.' });
     }
 
+    // Convert appointment_date to UTC+2
+    const utcPlus2Date = new Date(newDate.getTime() + 2 * 60 * 60 * 1000);
+
     const whereClause = { appointment_id: appointmentId };
     if (req.user.role !== 'admin') {
         whereClause.user_id = req.user.user_id;
@@ -166,7 +212,7 @@ router.put(
 
     const existing = await Appointment.findOne({
       where: {
-        appointment_date: newDate,
+        appointment_date: utcPlus2Date,
         appointment_id: { [Sequelize.Op.ne]: appointmentId },
       }
     });
@@ -174,7 +220,7 @@ router.put(
       return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
-    appointment.appointment_date = newDate;
+    appointment.appointment_date = utcPlus2Date;
     await appointment.save();
 
     res.json({ msg: 'Appointment rescheduled successfully!', appointment });

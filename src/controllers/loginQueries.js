@@ -50,7 +50,7 @@ router.post('/login', validate(userSchemas.login), (req, res, next) => {
       // respond after login so express-session sets cookie
       return res.json({
         msg: 'Logged in successfully',
-        user: { user_id: user.user_id, username_email: user.username_email, role: user.role },
+        user: { user_id: user.user_id, name: user.name, username_email: user.username_email, role: user.role },
       });
     });
   })(req, res, next);
@@ -59,7 +59,8 @@ router.post('/login', validate(userSchemas.login), (req, res, next) => {
 // New route to check if a user is logged in
 router.get('/user', (req, res) => {
     if (req.isAuthenticated()) {
-        res.json({ username: req.user.username_email }); // Use username_email
+        // Send the full user object, not just the username
+        res.json({ user: req.user });
     } else {
         res.status(401).json({ msg: 'Not authenticated' });
     }
