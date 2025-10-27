@@ -11,7 +11,7 @@ let transporterMode = 'none';
 // Primary: Use real SMTP transport when EMAIL_HOST is present
 if (process.env.EMAIL_HOST) {
   const port = process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT, 10) : 587;
-  const secure = port === 465;
+  const secure = process.env.EMAIL_SECURE === 'true'; // true for 465, false for other ports
   transporter = createTransport({
     host: process.env.EMAIL_HOST,
     port,

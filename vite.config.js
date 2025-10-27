@@ -13,4 +13,10 @@ export default defineConfig({
       },
     },
   },
+  // Build directly into the `public` directory so the Express server can serve the built frontend.
+  // Set `emptyOutDir: false` to avoid deleting existing static assets (images) already in `public`.
+  build: {
+    outDir: 'public',
+    emptyOutDir: false,
+  },
 });

@@ -7,6 +7,8 @@ import cors from 'cors';
 import 'dotenv/config';
 import helmet from 'helmet';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+const PgSession = connectPgSimple(session);
 import csurf from '@dr.pogodin/csurf';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -69,25 +71,30 @@ app.use(express.static(join(process.cwd(), 'public')));
 app.use(cookieParser());
 
 // Initialize session middleware
-app.use(
-  session({
-    name: 'sessionId',
-    secret: process.env.SESSION_SECRET || 'a-secure-default-secret',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      // Use stricter sameSite in production, relax in development so cookies are forwarded during local dev
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
-    },
-    // WARNING: The default MemoryStore is not for production.
-    // It will leak memory and not persist across restarts.
-    // For production, uncomment and configure a persistent store like this:
-    // store: new (require('connect-pg-simple')(session))({ conObject: process.env.DATABASE_URL })
-  })
-);
+const sessionOptions = {
+  name: 'sessionId',
+  secret: process.env.SESSION_SECRET || 'a-secure-default-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    // Use stricter sameSite in production, relax in development so cookies are forwarded during local dev
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+  },
+};
+
+if (process.env.DATABASE_URL) {
+  // Use Postgres-backed session store in production when DATABASE_URL exists
+  sessionOptions.store = new PgSession({ conObject: { connectionString: process.env.DATABASE_URL } });
+  console.log('Session store: configured connect-pg-simple with DATABASE_URL');
+} else {
+  // Fallback to MemoryStore with a warning
+  console.warn('Session store: DATABASE_URL not provided. Using default MemoryStore (not recommended for production).');
+}
+
+app.use(session(sessionOptions));
 
 // Test database connection
 sequelize
