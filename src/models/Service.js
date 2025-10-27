@@ -7,8 +7,14 @@ export default (sequelize, DataTypes) => {
             autoIncrement: true,
         },
         gender_target: {
-            type: DataTypes.ENUM('male', 'female'),
+            type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                isIn: {
+                    args: [['male', 'female']],
+                    msg: 'gender_target must be either "male" or "female"',
+                },
+            },
         },
         washing: {
             type: DataTypes.BOOLEAN,

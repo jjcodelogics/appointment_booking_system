@@ -19,8 +19,9 @@ describe('User Model Unit Tests', () => {
   });
 
   afterEach(async () => {
-    // Clean up users after each test
-    await db.User.destroy({ where: {}, truncate: true });
+    // Reset the database to a clean state between tests. Using sync({ force: true })
+    // drops and recreates tables which avoids FK constraint issues when truncating.
+    await db.sequelize.sync({ force: true });
   });
 
   describe('Email Uniqueness Validation', () => {

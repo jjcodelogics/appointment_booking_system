@@ -7,7 +7,7 @@
     "start": "node server.js",
     "dev": "vite",
     "build": "vite build",
-    "test": "mocha test/**/*.test.js --exit",
+    "test": "NODE_ENV=test mocha test/**/*.test.js --exit",
     "create-admin": "node scripts/create-admin.js"
   },
   "keywords": [],

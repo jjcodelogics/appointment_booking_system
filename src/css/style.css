@@ -656,8 +656,13 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
 
 .btn.full-width {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.5rem; /* slightly smaller for auth buttons */
   margin-top: 0.5rem;
+  font-size: 0.95rem; /* slightly smaller text */
+  border-radius: 8px; /* less pill-like on auth form */
+  max-width: 360px; /* prevent overly wide button inside auth card */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* 2. Style the main content block on the dashboard */

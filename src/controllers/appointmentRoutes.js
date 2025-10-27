@@ -4,23 +4,16 @@ import validate from '../middleware/validate.js';
 import { isAuthenticated, canAccess } from '../middleware/auth.js';
 import { appointmentsSchemas } from '../middleware/appointments.schemas.js';
 import db from '../models/index.js';
+import {
+  toUtcPlus2,
+  isBusinessOpen as isBusinessOpenHelper,
+  isInPastUtcPlus2,
+  buildServiceQuery,
+  findCompatibleService,
+} from '../utils/appointmentHelpers.js';
+import { sendBookingConfirmation } from '../services/emailService.js';
 
 const router = Router();
-
-// --- Helper function for business hours ---
-function isBusinessOpen(day, hour) {
-  // Sunday (0) or Monday (1) are closed
-  if (day === 0 || day === 1) return false;
-  // Tue-Fri (2-5) from 9 AM to 7 PM (19:00)
-  if (day >= 2 && day <= 5) {
-    return hour >= 9 && hour < 19;
-  }
-  // Saturday (6) from 8 AM to 5 PM (17:00)
-  if (day === 6) {
-    return hour >= 8 && hour < 17;
-  }
-  return false;
-}
 
 // GET /api/appointments/slots - returns all booked slots for a given date
 router.get('/slots', asyncHandler(async (req, res) => {
@@ -104,7 +97,7 @@ router.post(
     }
 
     // Convert appointment_date to UTC+2
-    const utcPlus2Date = new Date(newDate.getTime() + 2 * 60 * 60 * 1000);
+    const utcPlus2Date = toUtcPlus2(newDate);
 
     // This check is still useful for a quick response without hitting the DB
     const existing = await Appointment.findOne({ where: { appointment_date: utcPlus2Date } });
@@ -112,29 +105,25 @@ router.post(
       return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
-    const day = newDate.getDay();
-    const hour = newDate.getHours();
-    if (!isBusinessOpen(day, hour)) {
+    if (!isBusinessOpenHelper(newDate)) {
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
     }
 
-    const serviceQuery = {
-  gender_target: gender,
-  cutting: cut,
-  washing: washing,
-  coloring: coloring,
-};
-
+    // Ensure at least one service selected
     if (!cut && !washing && !coloring) {
       return res.status(400).json({ msg: 'You must select at least one service (cut, wash, or color).' });
     }
 
-    const selectedService = await Service.findOne({
-      where: serviceQuery,
-      order: [['cutting', 'DESC'], ['washing', 'DESC'], ['coloring', 'DESC']],
-    });
+    const serviceQuery = buildServiceQuery({ gender, cut, washing, coloring });
+
+    const selectedService = await findCompatibleService(Service, serviceQuery);
 
     if (!selectedService) {
+      // Helpful debug log to inspect what services exist for this gender
+      console.log('No direct service match. Looking up available services for gender:', gender);
+      const available = await Service.findAll({ where: { gender_target: gender } });
+      console.log('Available services for gender:', available.map(s => ({ id: s.service_id, cutting: s.cutting, washing: s.washing, coloring: s.coloring })));
+
       return res.status(404).json({ msg: 'No matching service found for your selected options.' });
     }
 
@@ -159,6 +148,20 @@ router.post(
 
       // Log the result of the Appointment.create call
       console.log('New appointment created:', newAppointment);
+
+      // Fire-and-forget: send booking confirmation email without delaying the response
+      try {
+        // Use username_email field on the authenticated user as recipient
+        const recipient = req.user?.username_email || req.user?.email;
+        if (recipient) {
+          // don't await so response isn't delayed; log any errors inside the service
+          sendBookingConfirmation(recipient, newAppointment).catch(err => console.error('Error sending booking confirmation (async):', err));
+        } else {
+          console.warn('No recipient email available on req.user; skipping confirmation email.');
+        }
+      } catch (err) {
+        console.error('Unexpected error attempting to send confirmation email:', err);
+      }
 
       res.status(201).json({ msg: 'Appointment booked successfully!', appointment: newAppointment });
     } catch (error) {
@@ -192,7 +195,7 @@ router.put(
     }
 
     // Convert appointment_date to UTC+2
-    const utcPlus2Date = new Date(newDate.getTime() + 2 * 60 * 60 * 1000);
+    const utcPlus2Date = toUtcPlus2(newDate);
 
     const whereClause = { appointment_id: appointmentId };
     if (req.user.role !== 'admin') {
@@ -204,10 +207,13 @@ router.put(
       return res.status(404).json({ msg: 'Appointment not found or you do not have permission to edit it.' });
     }
 
-    const day = newDate.getDay();
-    const hour = newDate.getHours();
-    if (!isBusinessOpen(day, hour)) {
+    if (!isBusinessOpenHelper(newDate)) {
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
+    }
+
+    // Prevent rescheduling to a past date/time (compare in UTC+2, same offset used for storage)
+    if (isInPastUtcPlus2(newDate)) {
+      return res.status(400).json({ msg: 'Cannot reschedule to a past date/time.' });
     }
 
     const existing = await Appointment.findOne({
