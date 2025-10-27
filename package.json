@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "node ./node_modules/vite/bin/vite.js build",
     "test": "echo \"No tests\" && exit 0",
     "create-admin": "node scripts/create-admin.js",
     "postinstall": "npm run build"
@@ -30,13 +30,11 @@
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
     "express-session": "^1.18.2",
-    "fs": "^0.0.1-security",
     "helmet": "^8.1.0",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.9",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "path": "^0.12.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sequelize": "^6.37.7",
