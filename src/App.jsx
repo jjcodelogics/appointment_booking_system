@@ -25,6 +25,24 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [rescheduleId, setRescheduleId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const checkLoggedIn = () => {
+    api.checkUserSession()
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+          setIsLoggedIn(true);
+        } else {
+          setUser(null);
+          setIsLoggedIn(false);
+        }
+      })
+      .catch(() => {
+        setUser(null);
+        setIsLoggedIn(false);
+      });
+  };
 
   // Check for logged-in user on initial load
   useEffect(() => {

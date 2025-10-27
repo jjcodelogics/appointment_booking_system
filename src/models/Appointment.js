@@ -16,6 +16,7 @@ export default (sequelize, DataTypes) => {
     appointment_date: {
       type: DataTypes.DATE,
       allowNull: false,
+      unique: true,
     },
     notes: {
       type: DataTypes.TEXT,
