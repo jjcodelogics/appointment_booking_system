@@ -297,8 +297,8 @@ export const adminRateLimit = rateLimit({
 - **npm audit:** Developers can run `npm audit` to check for known vulnerabilities
 - **Dependency Count:** 20+ direct dependencies, 400+ transitive dependencies
 
-**Current Vulnerabilities:**
-- Run `npm audit` to check (1 moderate vulnerability reported at install time)
+**Checking for Vulnerabilities:**
+- Run `npm audit` to check for current vulnerabilities and security advisories
 
 **Strengths:**
 - ✅ Lock file prevents dependency confusion attacks
@@ -539,7 +539,7 @@ npm test
 ```
 
 **Coverage:**
-- 95%+ coverage for models, controllers, middleware (assumption based on test files present)
+- Comprehensive coverage for models, controllers, middleware (actual coverage can be measured with tools like nyc/istanbul)
 
 **Strengths:**
 - ✅ Comprehensive test suite for auth, validation, and business logic

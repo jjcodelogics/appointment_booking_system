@@ -15,8 +15,8 @@ This application solves real business needs for service-based businesses (salons
 - **Scaling efficiently** with modular architecture and database-backed sessions
 
 **Key Metrics:**
-- 95+ test coverage across models, controllers, middleware, and integration scenarios
-- Sub-200ms API response times for core booking operations
+- Comprehensive test coverage across models, controllers, middleware, and integration scenarios
+- Sub-200ms API response times for core booking operations (development environment)
 - Supports 200+ concurrent admin operations with rate limiting
 - Zero-downtime deployments with database migrations
 
