@@ -1,15 +1,18 @@
 import { expect } from 'chai';
+import { initializeModels } from '../../src/models/index.js';
 import db from '../../src/models/index.js';
 
 describe('Admin Routes Integration', () => {
   before(async () => {
+    await initializeModels();
     await db.sequelize.sync({ force: true });
   });
 
   describe('Admin Authorization', () => {
-    it('should have admin middleware setup', () => {
+    it('should have admin middleware setup', async () => {
       // This test validates that the auth middleware exists
-      const { isAuthenticated, canAccess } = require('../../src/middleware/auth.js');
+      const authModule = await import('../../src/middleware/auth.js');
+      const { isAuthenticated, canAccess } = authModule;
       expect(isAuthenticated).to.be.a('function');
       expect(canAccess).to.be.a('function');
     });
@@ -70,7 +73,14 @@ describe('Admin Routes Integration', () => {
 
     it('should have default status "confirmed"', async () => {
       const user = await db.User.findOne({ where: { username_email: 'test@example.com' } });
-      const service = await db.Service.findOne({ where: { service_name: 'Test Service' } });
+      const service = await db.Service.findOne({ 
+        where: { 
+          gender_target: 'male',
+          cutting: true,
+          washing: false,
+          coloring: false
+        } 
+      });
 
       const appointment = await db.Appointment.create({
         user_id: user.user_id,
