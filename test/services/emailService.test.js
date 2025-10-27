@@ -156,8 +156,9 @@ describe('Email Service Unit Tests', () => {
 
       // Create an appointment for tomorrow
       const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(10, 0, 0, 0);
+      tomorrow.setHours(0, 0, 0, 0); // Reset time to midnight
+      tomorrow.setDate(tomorrow.getDate() + 1); // Add one day
+      tomorrow.setHours(10, 0, 0, 0); // Set to 10 AM
       
       await db.Appointment.create({
         user_id: testUser.user_id,
