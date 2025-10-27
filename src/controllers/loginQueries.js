@@ -47,6 +47,10 @@ router.post('/login', validate(userSchemas.login), (req, res, next) => {
       if (err) return next(err);
       console.log('Login success - user:', { id: user.user_id, email: user.username_email, role: user.role });
       console.log('session.passport after login:', req.session.passport);
+      
+      // Server-side redirect URL based on role
+      const redirectUrl = user.role === 'admin' ? '/admin/dashboard' : '/dashboard';
+      
       // respond after login so express-session sets cookie
       return res.json({
         msg: 'Logged in successfully',

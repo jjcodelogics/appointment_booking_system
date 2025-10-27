@@ -16,6 +16,8 @@ import AuthPage from './components/auth/Auth';
 import Dashboard from './components/user/Dashboard';
 import BookAppointment from './components/booking/BookAppointment';
 import RescheduleAppointment from './components/booking/RescheduleAppointment';
+import AdminDashboard from './components/admin/AdminDashboard';
+import AdminBookAppointment from './components/admin/AdminBookAppointment';
 
 const App = () => {
   const [view, setView] = useState('home');
@@ -68,7 +70,12 @@ const App = () => {
 
   const handleLogin = (loggedInUser) => {
     setUser(loggedInUser);
-    setView('dashboard');
+    // Role-based redirection
+    if (loggedInUser.role === 'admin') {
+      setView('admin-dashboard');
+    } else {
+      setView('dashboard');
+    }
   };
 
   const handleLogout = async () => {
@@ -117,6 +124,21 @@ const App = () => {
           return <BookAppointment onBookingSuccess={navigateToDashboard} />;
         case 'rescheduling':
           return <RescheduleAppointment appointmentId={rescheduleId} onRescheduleSuccess={navigateToDashboard} />;
+        case 'admin-dashboard':
+          if (user.role === 'admin') {
+            return <AdminDashboard key={refreshKey} user={user} onBookNew={() => navigate('admin-booking')} />;
+          }
+          // If non-admin tries to access admin dashboard, redirect to user dashboard
+          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+        case 'admin-booking':
+          if (user.role === 'admin') {
+            return <AdminBookAppointment onBookingSuccess={() => {
+              setRefreshKey(prevKey => prevKey + 1);
+              navigate('admin-dashboard');
+            }} />;
+          }
+          // If non-admin tries to access admin booking, redirect to user booking
+          return <BookAppointment onBookingSuccess={navigateToDashboard} />;
       }
     }
 

@@ -34,4 +34,22 @@ export default {
   
   cancelAppointment: (id) =>
     api.delete(`/appointments/cancel/${id}`),
+
+  // --- Admin Appointments ---
+  getAdminAppointments: (queryString = '') => 
+    api.get(`/admin/appointments${queryString ? `?${queryString}` : ''}`),
+  
+  adminBookAppointment: (appointmentData) =>
+    api.post('/admin/appointments', appointmentData),
+  
+  updateAdminAppointment: (id, updates) =>
+    api.put(`/admin/appointments/${id}`, updates),
+  
+  bulkOperations: (data) =>
+    api.post('/admin/appointments/bulk', data),
+  
+  exportAppointments: (queryString = '') =>
+    api.get(`/admin/appointments/export${queryString ? `?${queryString}` : ''}`, {
+      responseType: 'blob',
+    }),
 };

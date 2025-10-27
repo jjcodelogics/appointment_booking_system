@@ -21,6 +21,23 @@ export default (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'confirmed',
+      allowNull: false,
+    },
+    customer_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    customer_phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    staff_assigned: {
+      type: DataTypes.STRING,
+      allowNull: true,
     }
   });
 
