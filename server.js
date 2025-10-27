@@ -1,6 +1,6 @@
 import express from 'express';
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 import pkg from 'body-parser';
 const { json, urlencoded } = pkg;
 import cors from 'cors';
@@ -156,6 +156,6 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
 });
