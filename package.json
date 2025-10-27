@@ -15,7 +15,7 @@
   "license": "ISC",
   "type": "module",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@dr.pogodin/csurf": "^1.16.6",
