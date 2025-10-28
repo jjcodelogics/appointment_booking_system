@@ -67,8 +67,9 @@ if (process.env.EMAIL_HOST) {
 // Helper to actually send and log preview URL for Ethereal
 async function _sendMail(mailOptions) {
   if (!transporter) throw new Error('No transporter configured');
+
   const info = await transporter.sendMail(mailOptions);
-  console.log(`EmailService: mail sent (mode=${transporterMode}), messageId=${info.messageId}`);
+
   if (transporterMode === 'ethereal') {
     try {
       const preview = getTestMessageUrl(info);
@@ -90,7 +91,13 @@ const sendBookingConfirmation = async (userEmail, appointmentDetails) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || 'no-reply@yourapp.local',
+    // Prefer explicit verified sender; fallback to EMAIL_USER when set
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'no-reply@yourapp.local',
+    // Explicit envelope can help some relays enforce correct MAIL FROM
+    envelope: {
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'no-reply@yourapp.local',
+      to: userEmail,
+    },
     to: userEmail,
     subject: 'Your Appointment is Confirmed!',
     html: `
@@ -120,7 +127,7 @@ const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
   }
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || 'no-reply@yourapp.local',
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'no-reply@yourapp.local',
     to: userEmail,
     subject: 'Appointment Reminder',
     html: `

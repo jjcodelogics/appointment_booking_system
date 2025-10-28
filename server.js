@@ -87,7 +87,11 @@ const sessionOptions = {
 
 if (process.env.DATABASE_URL) {
   // Use Postgres-backed session store in production when DATABASE_URL exists
-  sessionOptions.store = new PgSession({ conObject: { connectionString: process.env.DATABASE_URL } });
+  // Ask connect-pg-simple to create the session table if missing
+  sessionOptions.store = new PgSession({
+    conObject: { connectionString: process.env.DATABASE_URL },
+    createTableIfMissing: true
+  });
   console.log('Session store: configured connect-pg-simple with DATABASE_URL');
 } else {
   // Fallback to MemoryStore with a warning
