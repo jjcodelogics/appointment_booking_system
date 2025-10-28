@@ -35,7 +35,51 @@ try {
   process.exit(1); // Exit if we can't sync
 }
 
-// import passport after db is ready
+// If services table is empty (e.g. seeders not executed on deploy), seed default services
+try {
+  const { Service } = db;
+  if (Service) {
+    const servicesCount = await Service.count();
+    if (servicesCount === 0) {
+      console.log('No services found in DB — seeding default services...');
+      const now = new Date();
+      const genders = ['male', 'female'];
+      const bools = [true, false];
+      const servicesToCreate = [];
+
+      for (const gender of genders) {
+        for (const washing of bools) {
+          for (const cutting of bools) {
+            for (const coloring of bools) {
+              if (washing || cutting || coloring) {
+                servicesToCreate.push({
+                  gender_target: gender,
+                  washing,
+                  cutting,
+                  coloring,
+                  createdAt: now,
+                  updatedAt: now,
+                });
+              }
+            }
+          }
+        }
+      }
+
+      if (servicesToCreate.length > 0) {
+        await Service.bulkCreate(servicesToCreate);
+        console.log('Seeded services:', servicesToCreate.length);
+      }
+    } else {
+      console.log('Services exist in DB:', servicesCount);
+    }
+  } else {
+    console.warn('Service model not available; skipping service seeding.');
+  }
+} catch (err) {
+  console.error('Error checking/seeding services:', err);
+}
+
 import passportMiddleware from './src/middleware/passport.js';
 
 app.use(
