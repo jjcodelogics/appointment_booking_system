@@ -75,8 +75,8 @@ const sessionOptions = {
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    // Use stricter sameSite in production, relax in development so cookies are forwarded during local dev
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    // Use 'none' in production so cookies are sent cross-site (frontend and backend on different origins)
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
   },
 };
@@ -112,7 +112,8 @@ const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    // Allow CSRF cookie to be sent cross-site in production
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
 });
 
@@ -136,7 +137,12 @@ app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
 
 // Middleware to attach CSRF token to all responses for non-API GET requests
 app.use((req, res, next) => {
-  res.cookie('XSRF-TOKEN', req.csrfToken());
+  // Explicitly set options so the frontend can read the XSRF-TOKEN cookie when frontend and backend are on different origins
+  res.cookie('XSRF-TOKEN', req.csrfToken(), {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  });
   next();
 });
 
