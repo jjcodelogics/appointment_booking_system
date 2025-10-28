@@ -41,6 +41,10 @@ export function buildServiceQuery({ gender, cut, washing, coloring }) {
 export async function findCompatibleService(ServiceModel, query) {
   return ServiceModel.findOne({
     where: query,
-    order: [['cutting', 'DESC'], ['washing', 'DESC'], ['coloring', 'DESC']],
+    order: [
+      ['cutting', 'DESC'],
+      ['washing', 'DESC'],
+      ['coloring', 'DESC'],
+    ],
   });
 }

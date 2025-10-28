@@ -73,13 +73,13 @@ describe('Admin Routes Integration', () => {
 
     it('should have default status "confirmed"', async () => {
       const user = await db.User.findOne({ where: { username_email: 'test@example.com' } });
-      const service = await db.Service.findOne({ 
-        where: { 
+      const service = await db.Service.findOne({
+        where: {
           gender_target: 'male',
           cutting: true,
           washing: false,
-          coloring: false
-        } 
+          coloring: false,
+        },
       });
 
       const appointment = await db.Appointment.create({

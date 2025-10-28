@@ -41,11 +41,7 @@ app.use(
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        "script-src": [
-          "'self'",
-          "https://unpkg.com",
-          "https://cdn.jsdelivr.net",
-        ],
+        'script-src': ["'self'", 'https://unpkg.com', 'https://cdn.jsdelivr.net'],
       },
     },
   })
@@ -90,12 +86,14 @@ if (process.env.DATABASE_URL) {
   // Ask connect-pg-simple to create the session table if missing
   sessionOptions.store = new PgSession({
     conObject: { connectionString: process.env.DATABASE_URL },
-    createTableIfMissing: true
+    createTableIfMissing: true,
   });
   console.log('Session store: configured connect-pg-simple with DATABASE_URL');
 } else {
   // Fallback to MemoryStore with a warning
-  console.warn('Session store: DATABASE_URL not provided. Using default MemoryStore (not recommended for production).');
+  console.warn(
+    'Session store: DATABASE_URL not provided. Using default MemoryStore (not recommended for production).'
+  );
 }
 
 app.use(session(sessionOptions));
@@ -104,7 +102,7 @@ app.use(session(sessionOptions));
 sequelize
   .authenticate()
   .then(() => console.log('Database connected successfully.'))
-  .catch((err) => console.error('Unable to connect to the database:', err));
+  .catch(err => console.error('Unable to connect to the database:', err));
 
 app.use(passportMiddleware.initialize());
 app.use(passportMiddleware.session());

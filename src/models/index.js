@@ -25,8 +25,8 @@ const db = {};
 
 export const initializeModels = async () => {
   const modelsDir = join(process.cwd(), 'src', 'models');
-  const modelFiles = readdirSync(modelsDir).filter((file) =>
-    file !== 'index.js' && /\.(js|mjs|cjs)$/.test(file)
+  const modelFiles = readdirSync(modelsDir).filter(
+    file => file !== 'index.js' && /\.(js|mjs|cjs)$/.test(file)
   );
 
   for (const file of modelFiles) {
@@ -45,7 +45,7 @@ export const initializeModels = async () => {
   }
 
   // Set up associations if any
-  Object.keys(db).forEach((modelName) => {
+  Object.keys(db).forEach(modelName => {
     if (typeof db[modelName].associate === 'function') {
       db[modelName].associate(db);
     }

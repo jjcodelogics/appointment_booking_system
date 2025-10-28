@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 
 // Helper function to format the date
-const formatAppointmentDate = (isoString) => {
+const formatAppointmentDate = isoString => {
   const date = new Date(isoString);
   const day = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
   const dayOfMonth = date.getDate();
@@ -10,7 +10,7 @@ const formatAppointmentDate = (isoString) => {
   const minute = date.getMinutes().toString().padStart(2, '0');
 
   // Function to get the ordinal suffix (st, nd, rd, th)
-  const getOrdinal = (n) => {
+  const getOrdinal = n => {
     const s = ['th', 'st', 'nd', 'rd'];
     const v = n % 100;
     return s[(v - 20) % 10] || s[v] || s[0];
@@ -25,10 +25,9 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
   const [error, setError] = useState('');
 
   const fetchAppointments = () => {
-    api.getAllAppointments()
-      .then((response) => {
-        console.log('Fetched appointments response:', response);
-
+    api
+      .getAllAppointments()
+      .then(response => {
         // The actual data from axios is in the `data` property.
         // Then, check if the appointments are nested inside that.
         const responseData = response.data;
@@ -36,11 +35,11 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
 
         // Ensure data is an array and filter out any invalid items.
         const validAppointments = (Array.isArray(data) ? data : [data]).filter(
-          (app) => app && app.appointment_id && app.appointment_date
+          app => app && app.appointment_id && app.appointment_date
         );
         setAppointments(validAppointments);
       })
-      .catch((err) => {
+      .catch(err => {
         // If the API returns a 404 (Not Found), it's not an error, just no appointments.
         if (err.response && err.response.status === 404) {
           setAppointments([]);
@@ -54,7 +53,7 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
     fetchAppointments();
   }, []);
 
-  const handleCancel = async (id) => {
+  const handleCancel = async id => {
     if (window.confirm('Are you sure you want to cancel this appointment?')) {
       try {
         await api.cancelAppointment(id);
@@ -69,7 +68,9 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
     <main className="container dashboard-page">
       <div className="dashboard-header">
         <h1>Welcome, {user?.name || 'Guest'}!</h1>
-        <button onClick={onBookNew} className="btn btn-primary">Book New Appointment</button>
+        <button onClick={onBookNew} className="btn btn-primary">
+          Book New Appointment
+        </button>
       </div>
 
       <section className="appointments-list">
@@ -84,14 +85,20 @@ const Dashboard = ({ user, onBookNew, onReschedule }) => {
               </tr>
             </thead>
             <tbody>
-              {appointments.map((app) => (
+              {appointments.map(app => (
                 <tr key={app.appointment_id}>
                   <td>{formatAppointmentDate(app.appointment_date)}</td>
                   <td className="actions-cell">
-                    <button onClick={() => onReschedule(app.appointment_id)} className="btn btn-secondary btn-sm">
+                    <button
+                      onClick={() => onReschedule(app.appointment_id)}
+                      className="btn btn-secondary btn-sm"
+                    >
                       Reschedule
                     </button>
-                    <button onClick={() => handleCancel(app.appointment_id)} className="btn btn-danger btn-sm">
+                    <button
+                      onClick={() => handleCancel(app.appointment_id)}
+                      className="btn btn-danger btn-sm"
+                    >
                       Cancel
                     </button>
                   </td>

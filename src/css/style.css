@@ -1,15 +1,17 @@
 /* --- Design Variables --- */
 :root {
   --primary-color: #121212; /* Deep Charcoal Black */
-  --accent-color: #B8860B; /* Muted Elegant Gold */
-  --neutral-bg: #FFFFFF; /* Pure White */
-  --secondary-bg: #F9F7F4; /* Light Cream/Grey */
+  --accent-color: #b8860b; /* Muted Elegant Gold */
+  --neutral-bg: #ffffff; /* Pure White */
+  --secondary-bg: #f9f7f4; /* Light Cream/Grey */
   --heading-font: 'Playfair Display', serif;
   --body-font: 'Roboto', sans-serif;
 }
 
 /* --- Base Styles --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -22,7 +24,9 @@ body {
   line-height: 1.6;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--heading-font);
   color: var(--primary-color);
   margin-bottom: 1rem;
@@ -50,13 +54,17 @@ a:hover {
 .contact-card,
 .container.split .col {
   background: var(--neutral-bg); /* Use pure white for a cleaner look */
-  border: 1px solid #EAEAEA;
+  border: 1px solid #eaeaea;
   padding: 1.75rem; /* More padding */
   margin-bottom: 1rem;
   border-radius: 12px; /* Softer radius */
   /* A more complex, modern shadow */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .card:hover,
@@ -64,7 +72,9 @@ a:hover {
 .contact-card:hover,
 .container.split .col:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05), 0 12px 32px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 /* Split Layout */
@@ -159,7 +169,8 @@ table {
   margin-top: 1.5rem;
 }
 
-th, td {
+th,
+td {
   padding: 0.8rem;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -205,7 +216,12 @@ thead {
   width: 100%;
   height: 100%;
   /* A more sophisticated gradient */
-  background: linear-gradient(to top, rgba(18, 18, 18, 0.7) 0%, rgba(18, 18, 18, 0.3) 60%, rgba(18, 18, 18, 0.7) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(18, 18, 18, 0.7) 0%,
+    rgba(18, 18, 18, 0.3) 60%,
+    rgba(18, 18, 18, 0.7) 100%
+  );
   z-index: 2;
 }
 
@@ -233,7 +249,7 @@ thead {
   font-weight: 300;
   max-width: 70ch;
   margin: 0 auto 1.2rem auto;
-  color: rgba(255,255,255,0.95);
+  color: rgba(255, 255, 255, 0.95);
   letter-spacing: 0.01em;
 }
 
@@ -244,8 +260,8 @@ thead {
   position: sticky;
   top: 0;
   z-index: 999;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
   height: 96px; /* increased to fit larger logo */
 }
 
@@ -273,7 +289,7 @@ thead {
 /* enforce logo sizing across all pages / image types */
 .logo {
   display: block;
-  height: 80px;     /* doubled from 20px */
+  height: 80px; /* doubled from 20px */
   max-height: 80px;
   width: auto;
   object-fit: contain;
@@ -326,8 +342,12 @@ img.logo {
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.02em;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.08s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .site-nav a:hover,
@@ -335,7 +355,7 @@ img.logo {
   background: var(--accent-color);
   color: #fff;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   outline: none;
 }
 
@@ -353,7 +373,7 @@ img.logo {
   border: none;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(184,134,11,0.12);
+  box-shadow: 0 6px 16px rgba(184, 134, 11, 0.12);
 }
 
 /* Mobile adjustments */
@@ -368,7 +388,7 @@ img.logo {
     top: 100%;
     right: 1rem;
     background: var(--neutral-bg);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     border-radius: 8px;
     flex-direction: column;
     padding: 0.5rem;
@@ -406,7 +426,7 @@ footer {
   padding: 0.5rem 1rem; /* Reduced from 0.9rem to make the footer thinner */
   font-family: var(--body-font);
   font-size: 0.95em;
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .site-footer .container {
@@ -417,7 +437,10 @@ footer {
   align-items: center;
 }
 
-.site-footer p { margin: 0; text-align: center; }
+.site-footer p {
+  margin: 0;
+  text-align: center;
+}
 
 /* Compact footer variant for index page to reveal more hero */
 .site-footer--compact {
@@ -425,7 +448,8 @@ footer {
 }
 
 /* --- Page layout consistency --- */
-main, .page {
+main,
+.page {
   max-width: 1100px;
   margin: 1.5rem auto;
   padding: 0 1.25rem;
@@ -441,7 +465,9 @@ main, .page {
     text-align: center;
   }
 
-  .footer-brand, .footer-links, .footer-contact {
+  .footer-brand,
+  .footer-links,
+  .footer-contact {
     min-width: auto;
   }
 }
@@ -458,7 +484,7 @@ main, .page {
   background: var(--secondary-bg);
   padding: 1.25rem;
   border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
   line-height: 1.7;
 }
 
@@ -473,14 +499,23 @@ main, .page {
   background: var(--secondary-bg);
   padding: 1.25rem;
   border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
   margin-bottom: 1rem;
   display: block;
 }
 
-.service-card h3 { margin-top: 0; }
-.service-card .meta { color: #555; margin-bottom: 0.75rem; }
-.service-card .note { color: #333; margin-top: 0.75rem; font-size: 0.95rem; }
+.service-card h3 {
+  margin-top: 0;
+}
+.service-card .meta {
+  color: #555;
+  margin-bottom: 0.75rem;
+}
+.service-card .note {
+  color: #333;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
 
 /* Contact grid (left details / right map) */
 .contact-grid {
@@ -494,10 +529,14 @@ main, .page {
   background: var(--secondary-bg);
   padding: 1.25rem;
   border-radius: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
-.map-card iframe { width: 100%; height: 320px; border-radius: 6px; }
+.map-card iframe {
+  width: 100%;
+  height: 320px;
+  border-radius: 6px;
+}
 
 /* Team list styling */
 .team ul {
@@ -511,7 +550,7 @@ main, .page {
   background: #fff;
   padding: 0.6rem 0.8rem;
   border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 /* Responsive adjustments for split/contact */
@@ -521,20 +560,32 @@ main, .page {
     grid-template-columns: 1fr;
   }
 
-  .hero { padding: 4rem 0; }
-  .hero .container { padding: 0 1rem; }
+  .hero {
+    padding: 4rem 0;
+  }
+  .hero .container {
+    padding: 0 1rem;
+  }
 }
 
 /* Content typography improvements */
-main, .container, .card, .contact-card, .service-card, .col {
+main,
+.container,
+.card,
+.contact-card,
+.service-card,
+.col {
   color: var(--primary-color);
   font-family: var(--body-font);
 }
 
-.container p, .container li, .contact-card p, .service-card p {
+.container p,
+.container li,
+.contact-card p,
+.service-card p {
   font-size: 1rem;
   line-height: 1.7;
-  color: rgba(18,18,18,0.9);
+  color: rgba(18, 18, 18, 0.9);
 }
 
 /* Constrain long paragraphs for better readability */
@@ -559,14 +610,18 @@ h2::after {
   width: 60px; /* Longer line */
   height: 3px; /* Thicker line */
   /* A subtle gradient for the underline */
-  background: linear-gradient(90deg, var(--accent-color), #D4AF37);
+  background: linear-gradient(90deg, var(--accent-color), #d4af37);
   border-radius: 3px;
 }
 
-h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
 
 /* Improve lists */
-.team ul, .social-list {
+.team ul,
+.social-list {
   list-style: none;
   padding: 0;
   margin: 0.5rem 0 1rem 0;
@@ -588,10 +643,15 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
   margin-bottom: 0.75rem;
 }
 
-.contact-meta div { background: transparent; padding: 0; }
+.contact-meta div {
+  background: transparent;
+  padding: 0;
+}
 
 /* Utility: make buttons consistent in header and content */
-.btn, .btn-primary, .btn-inline {
+.btn,
+.btn-primary,
+.btn-inline {
   border-radius: 999px;
   padding: 0.5rem 1rem;
 }
@@ -632,7 +692,7 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid #EAEAEA;
+  border: 1px solid #eaeaea;
 }
 
 .auth-card h2 {
@@ -673,7 +733,7 @@ h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  border: 1px solid #EAEAEA;
+  border: 1px solid #eaeaea;
 }
 
 /* 3. Modern UI for the appointments table */

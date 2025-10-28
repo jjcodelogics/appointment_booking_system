@@ -11,11 +11,11 @@ const AuthPage = ({ onLogin, onNavigate }) => {
     name: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
 
@@ -55,7 +55,8 @@ const AuthPage = ({ onLogin, onNavigate }) => {
       // Pass the user data from the response (including role for role-based redirect)
       onLogin(response.data.user || response.data);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Invalid credentials or server error. Please try again.';
+      const errorMsg =
+        err.response?.data?.message || 'Invalid credentials or server error. Please try again.';
       setError(errorMsg);
     }
   };
@@ -69,16 +70,37 @@ const AuthPage = ({ onLogin, onNavigate }) => {
           {!isLoginView && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
-              <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
             </div>
           )}
           <div className="form-group">
             <label htmlFor="username_email">Email Address</label>
-            <input type="email" id="username_email" name="username_email" value={formData.username_email} onChange={handleChange} required />
+            <input
+              type="email"
+              id="username_email"
+              name="username_email"
+              value={formData.username_email}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
           </div>
           <button type="submit" className="btn btn-primary full-width">
             {isLoginView ? 'Login' : 'Register'}

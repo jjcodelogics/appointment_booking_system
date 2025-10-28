@@ -16,7 +16,7 @@ export const isAuthenticated = (req, res, next) => {
  * @param {string[]} allowedRoles - An array of roles that are permitted access.
  * e.g., canAccess(['admin', 'manager'])
  */
-export const canAccess = (allowedRoles) => {
+export const canAccess = allowedRoles => {
   return (req, res, next) => {
     // This middleware should run *after* isAuthenticated, so req.user is available.
     if (req.user && allowedRoles.includes(req.user.role)) {

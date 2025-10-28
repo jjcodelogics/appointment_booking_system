@@ -1,6 +1,6 @@
 /**
  * Authorization Middleware Unit Tests
- * 
+ *
  * Tests authorization middleware that enforces role-based access:
  * - canAccess: Verifies user has required role(s)
  * - Tests user role prevented from admin resources
@@ -20,11 +20,11 @@ describe('Authorization Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -52,11 +52,11 @@ describe('Authorization Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -86,11 +86,11 @@ describe('Authorization Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -116,11 +116,11 @@ describe('Authorization Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -149,11 +149,11 @@ describe('Authorization Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -181,11 +181,11 @@ describe('Authorization Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -209,11 +209,11 @@ describe('Authorization Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -237,11 +237,11 @@ describe('Authorization Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -268,11 +268,11 @@ describe('Authorization Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -298,11 +298,11 @@ describe('Authorization Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },

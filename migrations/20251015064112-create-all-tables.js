@@ -27,8 +27,20 @@ export async function up(queryInterface, Sequelize) {
   // 3. Create the 'appointments' table
   await queryInterface.createTable('appointments', {
     appointment_id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-    user_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'users', key: 'user_id' }, onUpdate: 'CASCADE', onDelete: 'CASCADE' },
-    service_id: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'services', key: 'service_id' }, onUpdate: 'CASCADE', onDelete: 'CASCADE' },
+    user_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: { model: 'users', key: 'user_id' },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
+    service_id: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: { model: 'services', key: 'service_id' },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    },
     appointment_date: { type: Sequelize.DATE, allowNull: false },
     notes: { type: Sequelize.TEXT, allowNull: true },
     createdAt: { allowNull: false, type: Sequelize.DATE },

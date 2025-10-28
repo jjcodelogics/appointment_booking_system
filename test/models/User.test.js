@@ -1,6 +1,6 @@
 /**
  * User Model Unit Tests
- * 
+ *
  * Tests data validation rules for the User model including:
  * - Email uniqueness
  * - Required fields
@@ -127,7 +127,7 @@ describe('User Model Unit Tests', () => {
   describe('Password Hashing', () => {
     it('should automatically hash password on user creation', async () => {
       const plainPassword = 'MySecurePassword123!';
-      
+
       const user = await db.User.create({
         username_email: 'hashtest@example.com',
         name: 'Hash Test User',
@@ -136,10 +136,10 @@ describe('User Model Unit Tests', () => {
 
       // Password should be hashed (not equal to plain password)
       expect(user.password).to.not.equal(plainPassword);
-      
+
       // Password should be a bcrypt hash (starts with $2b$)
       expect(user.password).to.match(/^\$2[aby]\$\d{2}\$/);
-      
+
       // Should be able to verify the password
       const isValid = await bcrypt.compare(plainPassword, user.password);
       expect(isValid).to.be.true;
@@ -147,7 +147,7 @@ describe('User Model Unit Tests', () => {
 
     it('should validate password using validPassword method', async () => {
       const plainPassword = 'TestPassword456!';
-      
+
       const user = await db.User.create({
         username_email: 'validation@example.com',
         name: 'Validation Test User',
@@ -173,7 +173,7 @@ describe('User Model Unit Tests', () => {
       // Extract salt rounds from hash
       // Bcrypt hash format: $2b$10$... where 10 is the salt rounds
       const saltRounds = parseInt(user.password.split('$')[2]);
-      
+
       // Should use at least 10 rounds (as specified in User model)
       expect(saltRounds).to.be.at.least(10);
     });
@@ -197,7 +197,7 @@ describe('User Model Unit Tests', () => {
 
     it('should hash same password differently (due to salt)', async () => {
       const samePassword = 'SamePassword123!';
-      
+
       const user1 = await db.User.create({
         username_email: 'same1@example.com',
         name: 'Same User One',
@@ -212,7 +212,7 @@ describe('User Model Unit Tests', () => {
 
       // Even with same password, hashes should be different due to different salts
       expect(user1.password).to.not.equal(user2.password);
-      
+
       // But both should validate with the original password
       expect(await user1.validPassword(samePassword)).to.be.true;
       expect(await user2.validPassword(samePassword)).to.be.true;

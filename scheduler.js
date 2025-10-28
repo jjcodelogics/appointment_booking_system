@@ -33,7 +33,7 @@ const startReminderScheduler = () => {
 
       const appointmentsToSend = await Appointment.findAll({
         where: whereClause,
-        include: [{ model: User, attributes: ['username_email'] }]
+        include: [{ model: User, attributes: ['username_email'] }],
       });
 
       if (appointmentsToSend.length === 0) {
@@ -53,7 +53,6 @@ const startReminderScheduler = () => {
           await appt.save();
         }
       }
-
     } catch (error) {
       console.error('Error in reminder scheduler:', error);
     }

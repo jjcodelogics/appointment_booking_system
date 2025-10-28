@@ -19,18 +19,18 @@ const AdminBookAppointment = ({ onBookingSuccess }) => {
   const [error, setError] = useState('');
   const [bookedSlots, setBookedSlots] = useState([]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const handleDateChange = async (e) => {
+  const handleDateChange = async e => {
     const newDate = e.target.value;
-    setFormData((prev) => ({ ...prev, date: newDate }));
-    
+    setFormData(prev => ({ ...prev, date: newDate }));
+
     if (newDate) {
       try {
         const response = await api.getSlotsForDate(newDate);
@@ -41,21 +41,33 @@ const AdminBookAppointment = ({ onBookingSuccess }) => {
     }
   };
 
-  const isSlotBooked = (time) => {
+  const isSlotBooked = time => {
     if (!formData.date || !time) return false;
     const selectedDateTime = new Date(`${formData.date}T${time}`);
-    return bookedSlots.some((slot) => {
+    return bookedSlots.some(slot => {
       const bookedDateTime = new Date(slot);
       return bookedDateTime.getTime() === selectedDateTime.getTime();
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setMessage('');
     setError('');
 
-    const { date, time, gender, cut, washing, coloring, notes, customer_name, customer_phone, staff_assigned, status } = formData;
+    const {
+      date,
+      time,
+      gender,
+      cut,
+      washing,
+      coloring,
+      notes,
+      customer_name,
+      customer_phone,
+      staff_assigned,
+      status,
+    } = formData;
 
     // Validate required fields
     if (!customer_name.trim()) {
@@ -182,12 +194,7 @@ const AdminBookAppointment = ({ onBookingSuccess }) => {
           </div>
           <div className="checkbox-group">
             <label>
-              <input
-                type="checkbox"
-                name="cut"
-                checked={formData.cut}
-                onChange={handleChange}
-              />
+              <input type="checkbox" name="cut" checked={formData.cut} onChange={handleChange} />
               Haircut
             </label>
             <label>
@@ -227,12 +234,7 @@ const AdminBookAppointment = ({ onBookingSuccess }) => {
           </div>
           <div className="form-group">
             <label htmlFor="status">Status:</label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
+            <select id="status" name="status" value={formData.status} onChange={handleChange}>
               <option value="confirmed">Confirmed</option>
               <option value="pending">Pending</option>
               <option value="completed">Completed</option>
@@ -251,7 +253,9 @@ const AdminBookAppointment = ({ onBookingSuccess }) => {
           </div>
         </fieldset>
 
-        <button type="submit" className="btn btn-primary">Book Appointment</button>
+        <button type="submit" className="btn btn-primary">
+          Book Appointment
+        </button>
       </form>
     </main>
   );

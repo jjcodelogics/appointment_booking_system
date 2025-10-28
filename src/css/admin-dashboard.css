@@ -10,7 +10,7 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* Filters & controls styled as cards to match site components */
@@ -19,8 +19,8 @@
   padding: 1.5rem;
   border-radius: 12px;
   margin-bottom: 2rem;
-  border: 1px solid #EAEAEA;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  border: 1px solid #eaeaea;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
 .filters-section h3 {
@@ -101,8 +101,8 @@
 /* Each body row styled as a soft card */
 .table tbody tr {
   background: var(--neutral-bg);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-  border: 1px solid #EAEAEA;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eaeaea;
   border-radius: 10px;
 }
 
@@ -122,8 +122,8 @@
   border-bottom-right-radius: 10px;
 }
 
-.table td input[type="text"],
-.table td input[type="datetime-local"],
+.table td input[type='text'],
+.table td input[type='datetime-local'],
 .table td select,
 .table td textarea {
   width: 100%;
@@ -134,7 +134,10 @@
   background: #fff;
 }
 
-.table td textarea { resize: vertical; min-height: 60px; }
+.table td textarea {
+  resize: vertical;
+  min-height: 60px;
+}
 
 .actions-cell {
   display: flex;
@@ -153,15 +156,43 @@
   text-transform: uppercase;
 }
 
-.badge-success { background: rgba(40,167,69,0.12); color: #1f7a2a; }
-.badge-warning { background: rgba(255,193,7,0.12); color: #7a6110; }
-.badge-danger  { background: rgba(220,53,69,0.12); color: #7a1b24; }
-.badge-info    { background: rgba(23,162,184,0.12); color: #075b63; }
-.badge-secondary { background: rgba(0,0,0,0.04); color: #383d41; }
+.badge-success {
+  background: rgba(40, 167, 69, 0.12);
+  color: #1f7a2a;
+}
+.badge-warning {
+  background: rgba(255, 193, 7, 0.12);
+  color: #7a6110;
+}
+.badge-danger {
+  background: rgba(220, 53, 69, 0.12);
+  color: #7a1b24;
+}
+.badge-info {
+  background: rgba(23, 162, 184, 0.12);
+  color: #075b63;
+}
+.badge-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  color: #383d41;
+}
 
-.alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; }
-.alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
 
 /* Buttons: use pill shape and site accent colors */
 .btn {
@@ -177,31 +208,62 @@
   gap: 0.5rem;
 }
 
-.btn-sm { padding: 0.35rem 0.6rem; font-size: 0.85rem; }
+.btn-sm {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+}
 
 .btn-primary {
   background: var(--accent-color);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(184,134,11,0.12);
+  box-shadow: 0 6px 16px rgba(184, 134, 11, 0.12);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(184,134,11,0.18); }
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(184, 134, 11, 0.18);
+}
 
 .btn-secondary {
   background: var(--secondary-bg);
   color: var(--primary-color);
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
-.btn-secondary:hover { transform: translateY(-1px); }
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
 
-.btn-success { background: #28a745; color: white; }
-.btn-danger  { background: #dc3545; color: white; }
-.btn-info    { background: #17a2b8; color: white; }
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+.btn-info {
+  background: #17a2b8;
+  color: white;
+}
 
 /* Responsive tweaks: keep behavior but match spacing */
 @media (max-width: 768px) {
-  .dashboard-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-  .filters-form { grid-template-columns: 1fr; }
-  .bulk-actions { flex-direction: column; width: 100%; }
-  .table { font-size: 0.9rem; }
-  .table th, .table td { padding: 0.6rem; }
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .filters-form {
+    grid-template-columns: 1fr;
+  }
+  .bulk-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .table {
+    font-size: 0.9rem;
+  }
+  .table th,
+  .table td {
+    padding: 0.6rem;
+  }
 }

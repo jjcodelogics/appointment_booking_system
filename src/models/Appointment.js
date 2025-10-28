@@ -38,11 +38,11 @@ export default (sequelize, DataTypes) => {
     staff_assigned: {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
   });
 
   // Associations - called from models/index after all models are loaded
-  Appointment.associate = (models) => {
+  Appointment.associate = models => {
     Appointment.belongsTo(models.User, { foreignKey: 'user_id', as: 'User' });
 
     if (models.Service) {

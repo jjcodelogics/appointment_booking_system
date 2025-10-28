@@ -3,32 +3,47 @@ import React from 'react';
 const ContactPage = ({ onNavigate }) => {
   return (
     <main>
-      <section id="contact" className="container contact-grid" aria-label="Contact information and map">
+      <section
+        id="contact"
+        className="container contact-grid"
+        aria-label="Contact information and map"
+      >
         <div className="contact-card studio-info">
           <h2>Visit Our Studio</h2>
           <div className="contact-meta">
             <div>
-              <strong>Address</strong><br />
-              The Modern Shear<br />
+              <strong>Address</strong>
+              <br />
+              The Modern Shear
+              <br />
               214 Main Street, Suite B<br />
               Fort Worth, TX 76102
             </div>
             <div>
-              <strong>Phone</strong><br />
+              <strong>Phone</strong>
+              <br />
               (817) 555-0198
             </div>
             <div>
-              <strong>Email</strong><br />
+              <strong>Email</strong>
+              <br />
               hello@themodernshear.com
             </div>
             <div>
-              <strong>Hours</strong><br />
-              Tuesday–Friday: 9:00 AM – 7:00 PM<br />
-              Saturday: 8:00 AM – 5:00 PM<br />
+              <strong>Hours</strong>
+              <br />
+              Tuesday–Friday: 9:00 AM – 7:00 PM
+              <br />
+              Saturday: 8:00 AM – 5:00 PM
+              <br />
               Sunday–Monday: Closed
             </div>
           </div>
-          <button onClick={() => onNavigate('login')} className="btn btn-primary" style={{ marginTop: '20px' }}>
+          <button
+            onClick={() => onNavigate('login')}
+            className="btn btn-primary"
+            style={{ marginTop: '20px' }}
+          >
             Book an Appointment
           </button>
         </div>

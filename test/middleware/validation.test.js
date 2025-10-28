@@ -1,6 +1,6 @@
 /**
  * Input Validation Middleware Unit Tests
- * 
+ *
  * Tests validation middleware that checks request data:
  * - Tests 400 Bad Request for missing required fields
  * - Tests 400 Bad Request for malformed data
@@ -26,11 +26,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -62,11 +62,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -101,11 +101,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -125,7 +125,7 @@ describe('Input Validation Middleware Unit Tests', () => {
       expect(res.statusCode).to.equal(400);
       expect(res.body).to.have.property('message', 'Validation failed');
       expect(res.body.errors).to.be.an('array');
-      
+
       // Check that error message mentions email
       const emailError = res.body.errors.find(e => e.path.includes('username_email'));
       expect(emailError).to.exist;
@@ -143,11 +143,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -166,7 +166,7 @@ describe('Input Validation Middleware Unit Tests', () => {
       expect(nextCalled).to.be.false;
       expect(res.statusCode).to.equal(400);
       expect(res.body).to.have.property('message', 'Validation failed');
-      
+
       const passwordError = res.body.errors.find(e => e.path.includes('password'));
       expect(passwordError).to.exist;
     });
@@ -183,11 +183,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -220,11 +220,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -255,11 +255,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -297,11 +297,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -335,11 +335,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -374,11 +374,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -412,11 +412,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -450,11 +450,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -490,11 +490,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -527,11 +527,11 @@ describe('Input Validation Middleware Unit Tests', () => {
       };
 
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -550,7 +550,7 @@ describe('Input Validation Middleware Unit Tests', () => {
       expect(res.statusCode).to.equal(400);
       expect(res.body.errors).to.be.an('array');
       expect(res.body.errors.length).to.be.greaterThan(0);
-      
+
       // Each error should have path and message
       res.body.errors.forEach(error => {
         expect(error).to.have.property('path');

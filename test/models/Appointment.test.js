@@ -1,6 +1,6 @@
 /**
  * Appointment Model Unit Tests
- * 
+ *
  * Tests data validation rules for the Appointment model including:
  * - Required date/time validation
  * - Valid user foreign key constraint
@@ -100,7 +100,7 @@ describe('Appointment Model Unit Tests', () => {
   describe('Date/Time Validation', () => {
     it('should accept valid date/time', async () => {
       const appointmentDate = new Date('2025-12-15T14:30:00');
-      
+
       const appointment = await db.Appointment.create({
         user_id: testUser.user_id,
         service_id: testService.service_id,
@@ -113,7 +113,7 @@ describe('Appointment Model Unit Tests', () => {
 
     it('should enforce unique appointment_date constraint', async () => {
       const appointmentDate = new Date('2025-11-11T10:00:00');
-      
+
       // Create first appointment
       await db.Appointment.create({
         user_id: testUser.user_id,
@@ -222,12 +222,12 @@ describe('Appointment Model Unit Tests', () => {
       });
 
       // SQLite returns undefined for null fields
-      expect(appointment.notes).to.satisfy((val) => val === null || val === undefined);
+      expect(appointment.notes).to.satisfy(val => val === null || val === undefined);
     });
 
     it('should store notes when provided', async () => {
       const notes = 'Please bring a referral letter';
-      
+
       const appointment = await db.Appointment.create({
         user_id: testUser.user_id,
         service_id: testService.service_id,
@@ -262,10 +262,9 @@ describe('Appointment Model Unit Tests', () => {
         appointment_date: new Date('2025-11-16T10:00:00'),
       });
 
-      const appointmentWithUser = await db.Appointment.findByPk(
-        appointment.appointment_id,
-        { include: [{ model: db.User, as: 'User' }] }
-      );
+      const appointmentWithUser = await db.Appointment.findByPk(appointment.appointment_id, {
+        include: [{ model: db.User, as: 'User' }],
+      });
 
       expect(appointmentWithUser.User).to.exist;
       expect(appointmentWithUser.User.user_id).to.equal(testUser.user_id);
@@ -279,10 +278,9 @@ describe('Appointment Model Unit Tests', () => {
         appointment_date: new Date('2025-11-16T11:00:00'),
       });
 
-      const appointmentWithService = await db.Appointment.findByPk(
-        appointment.appointment_id,
-        { include: [{ model: db.Service, as: 'Service' }] }
-      );
+      const appointmentWithService = await db.Appointment.findByPk(appointment.appointment_id, {
+        include: [{ model: db.Service, as: 'Service' }],
+      });
 
       expect(appointmentWithService.Service).to.exist;
       expect(appointmentWithService.Service.service_id).to.equal(testService.service_id);

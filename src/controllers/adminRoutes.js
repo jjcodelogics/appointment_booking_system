@@ -31,15 +31,15 @@ function getCurrentWeekRange() {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ...
   const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust to Monday
-  
+
   const monday = new Date(now);
   monday.setDate(now.getDate() + diff);
   monday.setHours(0, 0, 0, 0);
-  
+
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   sunday.setHours(23, 59, 59, 999);
-  
+
   return { start: monday, end: sunday };
 }
 
@@ -52,28 +52,28 @@ router.get(
   asyncHandler(async (req, res) => {
     const { Appointment, User, Service, Sequelize } = db;
     const { start_date, end_date, status, staff, search } = req.query;
-    
+
     // Default to current week if no dates provided
     const weekRange = getCurrentWeekRange();
     const startDate = start_date ? new Date(start_date) : weekRange.start;
     const endDate = end_date ? new Date(end_date) : weekRange.end;
-    
+
     const whereClause = {
       appointment_date: {
         [Sequelize.Op.between]: [startDate, endDate],
       },
     };
-    
+
     // Filter by status if provided and not 'all'
     if (status && status !== 'all') {
       whereClause.status = status;
     }
-    
+
     // Filter by staff if provided
     if (staff) {
       whereClause.staff_assigned = staff;
     }
-    
+
     // Search by customer name or phone
     if (search) {
       whereClause[Sequelize.Op.or] = [
@@ -81,7 +81,7 @@ router.get(
         { customer_phone: { [Sequelize.Op.iLike]: `%${search}%` } },
       ];
     }
-    
+
     const appointments = await Appointment.findAll({
       where: whereClause,
       include: [
@@ -90,14 +90,11 @@ router.get(
       ],
       order: [['appointment_date', 'ASC']],
     });
-    
-    logAdminAction(
-      'VIEW_APPOINTMENTS',
-      req.user.user_id,
-      req.user.username_email,
-      { filters: { start_date: startDate, end_date: endDate, status, staff, search } }
-    );
-    
+
+    logAdminAction('VIEW_APPOINTMENTS', req.user.user_id, req.user.username_email, {
+      filters: { start_date: startDate, end_date: endDate, status, staff, search },
+    });
+
     res.json(appointments);
   })
 );
@@ -110,44 +107,46 @@ router.post(
   validate(adminSchemas.adminBookAppointment),
   asyncHandler(async (req, res) => {
     const { Appointment, Service, Sequelize } = db;
-    const { 
-      appointment_date, 
-      gender, 
-      washing, 
-      coloring, 
-      cut, 
+    const {
+      appointment_date,
+      gender,
+      washing,
+      coloring,
+      cut,
       notes,
       customer_name,
       customer_phone,
       staff_assigned,
-      status = 'confirmed'
+      status = 'confirmed',
     } = req.body;
-    
+
     const newDate = new Date(appointment_date);
-    
+
     if (isNaN(newDate.getTime())) {
       return res.status(400).json({ msg: 'Invalid appointment_date.' });
     }
-    
+
     // Check for conflicts
-    const existing = await Appointment.findOne({ 
-      where: { 
+    const existing = await Appointment.findOne({
+      where: {
         appointment_date: newDate,
-        status: { [Sequelize.Op.ne]: 'cancelled' }
-      } 
+        status: { [Sequelize.Op.ne]: 'cancelled' },
+      },
     });
-    
+
     if (existing) {
-      return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+      return res
+        .status(409)
+        .json({ msg: 'This time slot is already booked. Please choose another.' });
     }
-    
+
     // Validate business hours
     const day = newDate.getDay();
     const hour = newDate.getHours();
     if (!isBusinessOpen(day, hour)) {
       return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
     }
-    
+
     // Find matching service
     const serviceQuery = {
       gender_target: gender,
@@ -155,45 +154,55 @@ router.post(
       ...(washing && { washing: true }),
       ...(coloring && { coloring: true }),
     };
-    
+
     if (!cut && !washing && !coloring) {
-      return res.status(400).json({ msg: 'You must select at least one service (cut, wash, or color).' });
+      return res
+        .status(400)
+        .json({ msg: 'You must select at least one service (cut, wash, or color).' });
     }
-    
+
     const selectedService = await Service.findOne({
       where: serviceQuery,
-      order: [['cutting', 'DESC'], ['washing', 'DESC'], ['coloring', 'DESC']],
+      order: [
+        ['cutting', 'DESC'],
+        ['washing', 'DESC'],
+        ['coloring', 'DESC'],
+      ],
     });
-    
+
     if (!selectedService) {
       return res.status(404).json({ msg: 'No matching service found for your selected options.' });
     }
-    
+
     // Use transaction for data consistency
     const transaction = await db.sequelize.transaction();
-    
+
     try {
-      const newAppointment = await Appointment.create({
-        user_id: req.user.user_id,
-        appointment_date: newDate,
-        service_id: selectedService.service_id,
-        notes,
-        customer_name,
-        customer_phone,
-        staff_assigned,
-        status,
-      }, { transaction });
-      
-      await transaction.commit();
-      
-      logAdminAction(
-        'CREATE_APPOINTMENT',
-        req.user.user_id,
-        req.user.username_email,
-        { appointment_id: newAppointment.appointment_id, customer_name, appointment_date: newDate }
+      const newAppointment = await Appointment.create(
+        {
+          user_id: req.user.user_id,
+          appointment_date: newDate,
+          service_id: selectedService.service_id,
+          notes,
+          customer_name,
+          customer_phone,
+          staff_assigned,
+          status,
+        },
+        { transaction }
       );
-      
-      res.status(201).json({ msg: 'Appointment created successfully!', appointment: newAppointment });
+
+      await transaction.commit();
+
+      logAdminAction('CREATE_APPOINTMENT', req.user.user_id, req.user.username_email, {
+        appointment_id: newAppointment.appointment_id,
+        customer_name,
+        appointment_date: newDate,
+      });
+
+      res
+        .status(201)
+        .json({ msg: 'Appointment created successfully!', appointment: newAppointment });
     } catch (error) {
       await transaction.rollback();
       throw error;
@@ -211,54 +220,54 @@ router.put(
     const { Appointment, Sequelize } = db;
     const appointmentId = req.params.id;
     const updates = req.body;
-    
+
     const appointment = await Appointment.findByPk(appointmentId);
-    
+
     if (!appointment) {
       return res.status(404).json({ msg: 'Appointment not found.' });
     }
-    
+
     // If updating appointment_date, check for conflicts and business hours
     if (updates.appointment_date) {
       const newDate = new Date(updates.appointment_date);
-      
+
       if (isNaN(newDate.getTime())) {
         return res.status(400).json({ msg: 'Invalid appointment_date.' });
       }
-      
+
       const day = newDate.getDay();
       const hour = newDate.getHours();
       if (!isBusinessOpen(day, hour)) {
         return res.status(400).json({ msg: 'The selected time is outside of business hours.' });
       }
-      
+
       const existing = await Appointment.findOne({
         where: {
           appointment_date: newDate,
           appointment_id: { [Sequelize.Op.ne]: appointmentId },
-          status: { [Sequelize.Op.ne]: 'cancelled' }
-        }
+          status: { [Sequelize.Op.ne]: 'cancelled' },
+        },
       });
-      
+
       if (existing) {
-        return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+        return res
+          .status(409)
+          .json({ msg: 'This time slot is already booked. Please choose another.' });
       }
     }
-    
+
     // Use transaction for data consistency
     const transaction = await db.sequelize.transaction();
-    
+
     try {
       await appointment.update(updates, { transaction });
       await transaction.commit();
-      
-      logAdminAction(
-        'UPDATE_APPOINTMENT',
-        req.user.user_id,
-        req.user.username_email,
-        { appointment_id: appointmentId, updates }
-      );
-      
+
+      logAdminAction('UPDATE_APPOINTMENT', req.user.user_id, req.user.username_email, {
+        appointment_id: appointmentId,
+        updates,
+      });
+
       res.json({ msg: 'Appointment updated successfully!', appointment });
     } catch (error) {
       await transaction.rollback();
@@ -276,43 +285,43 @@ router.post(
   asyncHandler(async (req, res) => {
     const { Appointment, Sequelize } = db;
     const { appointment_ids, operation, new_date, status } = req.body;
-    
+
     const transaction = await db.sequelize.transaction();
-    
+
     try {
       if (operation === 'cancel') {
         await Appointment.update(
           { status: 'cancelled' },
-          { 
+          {
             where: { appointment_id: { [Sequelize.Op.in]: appointment_ids } },
-            transaction 
+            transaction,
           }
         );
-        
+
         await transaction.commit();
-        
-        logAdminAction(
-          'BULK_CANCEL',
-          req.user.user_id,
-          req.user.username_email,
-          { appointment_ids, count: appointment_ids.length }
-        );
-        
-        return res.json({ msg: `${appointment_ids.length} appointment(s) cancelled successfully.` });
+
+        logAdminAction('BULK_CANCEL', req.user.user_id, req.user.username_email, {
+          appointment_ids,
+          count: appointment_ids.length,
+        });
+
+        return res.json({
+          msg: `${appointment_ids.length} appointment(s) cancelled successfully.`,
+        });
       }
-      
+
       if (operation === 'reschedule') {
         const newDateTime = new Date(new_date);
-        
+
         if (isNaN(newDateTime.getTime())) {
           await transaction.rollback();
           return res.status(400).json({ msg: 'Invalid new_date.' });
         }
-        
+
         // For simplicity, we'll reschedule to the same time but different day
         // In a real app, you'd need more sophisticated logic to avoid conflicts
         const results = [];
-        
+
         for (const id of appointment_ids) {
           const appointment = await Appointment.findByPk(id);
           if (appointment) {
@@ -320,7 +329,7 @@ router.post(
             const rescheduleDate = new Date(newDateTime);
             rescheduleDate.setHours(originalDate.getHours());
             rescheduleDate.setMinutes(originalDate.getMinutes());
-            
+
             // Check business hours
             const day = rescheduleDate.getDay();
             const hour = rescheduleDate.getHours();
@@ -328,35 +337,34 @@ router.post(
               results.push({ id, status: 'failed', reason: 'Outside business hours' });
               continue;
             }
-            
+
             // Check conflicts
             const existing = await Appointment.findOne({
               where: {
                 appointment_date: rescheduleDate,
                 appointment_id: { [Sequelize.Op.ne]: id },
-                status: { [Sequelize.Op.ne]: 'cancelled' }
-              }
+                status: { [Sequelize.Op.ne]: 'cancelled' },
+              },
             });
-            
+
             if (existing) {
               results.push({ id, status: 'failed', reason: 'Time slot already booked' });
               continue;
             }
-            
+
             await appointment.update({ appointment_date: rescheduleDate }, { transaction });
             results.push({ id, status: 'success' });
           }
         }
-        
+
         await transaction.commit();
-        
-        logAdminAction(
-          'BULK_RESCHEDULE',
-          req.user.user_id,
-          req.user.username_email,
-          { appointment_ids, new_date, results }
-        );
-        
+
+        logAdminAction('BULK_RESCHEDULE', req.user.user_id, req.user.username_email, {
+          appointment_ids,
+          new_date,
+          results,
+        });
+
         return res.json({ msg: 'Bulk reschedule completed.', results });
       }
     } catch (error) {
@@ -374,21 +382,21 @@ router.get(
   asyncHandler(async (req, res) => {
     const { Appointment, User, Service, Sequelize } = db;
     const { start_date, end_date, status } = req.query;
-    
+
     const weekRange = getCurrentWeekRange();
     const startDate = start_date ? new Date(start_date) : weekRange.start;
     const endDate = end_date ? new Date(end_date) : weekRange.end;
-    
+
     const whereClause = {
       appointment_date: {
         [Sequelize.Op.between]: [startDate, endDate],
       },
     };
-    
+
     if (status && status !== 'all') {
       whereClause.status = status;
     }
-    
+
     const appointments = await Appointment.findAll({
       where: whereClause,
       include: [
@@ -397,37 +405,39 @@ router.get(
       ],
       order: [['appointment_date', 'ASC']],
     });
-    
+
     // Generate CSV
     const csvHeader = 'ID,Date,Time,Customer Name,Phone,Service,Status,Staff,Notes,User Email\n';
-    const csvRows = appointments.map(app => {
-      const date = new Date(app.appointment_date);
-      const dateStr = date.toLocaleDateString();
-      const timeStr = date.toLocaleTimeString();
-      
-      return [
-        app.appointment_id,
-        dateStr,
-        timeStr,
-        app.customer_name || app.User?.name || '',
-        app.customer_phone || '',
-        app.Service?.service_name || '',
-        app.status || 'confirmed',
-        app.staff_assigned || '',
-        (app.notes || '').replace(/"/g, '""'), // Escape quotes
-        app.User?.username_email || '',
-      ].map(field => `"${field}"`).join(',');
-    }).join('\n');
-    
+    const csvRows = appointments
+      .map(app => {
+        const date = new Date(app.appointment_date);
+        const dateStr = date.toLocaleDateString();
+        const timeStr = date.toLocaleTimeString();
+
+        return [
+          app.appointment_id,
+          dateStr,
+          timeStr,
+          app.customer_name || app.User?.name || '',
+          app.customer_phone || '',
+          app.Service?.service_name || '',
+          app.status || 'confirmed',
+          app.staff_assigned || '',
+          (app.notes || '').replace(/"/g, '""'), // Escape quotes
+          app.User?.username_email || '',
+        ]
+          .map(field => `"${field}"`)
+          .join(',');
+      })
+      .join('\n');
+
     const csv = csvHeader + csvRows;
-    
-    logAdminAction(
-      'EXPORT_APPOINTMENTS',
-      req.user.user_id,
-      req.user.username_email,
-      { count: appointments.length, date_range: { start_date: startDate, end_date: endDate } }
-    );
-    
+
+    logAdminAction('EXPORT_APPOINTMENTS', req.user.user_id, req.user.username_email, {
+      count: appointments.length,
+      date_range: { start_date: startDate, end_date: endDate },
+    });
+
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=appointments.csv');
     res.send(csv);

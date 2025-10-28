@@ -1,6 +1,6 @@
 /**
  * Appointment Routes Integration Tests
- * 
+ *
  * Tests appointment booking creation, conflict handling, and retrieval
  * using the actual Express routes with a test database.
  */
@@ -77,12 +77,10 @@ describe('Appointment Routes Integration Tests', () => {
 
     // Create authenticated agent and login
     authenticatedAgent = chai.request.agent(app);
-    await authenticatedAgent
-      .post('/auth/login')
-      .send({
-        username_email: 'appointmenttest@example.com',
-        password: 'AppointmentPass123!',
-      });
+    await authenticatedAgent.post('/auth/login').send({
+      username_email: 'appointmenttest@example.com',
+      password: 'AppointmentPass123!',
+    });
   });
 
   after(async () => {
@@ -95,16 +93,14 @@ describe('Appointment Routes Integration Tests', () => {
       // Choose a date on a Tuesday at 10:00 AM (within business hours)
       const appointmentDate = new Date('2025-11-04T10:00:00');
 
-      const res = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Test appointment',
-        });
+      const res = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Test appointment',
+      });
 
       expect(res).to.have.status(201);
       expect(res.body).to.have.property('msg', 'Appointment booked successfully!');
@@ -113,7 +109,7 @@ describe('Appointment Routes Integration Tests', () => {
 
       // Verify appointment was created in database
       const appointment = await db.Appointment.findOne({
-        where: { appointment_id: res.body.appointment.appointment_id }
+        where: { appointment_id: res.body.appointment.appointment_id },
       });
       expect(appointment).to.exist;
       expect(appointment.user_id).to.equal(testUser.user_id);
@@ -123,16 +119,14 @@ describe('Appointment Routes Integration Tests', () => {
       // Sunday at 10:00 AM (business closed)
       const appointmentDate = new Date('2025-11-02T10:00:00');
 
-      const res = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Test appointment',
-        });
+      const res = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Test appointment',
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('msg');
@@ -143,16 +137,14 @@ describe('Appointment Routes Integration Tests', () => {
       // Monday at 10:00 AM (business closed)
       const appointmentDate = new Date('2025-11-03T10:00:00');
 
-      const res = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Test appointment',
-        });
+      const res = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Test appointment',
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('msg');
@@ -162,16 +154,14 @@ describe('Appointment Routes Integration Tests', () => {
     it('should fail to create appointment with no services selected', async () => {
       const appointmentDate = new Date('2025-11-05T10:00:00');
 
-      const res = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: false, // No services selected
-          notes: 'Test appointment',
-        });
+      const res = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: false, // No services selected
+        notes: 'Test appointment',
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('msg');
@@ -182,16 +172,14 @@ describe('Appointment Routes Integration Tests', () => {
       const unauthenticatedAgent = chai.request.agent(app);
       const appointmentDate = new Date('2025-11-06T10:00:00');
 
-      const res = await unauthenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Test appointment',
-        });
+      const res = await unauthenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Test appointment',
+      });
 
       expect(res).to.have.status(401);
       expect(res.body).to.have.property('msg');
@@ -210,31 +198,27 @@ describe('Appointment Routes Integration Tests', () => {
     it('should prevent booking when slot is already taken', async () => {
       // First, create an appointment at a specific time
       const appointmentDate = new Date('2025-11-07T14:00:00');
-      
-      const firstBooking = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'First appointment',
-        });
+
+      const firstBooking = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'First appointment',
+      });
 
       expect(firstBooking).to.have.status(201);
 
       // Now try to book the same time slot
-      const conflictingBooking = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: appointmentDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Conflicting appointment',
-        });
+      const conflictingBooking = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: appointmentDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Conflicting appointment',
+      });
 
       expect(conflictingBooking).to.have.status(409);
       expect(conflictingBooking.body).to.have.property('msg');
@@ -244,37 +228,33 @@ describe('Appointment Routes Integration Tests', () => {
     it('should allow booking different time slots', async () => {
       // Book first appointment
       const firstDate = new Date('2025-11-08T10:00:00');
-      const firstBooking = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: firstDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'First appointment',
-        });
+      const firstBooking = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: firstDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'First appointment',
+      });
 
       expect(firstBooking).to.have.status(201);
 
       // Book second appointment at different time
       const secondDate = new Date('2025-11-08T11:00:00');
-      const secondBooking = await authenticatedAgent
-        .post('/api/appointments/book')
-        .send({
-          appointment_date: secondDate.toISOString(),
-          gender: 'male',
-          washing: false,
-          coloring: false,
-          cut: true,
-          notes: 'Second appointment',
-        });
+      const secondBooking = await authenticatedAgent.post('/api/appointments/book').send({
+        appointment_date: secondDate.toISOString(),
+        gender: 'male',
+        washing: false,
+        coloring: false,
+        cut: true,
+        notes: 'Second appointment',
+      });
 
       expect(secondBooking).to.have.status(201);
 
       // Verify both appointments exist
       const appointments = await db.Appointment.findAll({
-        where: { user_id: testUser.user_id }
+        where: { user_id: testUser.user_id },
       });
       expect(appointments).to.have.lengthOf(2);
     });
@@ -354,12 +334,10 @@ describe('Appointment Routes Integration Tests', () => {
       });
 
       const newAgent = chai.request.agent(app);
-      await newAgent
-        .post('/auth/login')
-        .send({
-          username_email: 'noappts@example.com',
-          password: 'NoAppts123!',
-        });
+      await newAgent.post('/auth/login').send({
+        username_email: 'noappts@example.com',
+        password: 'NoAppts123!',
+      });
 
       const res = await newAgent.get('/api/appointments/my-appointments');
 
@@ -400,7 +378,7 @@ describe('Appointment Routes Integration Tests', () => {
       expect(res).to.have.status(200);
       expect(res.body).to.be.an('array');
       expect(res.body).to.have.lengthOf(2);
-      
+
       // Verify the format is HH:MM
       res.body.forEach(slot => {
         expect(slot).to.match(/^\d{2}:\d{2}$/);

@@ -1,6 +1,6 @@
 /**
  * Email Service Unit Tests
- * 
+ *
  * Tests email service functionality:
  * - Confirmation email function exists and has correct interface
  * - Reminder email function exists and has correct interface
@@ -8,7 +8,10 @@
  */
 
 import { expect } from 'chai';
-import { sendBookingConfirmation, sendAppointmentReminder } from '../../src/services/emailService.js';
+import {
+  sendBookingConfirmation,
+  sendAppointmentReminder,
+} from '../../src/services/emailService.js';
 
 describe('Email Service Unit Tests', () => {
   describe('Email Service Functions', () => {
@@ -59,7 +62,7 @@ describe('Email Service Unit Tests', () => {
     it('should have scheduler module that can be started', async () => {
       // Import the scheduler
       const schedulerModule = await import('../../scheduler.js');
-      
+
       // Verify the scheduler exports the start function
       expect(schedulerModule).to.have.property('startReminderScheduler');
       expect(schedulerModule.startReminderScheduler).to.be.a('function');
@@ -68,10 +71,10 @@ describe('Email Service Unit Tests', () => {
     it('should identify appointments for today (business logic test)', async () => {
       // This test validates the business logic without actually running the cron job
       // We test that the scheduler would identify correct appointments
-      
+
       const { initializeModels } = await import('../../src/models/index.js');
       const db = (await import('../../src/models/index.js')).default;
-      
+
       // Initialize if not already done
       if (!db.User) {
         await initializeModels();
@@ -96,7 +99,7 @@ describe('Email Service Unit Tests', () => {
       // Create an appointment for today
       const today = new Date();
       today.setHours(today.getHours() + 2); // 2 hours from now
-      
+
       await db.Appointment.create({
         user_id: testUser.user_id,
         service_id: testService.service_id,
@@ -133,7 +136,7 @@ describe('Email Service Unit Tests', () => {
     it('should not send reminders for appointments on different days', async () => {
       const { initializeModels } = await import('../../src/models/index.js');
       const db = (await import('../../src/models/index.js')).default;
-      
+
       if (!db.User) {
         await initializeModels();
         await db.sequelize.sync({ force: true });
@@ -159,7 +162,7 @@ describe('Email Service Unit Tests', () => {
       tomorrow.setHours(0, 0, 0, 0); // Reset time to midnight
       tomorrow.setDate(tomorrow.getDate() + 1); // Add one day
       tomorrow.setHours(10, 0, 0, 0); // Set to 10 AM
-      
+
       await db.Appointment.create({
         user_id: testUser.user_id,
         service_id: testService.service_id,
@@ -197,16 +200,16 @@ describe('Email Service Unit Tests', () => {
       // This test documents the expected integration:
       // After creating an appointment via POST /api/appointments/book,
       // the confirmation email service should be invoked
-      
+
       // In a real integration, we would:
       // 1. Create an appointment via the API
       // 2. Mock/spy on sendBookingConfirmation
       // 3. Verify it was called with correct parameters
-      
+
       // For this unit test, we just verify the function exists and can be imported
       expect(sendBookingConfirmation).to.exist;
       expect(sendBookingConfirmation).to.be.a('function');
-      
+
       // The actual integration is tested in the appointment routes integration tests
     });
 
@@ -214,7 +217,7 @@ describe('Email Service Unit Tests', () => {
       // This test documents the expected integration:
       // The scheduler should periodically check for appointments
       // and call sendAppointmentReminder for each one
-      
+
       // For this unit test, we verify the components exist
       expect(sendAppointmentReminder).to.exist;
       expect(sendAppointmentReminder).to.be.a('function');

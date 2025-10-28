@@ -1,6 +1,6 @@
 /**
  * Authentication Middleware Unit Tests
- * 
+ *
  * Tests authentication middleware that protects routes:
  * - isAuthenticated: Verifies user is logged in
  * - Tests access denial without session/token
@@ -21,11 +21,11 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -53,11 +53,11 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -87,11 +87,11 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -123,11 +123,11 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },
@@ -159,11 +159,11 @@ describe('Authentication Middleware Unit Tests', () => {
 
       // Mock response
       const res = {
-        status: function(code) {
+        status: function (code) {
           this.statusCode = code;
           return this;
         },
-        json: function(data) {
+        json: function (data) {
           this.body = data;
           return this;
         },

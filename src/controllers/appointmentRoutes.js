@@ -16,12 +16,14 @@ import { sendBookingConfirmation } from '../services/emailService.js';
 const router = Router();
 
 // GET /api/appointments/slots - returns all booked slots for a given date
-router.get('/slots', asyncHandler(async (req, res) => {
+router.get(
+  '/slots',
+  asyncHandler(async (req, res) => {
     const { Appointment, Sequelize } = db;
     const { date } = req.query; // Expecting a date string like 'YYYY-MM-DD'
 
     if (!date) {
-        return res.status(400).json({ msg: 'A date query parameter is required.' });
+      return res.status(400).json({ msg: 'A date query parameter is required.' });
     }
 
     const startDate = new Date(date);
@@ -31,51 +33,56 @@ router.get('/slots', asyncHandler(async (req, res) => {
     endDate.setHours(23, 59, 59, 999);
 
     const slots = await Appointment.findAll({
-        where: {
-            appointment_date: {
-                [Sequelize.Op.between]: [startDate, endDate],
-            },
+      where: {
+        appointment_date: {
+          [Sequelize.Op.between]: [startDate, endDate],
         },
-        attributes: ['appointment_date'],
+      },
+      attributes: ['appointment_date'],
     });
 
     // Return time in HH:MM format, which is what the frontend needs for comparison.
     // This avoids timezone and formatting issues on the client.
     const bookedTimes = slots.map(slot => {
-        const date = new Date(slot.appointment_date);
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${hours}:${minutes}`;
+      const date = new Date(slot.appointment_date);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
     });
 
     res.json(bookedTimes);
-}));
-
+  })
+);
 
 // GET /api/appointments/my-appointments - Fetches all appointments for the logged-in user
-router.get('/my-appointments', isAuthenticated, canAccess(['user', 'admin']), asyncHandler(async (req, res) => {
-  const { Appointment, User, Service } = db;
+router.get(
+  '/my-appointments',
+  isAuthenticated,
+  canAccess(['user', 'admin']),
+  asyncHandler(async (req, res) => {
+    const { Appointment, User, Service } = db;
 
-  try {
-    let appointments;
-    if (req.user && req.user.role === 'admin') {
-      appointments = await Appointment.findAll({
-        include: [{ model: User, as: 'User', attributes: ['user_id', 'username_email', 'name'] }],
-        order: [['appointment_date', 'ASC']],
-      });
-    } else {
-      appointments = await Appointment.findAll({
-        where: { user_id: req.user.user_id },
-        include: [{ model: Service, as: 'Service' }],
-        order: [['appointment_date', 'ASC']],
-      });
+    try {
+      let appointments;
+      if (req.user && req.user.role === 'admin') {
+        appointments = await Appointment.findAll({
+          include: [{ model: User, as: 'User', attributes: ['user_id', 'username_email', 'name'] }],
+          order: [['appointment_date', 'ASC']],
+        });
+      } else {
+        appointments = await Appointment.findAll({
+          where: { user_id: req.user.user_id },
+          include: [{ model: Service, as: 'Service' }],
+          order: [['appointment_date', 'ASC']],
+        });
+      }
+      res.json(appointments);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      res.status(500).json({ msg: 'Server error fetching appointments.', error: err?.message });
     }
-    res.json(appointments);
-  } catch (err) {
-    console.error('Error fetching appointments:', err);
-    res.status(500).json({ msg: 'Server error fetching appointments.', error: err?.message });
-  }
-}));
+  })
+);
 
 // POST /api/appointments/book - Creates a new appointment
 router.post(
@@ -102,7 +109,9 @@ router.post(
     // This check is still useful for a quick response without hitting the DB
     const existing = await Appointment.findOne({ where: { appointment_date: utcPlus2Date } });
     if (existing) {
-      return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+      return res
+        .status(409)
+        .json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
     if (!isBusinessOpenHelper(newDate)) {
@@ -111,7 +120,9 @@ router.post(
 
     // Ensure at least one service selected
     if (!cut && !washing && !coloring) {
-      return res.status(400).json({ msg: 'You must select at least one service (cut, wash, or color).' });
+      return res
+        .status(400)
+        .json({ msg: 'You must select at least one service (cut, wash, or color).' });
     }
 
     const serviceQuery = buildServiceQuery({ gender, cut, washing, coloring });
@@ -122,7 +133,15 @@ router.post(
       // Helpful debug log to inspect what services exist for this gender
       console.log('No direct service match. Looking up available services for gender:', gender);
       const available = await Service.findAll({ where: { gender_target: gender } });
-      console.log('Available services for gender:', available.map(s => ({ id: s.service_id, cutting: s.cutting, washing: s.washing, coloring: s.coloring })));
+      console.log(
+        'Available services for gender:',
+        available.map(s => ({
+          id: s.service_id,
+          cutting: s.cutting,
+          washing: s.washing,
+          coloring: s.coloring,
+        }))
+      );
 
       return res.status(404).json({ msg: 'No matching service found for your selected options.' });
     }
@@ -155,7 +174,9 @@ router.post(
         const recipient = req.user?.username_email || req.user?.email;
         if (recipient) {
           // don't await so response isn't delayed; log any errors inside the service
-          sendBookingConfirmation(recipient, newAppointment).catch(err => console.error('Error sending booking confirmation (async):', err));
+          sendBookingConfirmation(recipient, newAppointment).catch(err =>
+            console.error('Error sending booking confirmation (async):', err)
+          );
         } else {
           console.warn('No recipient email available on req.user; skipping confirmation email.');
         }
@@ -163,15 +184,22 @@ router.post(
         console.error('Unexpected error attempting to send confirmation email:', err);
       }
 
-      res.status(201).json({ msg: 'Appointment booked successfully!', appointment: newAppointment });
+      res
+        .status(201)
+        .json({ msg: 'Appointment booked successfully!', appointment: newAppointment });
     } catch (error) {
       if (error instanceof Sequelize.UniqueConstraintError) {
-        return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+        return res
+          .status(409)
+          .json({ msg: 'This time slot is already booked. Please choose another.' });
       }
       // For other unexpected errors
       console.error('Error booking appointment:', error);
       if (error.errors) {
-        console.error('Validation errors:', error.errors.map(e => e.message));
+        console.error(
+          'Validation errors:',
+          error.errors.map(e => e.message)
+        );
       }
       res.status(500).json({ msg: 'An unexpected error occurred while booking the appointment.' });
     }
@@ -199,12 +227,14 @@ router.put(
 
     const whereClause = { appointment_id: appointmentId };
     if (req.user.role !== 'admin') {
-        whereClause.user_id = req.user.user_id;
+      whereClause.user_id = req.user.user_id;
     }
 
     const appointment = await Appointment.findOne({ where: whereClause });
     if (!appointment) {
-      return res.status(404).json({ msg: 'Appointment not found or you do not have permission to edit it.' });
+      return res
+        .status(404)
+        .json({ msg: 'Appointment not found or you do not have permission to edit it.' });
     }
 
     if (!isBusinessOpenHelper(newDate)) {
@@ -220,10 +250,12 @@ router.put(
       where: {
         appointment_date: utcPlus2Date,
         appointment_id: { [Sequelize.Op.ne]: appointmentId },
-      }
+      },
     });
     if (existing) {
-      return res.status(409).json({ msg: 'This time slot is already booked. Please choose another.' });
+      return res
+        .status(409)
+        .json({ msg: 'This time slot is already booked. Please choose another.' });
     }
 
     appointment.appointment_date = utcPlus2Date;
@@ -245,12 +277,14 @@ router.delete(
 
     const whereClause = { appointment_id: id };
     if (req.user.role !== 'admin') {
-        whereClause.user_id = req.user.user_id;
+      whereClause.user_id = req.user.user_id;
     }
 
     const result = await Appointment.destroy({ where: whereClause });
     if (result === 0) {
-      return res.status(404).json({ msg: 'Appointment not found or you do not have permission to cancel it.' });
+      return res
+        .status(404)
+        .json({ msg: 'Appointment not found or you do not have permission to cancel it.' });
     }
 
     res.json({ msg: 'Appointment cancelled successfully.' });

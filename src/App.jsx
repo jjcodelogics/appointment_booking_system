@@ -28,7 +28,8 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const checkLoggedIn = () => {
-    api.checkUserSession()
+    api
+      .checkUserSession()
       .then(data => {
         if (data.user) {
           setUser(data.user);
@@ -49,7 +50,7 @@ const App = () => {
     const checkLoginStatus = async () => {
       try {
         // This endpoint should return the user data if a session is active
-        const response = await api.checkAuthStatus(); 
+        const response = await api.checkAuthStatus();
         if (response.data && response.data.user) {
           setUser(response.data.user);
           // We no longer automatically navigate to the dashboard here.
@@ -66,9 +67,9 @@ const App = () => {
     checkLoginStatus();
   }, []); // The empty dependency array ensures this runs only once on mount
 
-  const navigate = (targetView) => setView(targetView);
+  const navigate = targetView => setView(targetView);
 
-  const handleLogin = (loggedInUser) => {
+  const handleLogin = loggedInUser => {
     setUser(loggedInUser);
     // Role-based redirection
     if (loggedInUser.role === 'admin') {
@@ -89,13 +90,18 @@ const App = () => {
     setView('dashboard');
   };
 
-  const handleReschedule = (id) => {
+  const handleReschedule = id => {
     setRescheduleId(id);
     setView('rescheduling');
   };
 
   const renderView = () => {
-    if (loading) return <div className="container"><p>Loading...</p></div>;
+    if (loading)
+      return (
+        <div className="container">
+          <p>Loading...</p>
+        </div>
+      );
 
     // Prioritize rendering public pages first
     switch (view) {
@@ -110,7 +116,14 @@ const App = () => {
       case 'login':
         // If user is already logged in, redirect them from login page to dashboard
         if (user) {
-          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+          return (
+            <Dashboard
+              key={refreshKey}
+              user={user}
+              onBookNew={() => navigate('booking')}
+              onReschedule={handleReschedule}
+            />
+          );
         }
         return <AuthPage onLogin={handleLogin} onNavigate={navigate} />;
     }
@@ -119,23 +132,52 @@ const App = () => {
     if (user) {
       switch (view) {
         case 'dashboard':
-          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+          return (
+            <Dashboard
+              key={refreshKey}
+              user={user}
+              onBookNew={() => navigate('booking')}
+              onReschedule={handleReschedule}
+            />
+          );
         case 'booking':
           return <BookAppointment onBookingSuccess={navigateToDashboard} />;
         case 'rescheduling':
-          return <RescheduleAppointment appointmentId={rescheduleId} onRescheduleSuccess={navigateToDashboard} />;
+          return (
+            <RescheduleAppointment
+              appointmentId={rescheduleId}
+              onRescheduleSuccess={navigateToDashboard}
+            />
+          );
         case 'admin-dashboard':
           if (user.role === 'admin') {
-            return <AdminDashboard key={refreshKey} user={user} onBookNew={() => navigate('admin-booking')} />;
+            return (
+              <AdminDashboard
+                key={refreshKey}
+                user={user}
+                onBookNew={() => navigate('admin-booking')}
+              />
+            );
           }
           // If non-admin tries to access admin dashboard, redirect to user dashboard
-          return <Dashboard key={refreshKey} user={user} onBookNew={() => navigate('booking')} onReschedule={handleReschedule} />;
+          return (
+            <Dashboard
+              key={refreshKey}
+              user={user}
+              onBookNew={() => navigate('booking')}
+              onReschedule={handleReschedule}
+            />
+          );
         case 'admin-booking':
           if (user.role === 'admin') {
-            return <AdminBookAppointment onBookingSuccess={() => {
-              setRefreshKey(prevKey => prevKey + 1);
-              navigate('admin-dashboard');
-            }} />;
+            return (
+              <AdminBookAppointment
+                onBookingSuccess={() => {
+                  setRefreshKey(prevKey => prevKey + 1);
+                  navigate('admin-dashboard');
+                }}
+              />
+            );
           }
           // If non-admin tries to access admin booking, redirect to user booking
           return <BookAppointment onBookingSuccess={navigateToDashboard} />;

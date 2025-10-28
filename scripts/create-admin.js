@@ -14,7 +14,9 @@ async function createAdmin() {
 
   if (!email || !name || !password) {
     console.error('Usage: node scripts/create-admin.js <email> <name> <password>');
-    console.error('Example: node scripts/create-admin.js admin@example.com "Admin User" "SecurePass123!"');
+    console.error(
+      'Example: node scripts/create-admin.js admin@example.com "Admin User" "SecurePass123!"'
+    );
     process.exit(1);
   }
 

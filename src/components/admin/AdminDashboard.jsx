@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../utils/api';
 
 // Helper function to format the date
-const formatAppointmentDate = (isoString) => {
+const formatAppointmentDate = isoString => {
   const date = new Date(isoString);
   const day = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date);
   const dayOfMonth = date.getDate();
@@ -31,7 +31,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.start_date) params.append('start_date', filters.start_date);
       if (filters.end_date) params.append('end_date', filters.end_date);
       if (filters.status && filters.status !== 'all') params.append('status', filters.status);
@@ -53,17 +53,17 @@ const AdminDashboard = ({ user, onBookNew }) => {
     fetchAppointments();
   }, [filters]);
 
-  const handleFilterChange = (e) => {
+  const handleFilterChange = e => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSearchSubmit = (e) => {
+  const handleSearchSubmit = e => {
     e.preventDefault();
     fetchAppointments();
   };
 
-  const startEdit = (appointment) => {
+  const startEdit = appointment => {
     setEditingId(appointment.appointment_id);
     setEditData({
       appointment_date: new Date(appointment.appointment_date).toISOString().slice(0, 16),
@@ -80,7 +80,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
     setEditData({});
   };
 
-  const saveEdit = async (appointmentId) => {
+  const saveEdit = async appointmentId => {
     try {
       await api.updateAdminAppointment(appointmentId, editData);
       setEditingId(null);
@@ -96,10 +96,8 @@ const AdminDashboard = ({ user, onBookNew }) => {
     setEditData(prev => ({ ...prev, [field]: value }));
   };
 
-  const toggleSelectAppointment = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
+  const toggleSelectAppointment = id => {
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
   };
 
   const toggleSelectAll = () => {
@@ -112,7 +110,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
 
   const handleBulkCancel = async () => {
     if (!window.confirm(`Cancel ${selectedIds.length} appointment(s)?`)) return;
-    
+
     try {
       await api.bulkOperations({ appointment_ids: selectedIds, operation: 'cancel' });
       setSelectedIds([]);
@@ -131,7 +129,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
       if (filters.status && filters.status !== 'all') params.append('status', filters.status);
 
       const response = await api.exportAppointments(params.toString());
-      
+
       // Create a download link
       const blob = new Blob([response.data], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -148,13 +146,18 @@ const AdminDashboard = ({ user, onBookNew }) => {
     }
   };
 
-  const getStatusBadgeClass = (status) => {
+  const getStatusBadgeClass = status => {
     switch (status) {
-      case 'confirmed': return 'badge-success';
-      case 'pending': return 'badge-warning';
-      case 'cancelled': return 'badge-danger';
-      case 'completed': return 'badge-info';
-      default: return 'badge-secondary';
+      case 'confirmed':
+        return 'badge-success';
+      case 'pending':
+        return 'badge-warning';
+      case 'cancelled':
+        return 'badge-danger';
+      case 'completed':
+        return 'badge-info';
+      default:
+        return 'badge-secondary';
     }
   };
 
@@ -162,7 +165,9 @@ const AdminDashboard = ({ user, onBookNew }) => {
     <main className="container admin-dashboard">
       <div className="dashboard-header">
         <h1>Admin Dashboard - Appointments</h1>
-        <button onClick={onBookNew} className="btn btn-primary">Book New Appointment</button>
+        <button onClick={onBookNew} className="btn btn-primary">
+          Book New Appointment
+        </button>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
@@ -219,7 +224,9 @@ const AdminDashboard = ({ user, onBookNew }) => {
               onChange={handleFilterChange}
             />
           </div>
-          <button type="submit" className="btn btn-secondary">Apply Filters</button>
+          <button type="submit" className="btn btn-secondary">
+            Apply Filters
+          </button>
         </form>
       </section>
 
@@ -248,7 +255,9 @@ const AdminDashboard = ({ user, onBookNew }) => {
                   <th>
                     <input
                       type="checkbox"
-                      checked={selectedIds.length === appointments.length && appointments.length > 0}
+                      checked={
+                        selectedIds.length === appointments.length && appointments.length > 0
+                      }
                       onChange={toggleSelectAll}
                     />
                   </th>
@@ -264,7 +273,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                 </tr>
               </thead>
               <tbody>
-                {appointments.map((app) => (
+                {appointments.map(app => (
                   <tr key={app.appointment_id}>
                     <td>
                       <input
@@ -279,7 +288,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                         <input
                           type="datetime-local"
                           value={editData.appointment_date}
-                          onChange={(e) => handleEditChange('appointment_date', e.target.value)}
+                          onChange={e => handleEditChange('appointment_date', e.target.value)}
                         />
                       ) : (
                         formatAppointmentDate(app.appointment_date)
@@ -290,7 +299,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                         <input
                           type="text"
                           value={editData.customer_name}
-                          onChange={(e) => handleEditChange('customer_name', e.target.value)}
+                          onChange={e => handleEditChange('customer_name', e.target.value)}
                         />
                       ) : (
                         app.customer_name || app.User?.name || '-'
@@ -301,7 +310,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                         <input
                           type="text"
                           value={editData.customer_phone}
-                          onChange={(e) => handleEditChange('customer_phone', e.target.value)}
+                          onChange={e => handleEditChange('customer_phone', e.target.value)}
                         />
                       ) : (
                         app.customer_phone || '-'
@@ -312,7 +321,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                       {editingId === app.appointment_id ? (
                         <select
                           value={editData.status}
-                          onChange={(e) => handleEditChange('status', e.target.value)}
+                          onChange={e => handleEditChange('status', e.target.value)}
                         >
                           <option value="confirmed">Confirmed</option>
                           <option value="pending">Pending</option>
@@ -330,7 +339,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                         <input
                           type="text"
                           value={editData.staff_assigned}
-                          onChange={(e) => handleEditChange('staff_assigned', e.target.value)}
+                          onChange={e => handleEditChange('staff_assigned', e.target.value)}
                         />
                       ) : (
                         app.staff_assigned || '-'
@@ -340,7 +349,7 @@ const AdminDashboard = ({ user, onBookNew }) => {
                       {editingId === app.appointment_id ? (
                         <textarea
                           value={editData.notes}
-                          onChange={(e) => handleEditChange('notes', e.target.value)}
+                          onChange={e => handleEditChange('notes', e.target.value)}
                           rows="2"
                         />
                       ) : (
@@ -350,7 +359,10 @@ const AdminDashboard = ({ user, onBookNew }) => {
                     <td className="actions-cell">
                       {editingId === app.appointment_id ? (
                         <>
-                          <button onClick={() => saveEdit(app.appointment_id)} className="btn btn-success btn-sm">
+                          <button
+                            onClick={() => saveEdit(app.appointment_id)}
+                            className="btn btn-success btn-sm"
+                          >
                             Save
                           </button>
                           <button onClick={cancelEdit} className="btn btn-secondary btn-sm">

@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Schema for admin booking appointments (requires customer_name)
 const adminBookAppointment = z.object({
   body: z.object({
-    appointment_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    appointment_date: z.string().refine(val => !isNaN(Date.parse(val)), {
       message: 'Invalid date format for appointment_date',
     }),
     gender: z.enum(['male', 'female', 'unisex']),
@@ -24,9 +24,12 @@ const adminUpdateAppointment = z.object({
     id: z.string().regex(/^\d+$/, 'ID must be a number'),
   }),
   body: z.object({
-    appointment_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid date format for appointment_date',
-    }).optional(),
+    appointment_date: z
+      .string()
+      .refine(val => !isNaN(Date.parse(val)), {
+        message: 'Invalid date format for appointment_date',
+      })
+      .optional(),
     status: z.enum(['confirmed', 'pending', 'cancelled', 'completed']).optional(),
     notes: z.string().optional(),
     staff_assigned: z.string().optional(),
@@ -38,21 +41,31 @@ const adminUpdateAppointment = z.object({
 
 // Schema for bulk operations
 const bulkOperation = z.object({
-  body: z.object({
-    appointment_ids: z.array(z.number().int().positive()).min(1, 'At least one appointment ID is required'),
-    operation: z.enum(['cancel', 'reschedule']),
-    new_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid date format for new_date',
-    }).optional(),
-    status: z.enum(['confirmed', 'pending', 'cancelled', 'completed']).optional(),
-  }).refine((data) => {
-    if (data.operation === 'reschedule' && !data.new_date) {
-      return false;
-    }
-    return true;
-  }, {
-    message: 'new_date is required when operation is reschedule',
-  }),
+  body: z
+    .object({
+      appointment_ids: z
+        .array(z.number().int().positive())
+        .min(1, 'At least one appointment ID is required'),
+      operation: z.enum(['cancel', 'reschedule']),
+      new_date: z
+        .string()
+        .refine(val => !isNaN(Date.parse(val)), {
+          message: 'Invalid date format for new_date',
+        })
+        .optional(),
+      status: z.enum(['confirmed', 'pending', 'cancelled', 'completed']).optional(),
+    })
+    .refine(
+      data => {
+        if (data.operation === 'reschedule' && !data.new_date) {
+          return false;
+        }
+        return true;
+      },
+      {
+        message: 'new_date is required when operation is reschedule',
+      }
+    ),
 });
 
 // Schema for filtering appointments

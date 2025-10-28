@@ -34,5 +34,5 @@ export async function up(queryInterface, Sequelize) {
 
 export async function down(queryInterface, Sequelize) {
   await queryInterface.bulkDelete('appointments', null, {}); // Delete appointments first
-  await queryInterface.bulkDelete('services', null, {});     // Then delete services
+  await queryInterface.bulkDelete('services', null, {}); // Then delete services
 }

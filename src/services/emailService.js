@@ -16,10 +16,12 @@ if (process.env.EMAIL_HOST) {
     host: process.env.EMAIL_HOST,
     port,
     secure,
-    auth: process.env.EMAIL_USER ? {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    } : undefined,
+    auth: process.env.EMAIL_USER
+      ? {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        }
+      : undefined,
     tls: {
       rejectUnauthorized: false,
     },
@@ -45,8 +47,11 @@ if (process.env.EMAIL_HOST) {
     console.error('EmailService: failed to create Ethereal test account:', err);
     // Fallback to no-op transporter if Ethereal creation fails
     transporter = {
-      sendMail: async (mailOptions) => {
-        console.log('Email sending skipped (no transporter available).', mailOptions && mailOptions.to);
+      sendMail: async mailOptions => {
+        console.log(
+          'Email sending skipped (no transporter available).',
+          mailOptions && mailOptions.to
+        );
         return Promise.resolve({ accepted: [], response: 'skipped' });
       },
     };
@@ -55,13 +60,15 @@ if (process.env.EMAIL_HOST) {
 } else {
   // Production without SMTP: do not attempt to send or create test accounts
   transporter = {
-    sendMail: async (mailOptions) => {
+    sendMail: async mailOptions => {
       console.log('Email sending skipped (missing SMTP config).', mailOptions && mailOptions.to);
       return Promise.resolve({ accepted: [], response: 'skipped' });
     },
   };
   transporterMode = 'noop';
-  console.warn('EmailService: no SMTP configured and running in production - emails will be skipped.');
+  console.warn(
+    'EmailService: no SMTP configured and running in production - emails will be skipped.'
+  );
 }
 
 // Helper to actually send and log preview URL for Ethereal
@@ -149,7 +156,4 @@ const sendAppointmentReminder = async (userEmail, appointmentDetails) => {
   }
 };
 
-export {
-  sendBookingConfirmation,
-  sendAppointmentReminder,
-};
+export { sendBookingConfirmation, sendAppointmentReminder };

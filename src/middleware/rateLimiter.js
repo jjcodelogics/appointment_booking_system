@@ -19,7 +19,7 @@ export const rateLimit = (options = {}) => {
     max = 100, // max requests per window
     message = 'Too many requests, please try again later.',
     statusCode = 429,
-    keyGenerator = (req) => req.ip || req.connection.remoteAddress,
+    keyGenerator = req => req.ip || req.connection.remoteAddress,
   } = options;
 
   return (req, res, next) => {

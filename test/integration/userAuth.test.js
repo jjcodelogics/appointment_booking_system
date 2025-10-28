@@ -1,6 +1,6 @@
 /**
  * User Routes & Authentication Integration Tests
- * 
+ *
  * Tests user login, registration, and protected profile access
  * using the actual Express routes with a test database.
  */
@@ -69,13 +69,11 @@ describe('User Routes & Authentication Integration Tests', () => {
 
   describe('User Registration', () => {
     it('should successfully create a new user account', async () => {
-      const res = await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'newuser@example.com',
-          name: 'New User',
-          password: 'SecurePass123!',
-        });
+      const res = await agent.post('/auth/register').send({
+        username_email: 'newuser@example.com',
+        name: 'New User',
+        password: 'SecurePass123!',
+      });
 
       expect(res).to.have.status(201);
       expect(res.body).to.have.property('username_email', 'newuser@example.com');
@@ -91,22 +89,18 @@ describe('User Routes & Authentication Integration Tests', () => {
 
     it('should fail registration with duplicate email', async () => {
       // First registration
-      await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'duplicate@example.com',
-          name: 'First User',
-          password: 'Pass123!',
-        });
+      await agent.post('/auth/register').send({
+        username_email: 'duplicate@example.com',
+        name: 'First User',
+        password: 'Pass123!',
+      });
 
       // Attempt duplicate registration
-      const res = await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'duplicate@example.com',
-          name: 'Second User',
-          password: 'Pass456!',
-        });
+      const res = await agent.post('/auth/register').send({
+        username_email: 'duplicate@example.com',
+        name: 'Second User',
+        password: 'Pass456!',
+      });
 
       expect(res).to.have.status(409);
       expect(res.body).to.have.property('message');
@@ -114,13 +108,11 @@ describe('User Routes & Authentication Integration Tests', () => {
     });
 
     it('should fail registration with invalid password format (too short)', async () => {
-      const res = await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'shortpass@example.com',
-          name: 'Short Pass User',
-          password: '12345', // Less than 6 characters
-        });
+      const res = await agent.post('/auth/register').send({
+        username_email: 'shortpass@example.com',
+        name: 'Short Pass User',
+        password: '12345', // Less than 6 characters
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('message', 'Validation failed');
@@ -128,25 +120,21 @@ describe('User Routes & Authentication Integration Tests', () => {
     });
 
     it('should fail registration with invalid email format', async () => {
-      const res = await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'not-an-email',
-          name: 'Invalid Email User',
-          password: 'ValidPass123!',
-        });
+      const res = await agent.post('/auth/register').send({
+        username_email: 'not-an-email',
+        name: 'Invalid Email User',
+        password: 'ValidPass123!',
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('message', 'Validation failed');
     });
 
     it('should fail registration with missing required fields', async () => {
-      const res = await agent
-        .post('/auth/register')
-        .send({
-          username_email: 'missing@example.com',
-          // Missing name and password
-        });
+      const res = await agent.post('/auth/register').send({
+        username_email: 'missing@example.com',
+        // Missing name and password
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('message', 'Validation failed');
@@ -164,12 +152,10 @@ describe('User Routes & Authentication Integration Tests', () => {
     });
 
     it('should successfully login with valid credentials', async () => {
-      const res = await agent
-        .post('/auth/login')
-        .send({
-          username_email: 'logintest@example.com',
-          password: 'LoginPass123!',
-        });
+      const res = await agent.post('/auth/login').send({
+        username_email: 'logintest@example.com',
+        password: 'LoginPass123!',
+      });
 
       expect(res).to.have.status(200);
       expect(res.body).to.have.property('msg', 'Logged in successfully');
@@ -179,12 +165,10 @@ describe('User Routes & Authentication Integration Tests', () => {
     });
 
     it('should fail login with incorrect password', async () => {
-      const res = await agent
-        .post('/auth/login')
-        .send({
-          username_email: 'logintest@example.com',
-          password: 'WrongPassword123!',
-        });
+      const res = await agent.post('/auth/login').send({
+        username_email: 'logintest@example.com',
+        password: 'WrongPassword123!',
+      });
 
       expect(res).to.have.status(401);
       expect(res.body).to.have.property('msg');
@@ -192,36 +176,30 @@ describe('User Routes & Authentication Integration Tests', () => {
     });
 
     it('should fail login with non-existent user', async () => {
-      const res = await agent
-        .post('/auth/login')
-        .send({
-          username_email: 'nonexistent@example.com',
-          password: 'SomePassword123!',
-        });
+      const res = await agent.post('/auth/login').send({
+        username_email: 'nonexistent@example.com',
+        password: 'SomePassword123!',
+      });
 
       expect(res).to.have.status(401);
       expect(res.body).to.have.property('msg');
     });
 
     it('should fail login with invalid email format', async () => {
-      const res = await agent
-        .post('/auth/login')
-        .send({
-          username_email: 'not-an-email',
-          password: 'SomePassword123!',
-        });
+      const res = await agent.post('/auth/login').send({
+        username_email: 'not-an-email',
+        password: 'SomePassword123!',
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('message', 'Validation failed');
     });
 
     it('should fail login with missing credentials', async () => {
-      const res = await agent
-        .post('/auth/login')
-        .send({
-          username_email: 'test@example.com',
-          // Missing password
-        });
+      const res = await agent.post('/auth/login').send({
+        username_email: 'test@example.com',
+        // Missing password
+      });
 
       expect(res).to.have.status(400);
       expect(res.body).to.have.property('message', 'Validation failed');
@@ -243,12 +221,10 @@ describe('User Routes & Authentication Integration Tests', () => {
       });
 
       // Login to establish session
-      await authenticatedAgent
-        .post('/auth/login')
-        .send({
-          username_email: 'profiletest@example.com',
-          password: 'ProfilePass123!',
-        });
+      await authenticatedAgent.post('/auth/login').send({
+        username_email: 'profiletest@example.com',
+        password: 'ProfilePass123!',
+      });
     });
 
     after(() => {
