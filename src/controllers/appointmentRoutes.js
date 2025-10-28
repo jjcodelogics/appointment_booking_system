@@ -127,26 +127,57 @@ router.post(
 
     const serviceQuery = buildServiceQuery({ gender, cut, washing, coloring });
 
-    const selectedService = await findCompatibleService(Service, serviceQuery);
+    let selectedService = await findCompatibleService(Service, serviceQuery);
 
     if (!selectedService) {
-      // Helpful debug log to inspect what services exist for this gender
       console.log('No direct service match. Looking up available services for gender:', gender);
+
       const available = await Service.findAll({ where: { gender_target: gender } });
       console.log(
         'Available services for gender:',
-        available.map(s => ({
-          id: s.service_id,
-          cutting: s.cutting,
-          washing: s.washing,
-          coloring: s.coloring,
-        }))
+        available.map(s => ({ id: s.service_id, cutting: s.cutting, washing: s.washing, coloring: s.coloring }))
       );
 
-      return res.status(404).json({ msg: 'No matching service found for your selected options.' });
+      // If no services exist for this gender, try fallback across all services
+      if (available.length === 0) {
+        console.log('No services found for gender. Trying fallback across all services.');
+        const allServices = await Service.findAll();
+        console.log(
+          'All services:',
+          allServices.map(s => ({ id: s.service_id, gender: s.gender_target, cutting: s.cutting, washing: s.washing, coloring: s.coloring }))
+        );
+
+        const fallback = allServices.find(s => {
+          if (cut && !s.cutting) return false;
+          if (washing && !s.washing) return false;
+          if (coloring && !s.coloring) return false;
+          return true;
+        });
+
+        if (fallback) {
+          console.log('Fallback service selected (different gender):', { id: fallback.service_id, gender: fallback.gender_target });
+          selectedService = fallback;
+        }
+      } else {
+        // If services exist for the gender but none matched exactly, try a relaxed match within the same gender
+        const relaxed = available.find(s => {
+          if (cut && !s.cutting) return false;
+          if (washing && !s.washing) return false;
+          if (coloring && !s.coloring) return false;
+          return true;
+        });
+        if (relaxed) {
+          console.log('Relaxed match selected within same gender:', { id: relaxed.service_id });
+          selectedService = relaxed;
+        }
+      }
+
+      if (!selectedService) {
+        return res.status(404).json({ msg: 'No matching service found for your selected options.' });
+      }
     }
 
-    // Log the service query result
+    // Log the service query result:
     console.log('Service query result:', selectedService);
 
     // Log before creating the appointment
