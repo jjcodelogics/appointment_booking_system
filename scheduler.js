@@ -44,13 +44,24 @@ const startReminderScheduler = () => {
       console.log(`Found ${appointmentsToSend.length} reminders to send.`);
 
       for (const appt of appointmentsToSend) {
-        // use the imported function directly
-        await sendAppointmentReminder(appt.User.username_email, appt);
+        // skip if there's no associated User or email
+        if (!appt.User || !appt.User.username_email) {
+          console.warn(`Skipping appointment id=${appt.id} — no user email found.`);
+          continue;
+        }
 
-        // Update the flag in the database to prevent re-sending if the column exists
-        if (Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
-          appt.reminder_sent = true;
-          await appt.save();
+        try {
+          // use the imported function directly
+          await sendAppointmentReminder(appt.User.username_email, appt);
+
+          // Update the flag in the database to prevent re-sending if the column exists
+          if (Appointment && Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
+            appt.reminder_sent = true;
+            await appt.save();
+          }
+        } catch (err) {
+          console.error(`Failed to send reminder for appointment id=${appt.id}:`, err);
+          // continue with next appointment
         }
       }
     } catch (error) {

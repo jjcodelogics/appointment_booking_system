@@ -1,5 +1,7 @@
 import express from 'express';
 const app = express();
+// Trust first proxy (Render, Heroku, etc.) so secure cookies and req.secure work correctly behind TLS termination
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 4000;
 import pkg from 'body-parser';
 const { json, urlencoded } = pkg;
@@ -107,6 +109,25 @@ sequelize
 app.use(passportMiddleware.initialize());
 app.use(passportMiddleware.session());
 
+// Debug middleware for CSRF issues (enable by setting DEBUG_CSRF='true')
+if (process.env.DEBUG_CSRF === 'true') {
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/appointments') || req.path.startsWith('/api/auth')) {
+      console.log('CSRF debug:', {
+        path: req.path,
+        cookies: req.cookies,
+        headers: {
+          'x-xsrf-token': req.headers['x-xsrf-token'],
+          'x-csrf-token': req.headers['x-csrf-token'],
+          cookie: req.headers['cookie'],
+        },
+        sessionID: req.sessionID,
+      });
+    }
+    next();
+  });
+}
+
 // Initialize CSRF protection after session and cookieParser
 const csrfProtection = csurf({
   cookie: {
@@ -117,25 +138,10 @@ const csrfProtection = csurf({
   },
 });
 
-// Apply CSRF protection to all routes except auth endpoints
-// Auth endpoints need to be accessible without CSRF token for initial login
-import { loginRateLimit } from './src/middleware/rateLimiter.js';
-import loginRouter from './src/controllers/loginQueries.js';
-// Apply rate limiting to login/register endpoints
-app.use('/api/auth/login', loginRateLimit);
-app.use('/api/auth/register', loginRateLimit);
-app.use('/api/auth', loginRouter); // Standardized path to /api/auth
-
 // Apply CSRF protection to protected routes
 app.use(csrfProtection);
 
-// Mount protected API routes AFTER CSRF protection
-import appointmentRouter from './src/controllers/appointmentRoutes.js'; // Import the new router
-app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointments
-import adminRouter from './src/controllers/adminRoutes.js'; // Import admin routes
-app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
-
-// Middleware to attach CSRF token to all responses for non-API GET requests
+// Attach CSRF token cookie to responses so SPA clients can read it. This must run BEFORE route handlers
 app.use((req, res, next) => {
   // Explicitly set options so the frontend can read the XSRF-TOKEN cookie when frontend and backend are on different origins
   res.cookie('XSRF-TOKEN', req.csrfToken(), {
@@ -150,6 +156,19 @@ app.use((req, res, next) => {
 app.get('/api/csrf-token', (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
+
+// Apply rate limiting to login/register endpoints
+import { loginRateLimit } from './src/middleware/rateLimiter.js';
+import loginRouter from './src/controllers/loginQueries.js';
+app.use('/api/auth/login', loginRateLimit);
+app.use('/api/auth/register', loginRateLimit);
+app.use('/api/auth', loginRouter); // Standardized path to /api/auth
+
+// Mount protected API routes AFTER CSRF protection and token middleware
+import appointmentRouter from './src/controllers/appointmentRoutes.js'; // Import the new router
+app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointments
+import adminRouter from './src/controllers/adminRoutes.js'; // Import admin routes
+app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
 
 import { startReminderScheduler } from './scheduler.js';
 startReminderScheduler();
