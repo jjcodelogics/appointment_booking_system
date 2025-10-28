@@ -1,6 +1,6 @@
 import express from 'express';
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 import pkg from 'body-parser';
 const { json, urlencoded } = pkg;
 import cors from 'cors';
