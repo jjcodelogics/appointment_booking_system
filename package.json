@@ -41,7 +41,7 @@
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
     "vite": "^7.1.12",
-    "zod": "^4.1.12"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "chai": "^4.5.0",
