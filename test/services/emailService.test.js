@@ -3,7 +3,7 @@
  *
  * Tests email service functionality:
  * - Confirmation email function exists and has correct interface
- * - Reminder email function exists and has correct interface
+ * - Reminder email function exists and has correct interface (not scheduled)
  */
 
 import { expect } from 'chai';
