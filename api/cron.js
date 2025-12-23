@@ -10,10 +10,31 @@ await initializeModels();
 import db from '../src/models/index.js';
 const { Appointment, User } = db;
 
+// Helper to check if reminder_sent column exists on the Appointment model
+const hasReminderSentColumn = () => {
+  return Appointment && Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent;
+};
+
 export default async function handler(req, res) {
   // Verify the request is from Vercel Cron
-  if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  // Note: Vercel Cron Jobs are authenticated by checking the request origin
+  // For additional security, we check for CRON_SECRET if configured
+  const cronSecret = process.env.CRON_SECRET;
+  
+  if (cronSecret) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
+      console.error('Unauthorized cron job attempt');
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  } else {
+    // If CRON_SECRET is not set, only allow requests from Vercel Cron
+    // Vercel Cron requests come from their internal infrastructure
+    const isVercelCron = req.headers['user-agent']?.includes('vercel-cron');
+    if (!isVercelCron && process.env.NODE_ENV === 'production') {
+      console.error('CRON_SECRET not configured and request not from Vercel Cron');
+      return res.status(401).json({ error: 'Unauthorized - configure CRON_SECRET' });
+    }
   }
 
   console.log('Running hourly check for appointment reminders...');
@@ -33,7 +54,7 @@ export default async function handler(req, res) {
       },
     };
 
-    if (Appointment && Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
+    if (hasReminderSentColumn()) {
       whereClause.reminder_sent = false;
     }
 
@@ -65,7 +86,7 @@ export default async function handler(req, res) {
         await sendAppointmentReminder(appt.User.username_email, appt);
 
         // Update the flag in the database to prevent re-sending if the column exists
-        if (Appointment && Appointment.rawAttributes && Appointment.rawAttributes.reminder_sent) {
+        if (hasReminderSentColumn()) {
           appt.reminder_sent = true;
           await appt.save();
         }

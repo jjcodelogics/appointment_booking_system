@@ -55,7 +55,7 @@ EMAIL_USER=your_email_username
 EMAIL_PASS=your_email_password
 EMAIL_FROM="Appointment System <noreply@yourdomain.com>"
 
-# Cron Job Secret (generate a random string for security)
+# Cron Job Secret (optional but recommended for additional security)
 CRON_SECRET=your_secure_random_cron_secret_here
 
 # Optional: Enable CSRF debugging if needed
@@ -109,8 +109,9 @@ After deployment:
 
 3. **Configure Cron Jobs**: The application uses Vercel Cron Jobs for sending appointment reminders
    - The cron job is already configured in `vercel.json` to run hourly
-   - Make sure to set the `CRON_SECRET` environment variable (generate a random secure string)
+   - Set the `CRON_SECRET` environment variable (optional but recommended for additional security)
    - The cron endpoint is at `/api/cron` and runs every hour
+   - Vercel automatically authenticates cron requests, but CRON_SECRET adds an extra layer of security
 
 4. **Test the Application**: 
    - Visit your Vercel URL

@@ -34,7 +34,7 @@ In the Vercel dashboard, add these required variables:
 
 #### Security
 - `SESSION_SECRET` - Random secure string
-- `CRON_SECRET` - Random secure string (for cron job authentication)
+- `CRON_SECRET` - Random secure string (optional but recommended for cron job security)
 
 #### App URLs
 - `FRONTEND_URL` - Your Vercel app URL (e.g., https://your-app.vercel.app)
