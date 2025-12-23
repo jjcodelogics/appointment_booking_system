@@ -78,21 +78,10 @@ This document provides a comprehensive overview of the Appointment Booking Syste
 └─────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     BACKGROUND JOBS LAYER                            │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │  node-cron Scheduler                                         │  │
-│  │  - Hourly check for appointments (0 * * * *)                 │  │
-│  │  - Send email reminders via nodemailer                       │  │
-│  │  - Update reminder_sent flag (if column exists)              │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
 │                     EXTERNAL SERVICES                                │
 │  ┌──────────────────────────────────────────────────────────────┐  │
 │  │  SMTP Server (Gmail, SendGrid, custom)                       │  │
 │  │  - Appointment confirmations                                 │  │
-│  │  - Reminder emails                                           │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -234,31 +223,9 @@ Request → Rate Limiter → Helmet → CORS → Body Parser → Cookie Parser
 
 ---
 
-### 4. Background Jobs (node-cron)
-
-**Responsibilities:**
-
-- Run scheduled tasks (hourly reminder checks)
-- Query database for appointments with upcoming dates
-- Send email reminders via nodemailer
-- Update `reminder_sent` flag (if column exists) to prevent duplicates
-
-**Implementation:**
-
-- Cron expression: `0 * * * *` (runs at minute 0 of every hour)
-- Queries appointments where `appointment_date` is today and `reminder_sent = false`
-- Sends email to user's `username_email`
-- Marks appointment as `reminder_sent = true`
-
-**Trade-offs:**
-
-- ✅ Simple in-process scheduling (no external dependencies)
-- ❌ Not suitable for multi-instance deployments (use Redis-backed queue in production)
-- ❌ No retry logic for failed emails (recommendation: integrate Bull or BeeQueue)
-
 ---
 
-### 5. Authentication & Authorization
+### 4. Authentication & Authorization
 
 **Authentication (Passport.js):**
 
@@ -285,7 +252,7 @@ Request → Rate Limiter → Helmet → CORS → Body Parser → Cookie Parser
 
 ---
 
-### 6. Validation Layer (Zod)
+### 5. Validation Layer (Zod)
 
 **Responsibilities:**
 
@@ -316,11 +283,11 @@ Request → Rate Limiter → Helmet → CORS → Body Parser → Cookie Parser
 
 ---
 
-### 7. External Services
+### 6. External Services
 
 **SMTP Server (nodemailer):**
 
-- **Purpose:** Send appointment confirmations and reminders
+- **Purpose:** Send appointment confirmations
 - **Configuration:** SMTP host, port, user, password in `.env`
 - **Supported Providers:** Gmail, SendGrid, Mailgun, custom SMTP
 - **Email Templates:** HTML templates with appointment details (date, time)

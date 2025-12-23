@@ -34,13 +34,12 @@ In the Vercel dashboard, add these required variables:
 
 #### Security
 - `SESSION_SECRET` - Random secure string
-- `CRON_SECRET` - Random secure string (optional but recommended for cron job security)
 
 #### App URLs
 - `FRONTEND_URL` - Your Vercel app URL (e.g., https://your-app.vercel.app)
 - `BASE_URL` - Same as FRONTEND_URL
 
-#### Email (for reminders)
+#### Email (for confirmations)
 - `EMAIL_HOST` - SMTP host
 - `EMAIL_PORT` - SMTP port (usually 587)
 - `EMAIL_USER` - SMTP username

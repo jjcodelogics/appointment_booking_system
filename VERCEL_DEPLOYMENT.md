@@ -55,9 +55,6 @@ EMAIL_USER=your_email_username
 EMAIL_PASS=your_email_password
 EMAIL_FROM="Appointment System <noreply@yourdomain.com>"
 
-# Cron Job Secret (optional but recommended for additional security)
-CRON_SECRET=your_secure_random_cron_secret_here
-
 # Optional: Enable CSRF debugging if needed
 DEBUG_CSRF=false
 ```
@@ -107,13 +104,7 @@ After deployment:
    - This currently requires running the script locally against your production database
    - Consider adding an API endpoint or admin creation functionality
 
-3. **Configure Cron Jobs**: The application uses Vercel Cron Jobs for sending appointment reminders
-   - The cron job is already configured in `vercel.json` to run hourly
-   - Set the `CRON_SECRET` environment variable (optional but recommended for additional security)
-   - The cron endpoint is at `/api/cron` and runs every hour
-   - Vercel automatically authenticates cron requests, but CRON_SECRET adds an extra layer of security
-
-4. **Test the Application**: 
+3. **Test the Application**: 
    - Visit your Vercel URL
    - Test user registration and login
    - Create a test appointment
@@ -135,11 +126,6 @@ After deployment:
 ### Serverless Function Limitations
 
 - **Execution Time**: Vercel serverless functions have a maximum execution time (10 seconds on Hobby, 60 seconds on Pro)
-- **Cron Jobs**: This app uses Vercel Cron Jobs for sending appointment reminders
-  - Configured in `vercel.json` to run hourly at the top of each hour
-  - The cron endpoint is secured with the `CRON_SECRET` environment variable
-  - Available on Vercel Pro plans and above (Hobby plans have limited cron capabilities)
-  - Documentation: https://vercel.com/docs/cron-jobs
 
 ### Session Storage
 
@@ -188,4 +174,3 @@ After deployment:
 - Vercel Documentation: https://vercel.com/docs
 - Vercel Node.js Runtime: https://vercel.com/docs/runtimes#official-runtimes/node-js
 - Vercel Environment Variables: https://vercel.com/docs/concepts/projects/environment-variables
-- Vercel Cron Jobs: https://vercel.com/docs/cron-jobs

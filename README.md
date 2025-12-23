@@ -4,12 +4,12 @@ A production-ready full‑stack scheduling platform with role-based access, auto
 ---
 
 ## Project Overview
-Appointment Booking is a portfolio-grade full‑stack application designed for businesses and teams that need reliable booking, calendar-aware scheduling, and administrative tooling. The system demonstrates production-aware architecture, end-to-end validation, background job processing, and comprehensive test coverage — making it ideal to evaluate engineering skill in backend APIs, frontend UX, security, and DevOps readiness.
+Appointment Booking is a portfolio-grade full‑stack application designed for businesses and teams that need reliable booking, calendar-aware scheduling, and administrative tooling. The system demonstrates production-aware architecture, end-to-end validation, and comprehensive test coverage — making it ideal to evaluate engineering skill in backend APIs, frontend UX, security, and DevOps readiness.
 
 Core principals:
 - Clean separation between API and UI (Express backend + React frontend)
 - Role-based access control (User / Admin)
-- Reliable email reminders and background scheduling
+- Email confirmations for appointments
 - Strong input validation, secure authentication, and audit logging
 
 ---
@@ -19,10 +19,9 @@ Core principals:
 - Register, authenticate, and manage user profiles
 - Create, reschedule, and cancel appointments with real-time availability checks
 - Admin dashboard for viewing, filtering, and bulk-managing appointments
-- Email confirmations and scheduled reminders to reduce no-shows
+- Email confirmations to reduce no-shows
 - Audit logging for administrative actions
 - Robust validation using Zod and secure password hashing with bcrypt
-- Background job scheduling with node-cron and nodemailer
 - Production-aware security: Helmet, CSRF protection, rate limiting, and secure cookies
 - Database migrations and seeders (Sequelize)
 - Unit and integration test coverage (Mocha, Chai, Sinon)
@@ -36,7 +35,7 @@ Core principals:
 - Backend: Node.js + Express 5
 - ORM / DB: Sequelize + PostgreSQL
 - Auth & Validation: Passport.js, Zod, bcrypt
-- Scheduling & Email: node-cron, nodemailer
+- Email: nodemailer
 - Testing: Mocha, Chai, Sinon
 - Dev tooling: ESLint, Prettier, sequelize-cli
 
@@ -172,7 +171,6 @@ vercel --prod
 
 ## Files of Interest
 - server.js — Express server and middleware setup
-- scheduler.js — scheduled jobs for sending reminders
 - src/ — React application and UI components
 - src/controllers — API route handlers
 - migrations/ and seeders/ — DB schema and fixtures
