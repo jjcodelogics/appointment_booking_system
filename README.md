@@ -131,7 +131,21 @@ npm run format
 
 ---
 
-## Deployment Notes (Production Checklist)
+## Deployment
+
+### Vercel Deployment (Recommended)
+
+This application is configured for easy deployment to Vercel. See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed instructions.
+
+Quick deploy:
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+### Other Deployment Options
+
 - Containerize with Docker and use a process manager (PM2, Docker Compose, or Kubernetes)
 - Configure HTTPS via a reverse proxy (Nginx, Traefik)
 - Use a production session store (connect-pg-simple or Redis)
