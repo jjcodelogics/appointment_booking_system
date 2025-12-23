@@ -214,16 +214,6 @@ app.use('/api/appointments', appointmentRouter); // Mount it at /api/appointment
 import adminRouter from './src/controllers/adminRoutes.js'; // Import admin routes
 app.use('/api/admin', adminRouter); // Mount admin routes at /api/admin
 
-import { startReminderScheduler } from './scheduler.js';
-// Only start scheduler in non-serverless environments
-// For Vercel, use Vercel Cron Jobs instead (see vercel.json and api/cron.js)
-if (process.env.VERCEL !== '1') {
-  startReminderScheduler();
-  console.log('Reminder scheduler started (local/traditional hosting)');
-} else {
-  console.log('Skipping reminder scheduler (use Vercel Cron Jobs instead)');
-}
-
 // CSRF error handler
 app.use((err, req, res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {
