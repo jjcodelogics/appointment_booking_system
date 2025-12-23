@@ -135,7 +135,11 @@ npm run format
 
 ### Vercel Deployment (Recommended)
 
-This application is configured for easy deployment to Vercel. See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed instructions.
+This application is configured for easy deployment to Vercel.
+
+**Quick Start**: See [VERCEL_QUICKSTART.md](./VERCEL_QUICKSTART.md) for a step-by-step checklist.
+
+**Detailed Guide**: See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for comprehensive instructions.
 
 Quick deploy:
 ```bash
