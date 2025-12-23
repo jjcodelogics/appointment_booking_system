@@ -1,9 +1,13 @@
 // Vercel Cron Job endpoint for sending appointment reminders
 // Configure in vercel.json under "crons"
 import { Op } from 'sequelize';
-import db from '../src/models/index.js';
+import { initializeModels } from '../src/models/index.js';
 import { sendAppointmentReminder } from '../src/services/emailService.js';
 
+// Initialize models on cold start
+await initializeModels();
+
+import db from '../src/models/index.js';
 const { Appointment, User } = db;
 
 export default async function handler(req, res) {
