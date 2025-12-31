@@ -81,15 +81,17 @@ try {
 }
 
 import passportMiddleware from './src/middleware/passport.js';
+import securityHeaders from './src/middleware/securityHeaders.js';
 
+// Apply comprehensive security headers middleware
+app.use(securityHeaders);
+
+// Use helmet for additional security with minimal CSP (we have custom CSP in securityHeaders)
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      useDefaults: true,
-      directives: {
-        'script-src': ["'self'", 'https://unpkg.com', 'https://cdn.jsdelivr.net'],
-      },
-    },
+    contentSecurityPolicy: false, // Disabled here since we handle it in securityHeaders middleware
+    hsts: false, // Disabled here since we handle it in securityHeaders middleware
+    frameguard: false, // Disabled here since we handle it in securityHeaders middleware
   })
 );
 app.use(
