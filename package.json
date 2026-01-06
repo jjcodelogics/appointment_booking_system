@@ -37,7 +37,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react-dom": "^19.2.3",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
     "vite": "^7.1.12",
