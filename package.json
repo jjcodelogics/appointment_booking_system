@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@dr.pogodin/csurf": "^1.16.6",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@vitejs/plugin-react": "^5.1.2",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "connect-pg-simple": "^10.0.0",
